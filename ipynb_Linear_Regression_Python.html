@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>Linear_Regression_Python</title>
+<title>ipynb_Linear_Regression_Python</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -174,16 +174,18 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>By: Tutorial by Michael Galarnyk <p></p>
+<p>Linear Regression Python Tutorial by Michael Galarnyk <p></p>
 youtube video on how to install anaconda on mac osx: <p></p>
-<a href = "https://www.youtube.com/watch?v=B6d5LrA8bNE">https://www.youtube.com/watch?v=B6d5LrA8bNE </a></p>
+<a href = "https://www.youtube.com/watch?v=B6d5LrA8bNE" style="color: rgb(0,0,255)"><u> https://www.youtube.com/watch?v=B6d5LrA8bNE </u> </a><p></p></p>
+<p>youtube video explaining linear regression using python (this notebook): <p></p>
+<a href = "https://www.youtube.com/watch?v=dSYJVbj4Eew" style="color: rgb(0,0,255)"><u>https://www.youtube.com/watch?v=dSYJVbj4Eew </u> </a><p></p></p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -214,10 +216,11 @@ youtube video on how to install anaconda on mac osx: <p></p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">raw_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">&quot;linear.csv&quot;</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span class="n">raw_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">&quot;linear.csv&quot;</span><span class="p">)</span> <span class="c">#any dataset will work. You can get the data from my github</span>
+<span class="c"># https://github.com/mGalarnyk/Linear_Regression</span>
 <span class="n">raw_data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 
@@ -229,7 +232,7 @@ youtube video on how to install anaconda on mac osx: <p></p>
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[7]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[5]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
@@ -280,7 +283,7 @@ youtube video on how to install anaconda on mac osx: <p></p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">filtered_data</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">raw_data</span><span class="p">[</span><span class="s">&quot;y&quot;</span><span class="p">])]</span> <span class="c">#removes rows with NaN in them</span>
@@ -295,7 +298,7 @@ youtube video on how to install anaconda on mac osx: <p></p>
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[8]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[6]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
@@ -346,7 +349,7 @@ youtube video on how to install anaconda on mac osx: <p></p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">npMatrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">filtered_data</span><span class="p">)</span>
@@ -379,7 +382,7 @@ youtube video on how to install anaconda on mac osx: <p></p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;blue&#39;</span><span class="p">)</span>
@@ -397,11 +400,11 @@ youtube video on how to install anaconda on mac osx: <p></p>
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[10]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[8]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.text.Text at 0x10bbd3050&gt;</pre>
+<pre>&lt;matplotlib.text.Text at 0x10ba4e250&gt;</pre>
 </div>
 
 </div>
