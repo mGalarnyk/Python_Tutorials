@@ -22,7 +22,7 @@
 [Linear Regression Python (sklearn, numpy, pandas)](https://www.youtube.com/watch?v=dSYJVbj4Eew "Linear Regression Python (sklearn, numpy, pandas)")
 
 ### Jupyter Notebook
-[Linear Regression Python (sklearn, numpy, pandas)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Linear_Regression_Python.ipynb "Linear Regression Python (sklearn, numpy, pandas)")
+[Linear Regression Python (sklearn, numpy, pandas)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Linear_Regression/Linear_Regression_Python.ipynb "Linear Regression Python (sklearn, numpy, pandas)")
 
 ### Other Python Resources
 
