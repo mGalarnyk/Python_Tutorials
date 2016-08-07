@@ -1,12 +1,12 @@
 # Python_for_Finance_GUI_Regression_Etc
 
-## Time Series Data Basics with Pandas
+## Time Series
 
 ### Youtube
-[Time Series Data Basics with Pandas](https://www.youtube.com/watch?v=OwnaUVt6VVE "Time Series Data Basics with Pandas")
+[Time Series Data Basics with Pandas Part 1](https://www.youtube.com/watch?v=OwnaUVt6VVE "Time Series Data Basics with Pandas part 1")
 
 ### Jupyter Notebook
-[Time Series Data Basics with Pandas](https://github.com/mGalarnyk/Python_for_Finance_GUI_Regression_Etc/blob/master/Intraday_Data/Part1_Time_Series_Data_BasicPlotting.ipynb "Time Series Data Basics with Pandas")
+[Time Series Data Basics with Pandas Part 1](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Time_Series/Part1_Time_Series_Data_BasicPlotting.ipynb "Time Series Data Basics with Pandas Part 1")
 
 ## PySpark Tutorials 
 
@@ -16,10 +16,10 @@
 ### Jupyter Notebook
 [Filtering and Word Count using PySpark on Pride and Prejudice by Jane Austen](https://github.com/mGalarnyk/Python_for_Finance_GUI_Regression_Etc/blob/master/PySpark_Basics/PySpark_Part1_Word_Count_Removing_Punctuation_Pride_Prejudice.ipynb "Filtering and Word Count using PySpark on Pride and Prejudice by Jane Austen")
 
-## Regression 
+## Python Basics 
 
 ### Youtube
 [Linear Regression Python (sklearn, numpy, pandas)](https://www.youtube.com/watch?v=dSYJVbj4Eew "Linear Regression Python (sklearn, numpy, pandas)")
 
 ### Jupyter Notebook
-[Linear Regression Python (sklearn, numpy, pandas)](https://github.com/mGalarnyk/Python_for_Finance_GUI_Regression_Etc/blob/master/Linear_Regression_Python.ipynb "Linear Regression Python (sklearn, numpy, pandas)")
+[Linear Regression Python (sklearn, numpy, pandas)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Linear_Regression_Python.ipynb "Linear Regression Python (sklearn, numpy, pandas)")
