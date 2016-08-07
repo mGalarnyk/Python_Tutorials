@@ -1,4 +1,4 @@
-# Python_for_Finance_GUI_Regression_Etc
+# Python Tutorials
 
 ## Time Series
 
