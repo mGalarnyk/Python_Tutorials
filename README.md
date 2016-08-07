@@ -31,3 +31,7 @@
 ### Other Python Resources
 [Python for Informatics](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Informatics/README.md "Python for Informatics")
 
+[Python Installations](https://github.com/mGalarnyk/Installations_Mac_Ubuntu_Windows "Python Installations")
+
+[Convert Jupyter Notebook to PDF](https://www.youtube.com/watch?v=WbNYvYCs9BY "Convert Jupyter Notebook to PDF")
+
