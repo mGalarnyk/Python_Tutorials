@@ -23,3 +23,8 @@
 
 ### Jupyter Notebook
 [Linear Regression Python (sklearn, numpy, pandas)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Linear_Regression_Python.ipynb "Linear Regression Python (sklearn, numpy, pandas)")
+
+### Other Python Resources
+
+[Python for Informatics](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Informatics/README.md "Python for Informatics")
+
