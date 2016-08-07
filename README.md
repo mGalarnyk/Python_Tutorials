@@ -21,10 +21,13 @@
 ### Youtube
 [Linear Regression Python (sklearn, numpy, pandas)](https://www.youtube.com/watch?v=dSYJVbj4Eew "Linear Regression Python (sklearn, numpy, pandas)")
 
+[Solving System of Equations](https://www.youtube.com/watch?v=AqIrdW2-K6k "Solving System of Equations")
+
 ### Jupyter Notebook
 [Linear Regression Python (sklearn, numpy, pandas)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Linear_Regression/Linear_Regression_Python.ipynb "Linear Regression Python (sklearn, numpy, pandas)")
 
-### Other Python Resources
+[Solving System of Equations](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Solving_Systems_Equations/Solving%20System%20of%20Linear%20Equations%20using%20Python.ipynb "Solving System of Equations")
 
+### Other Python Resources
 [Python for Informatics](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Informatics/README.md "Python for Informatics")
 
