@@ -4,9 +4,11 @@
 
 ### Youtube
 [Time Series Data Basics with Pandas Part 1](https://www.youtube.com/watch?v=OwnaUVt6VVE "Time Series Data Basics with Pandas part 1")
+[Time Series Data Basics with Pandas Part 1](https://www.youtube.com/watch?v=1S5UKLqe-gg "Time Series Data Basics with Pandas part 2")
 
 ### Jupyter Notebook
 [Time Series Data Basics with Pandas Part 1](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Time_Series/Part1_Time_Series_Data_BasicPlotting.ipynb "Time Series Data Basics with Pandas Part 1")
+[Time Series Data Basics with Pandas Part 1](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Time_Series/Part2_Time_Series_Data_Price_Variation_ShiftingGroupBy.ipynb "Time Series Data Basics with Pandas Part 2")
 
 ## PySpark Tutorials 
 
