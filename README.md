@@ -32,7 +32,14 @@
 
 [Solving System of Equations](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Solving_Systems_Equations/Solving%20System%20of%20Linear%20Equations%20using%20Python.ipynb "Solving System of Equations")
 
-### Other Python Resources
+## Requests (I take requests on my youtube channel) 
+### Youtube
+[Heatmaps using Matplotlib, Seaborn, and Pandas](https://www.youtube.com/watch?v=m7uXFyPN2Sk "Heatmaps using Matplotlib, Seaborn, and Pandas")
+
+### Jupyter Notebook
+[Heatmaps using Matplotlib, Seaborn, and Pandas](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Request/Heat%20Maps%20using%20Matplotlib%20and%20Seaborn.ipynb "Heatmaps using Matplotlib, Seaborn, and Pandas")
+
+## Other Python Resources
 [Python for Informatics](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Informatics/README.md "Python for Informatics")
 
 [Python Installations](https://github.com/mGalarnyk/Installations_Mac_Ubuntu_Windows "Python Installations")
