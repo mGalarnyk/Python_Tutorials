@@ -1,9 +1,9 @@
 # ud730 Deep Learning Udacity Assignment Walkthroughs
 
 ### Assignment 1
-[My 1_notmnist](https://github.com/mGalarnyk/Python_Tutorials/blob/master/TensorFlow/Udacity/1_notmnist-Michael.ipynb "My 1_notmnist")
+[Logistic Regression](https://github.com/mGalarnyk/Python_Tutorials/blob/master/TensorFlow/Udacity/1_logistic_regression.ipynb "Logistic Regression")
 
-[Blank 1_notmnist](https://github.com/mGalarnyk/Python_Tutorials/blob/master/TensorFlow/Udacity/Clean_Notebooks/1_notmnist.ipynb "1_notmnist")
+[1_notmnist](https://github.com/mGalarnyk/Python_Tutorials/blob/master/TensorFlow/Udacity/Clean_Notebooks/1_notmnist.ipynb "1_notmnist")
 
 ### Assignment 2
 
