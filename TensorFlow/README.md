@@ -7,8 +7,6 @@
 
 ### Assignment 2
 
-[2_fullyconnected Complete](https://github.com/mGalarnyk/Python_Tutorials/blob/master/TensorFlow/Udacity/2_fullyconnected-Michael.ipynb "2_fullyconnected Complete")
-
 [2_fullyconnected](https://github.com/mGalarnyk/Python_Tutorials/blob/master/TensorFlow/Udacity/Clean_Notebooks/2_fullyconnected.ipynb "2_fullyconnected")
 
 ### Assignment 3
