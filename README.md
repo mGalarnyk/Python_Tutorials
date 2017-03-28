@@ -4,7 +4,8 @@
 <img src="https://github.com/mGalarnyk/Python_Tutorials/blob/master/Time_Series/PythonTutorials.png" alt="Go to the Youtube Channel">
 </a>
 <br />
-Useful Python Tutorials. Feel free to submit a pull request. 
+Useful Python Tutorials. Feel free to submit a pull request. Also please subscribe to my </br>
+[youtube channel](https://www.youtube.com/c/MichaelGalarnyk?sub_confirmation=1)
 
 ## Basics 
 What is it? | Blog Post/IPython Notebook | Youtube Video
