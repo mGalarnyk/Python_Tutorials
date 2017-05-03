@@ -10,6 +10,7 @@ Useful Python Tutorials. Feel free to submit a pull request. Also please subscri
 What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
 1: Hello World and Strings | [1: Hello World and Strings](https://medium.com/@GalarnykMichael/python-basics-1-hello-world-and-strings-de0d17857c93) | [1: Hello World and Strings](https://www.youtube.com/watch?v=JqGjkNzzU4s)
+2: Simple Math | [2: Simple Math](https://medium.com/@GalarnykMichael/python-basics-2-simple-math-4ac7cc928738) | [2: Simple Math](https://www.youtube.com/watch?v=30ghRykclIU)
 Solving System of Equations | [Solving System of Equations](https://medium.com/@GalarnykMichael/solving-system-of-linear-equations-using-python-645ad1904cec#.z6lw1zyw6) | [Solving System of Equations](https://www.youtube.com/watch?v=AqIrdW2-K6k&)
 
 ## Modeling
