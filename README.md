@@ -16,6 +16,7 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 5: Elif Statements | [5: Elif Statements](https://medium.com/@GalarnykMichael/python-basics-5-elif-statements-b8950dc71cf9) | [5: Elif Statements](https://www.youtube.com/watch?v=NxBBBPjusyA)
 6: Lists and List Manipulation | [6: Lists and List Manipulation](https://medium.com/@GalarnykMichael/python-basics-6-lists-and-list-manipulation-a56be62b1f95) | [6: Lists and List Manipulation](https://www.youtube.com/watch?v=w9I8R3WSVqc)
 7: For Loops | [7: For Loops](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsForLoops.ipynb) | [7: For Loops](https://www.youtube.com/watch?v=8fswDyk9UIY)
+8: FizzBizz | [8: FizzBizz](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsFizzBuzz.ipynb) | [8: FizzBizz](https://www.youtube.com/watch?v=XR1QFrbPRnw)
 Solving System of Equations | [Solving System of Equations](https://medium.com/@GalarnykMichael/solving-system-of-linear-equations-using-python-645ad1904cec#.z6lw1zyw6) | [Solving System of Equations](https://www.youtube.com/watch?v=AqIrdW2-K6k&)
 
 ## Modeling
