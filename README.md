@@ -15,13 +15,13 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 4: Else Statements | [4: Else Statements](https://medium.com/@GalarnykMichael/python-basics-4-else-statements-7d8618e00afe) | [4: Else Statements](https://www.youtube.com/watch?v=e9ZMSHYwtDM)
 5: Elif Statements | [5: Elif Statements](https://medium.com/@GalarnykMichael/python-basics-5-elif-statements-b8950dc71cf9) | [5: Elif Statements](https://www.youtube.com/watch?v=NxBBBPjusyA)
 6: Lists and List Manipulation | [6: Lists and List Manipulation](https://medium.com/@GalarnykMichael/python-basics-6-lists-and-list-manipulation-a56be62b1f95) | [6: Lists and List Manipulation](https://www.youtube.com/watch?v=w9I8R3WSVqc)
+7: For Loops | [7: For Loops](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsForLoops.ipynb) | [7: For Loops](https://www.youtube.com/watch?v=8fswDyk9UIY)
 Solving System of Equations | [Solving System of Equations](https://medium.com/@GalarnykMichael/solving-system-of-linear-equations-using-python-645ad1904cec#.z6lw1zyw6) | [Solving System of Equations](https://www.youtube.com/watch?v=AqIrdW2-K6k&)
 
 ## Modeling
 What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
 Linear Regression | [Linear Regression Python (sklearn, numpy, pandas)](https://medium.com/@GalarnykMichael/linear-regression-using-python-b29174c3797a#.vczf85s0s) | [Linear Regression](https://www.youtube.com/watch?v=dSYJVbj4Eew&t=2s)
-
 
 ## Pandas
 Domain | Blog Post/IPython Notebook | Youtube Video
