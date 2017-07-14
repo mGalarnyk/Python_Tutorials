@@ -22,11 +22,6 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)  | [11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsWordCount.ipynb) | [11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)](https://www.youtube.com/watch?v=l_dIleafLZ8)
 Solving System of Equations | [Solving System of Equations](https://medium.com/@GalarnykMichael/solving-system-of-linear-equations-using-python-645ad1904cec#.z6lw1zyw6) | [Solving System of Equations](https://www.youtube.com/watch?v=AqIrdW2-K6k&)
 
-## Modeling
-What is it? | Blog Post/IPython Notebook | Youtube Video
---- | --- | ---
-Linear Regression | [Linear Regression Python (sklearn, numpy, pandas)](https://medium.com/@GalarnykMichael/linear-regression-using-python-b29174c3797a#.vczf85s0s) | [Linear Regression](https://www.youtube.com/watch?v=dSYJVbj4Eew&t=2s)
-
 ## Pandas
 Domain | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
@@ -34,6 +29,12 @@ Heatmaps Part 1  | [Heatmaps Part 1](https://github.com/mGalarnyk/Python_Tutoria
 Heatmaps Part 2  | [Heatmaps Part 2](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Request/Heat%20Maps%20using%20Matplotlib%20and%20Seaborn.ipynb) | [Youtube Video](https://www.youtube.com/watch?v=NHwXkvwSd7E)
 Time Series Part 1 | [Time Series Data Basics with Pandas Part 1](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Time_Series/Part1_Time_Series_Data_BasicPlotting.ipynb "Time Series Data Basics with Pandas Part 1") | [Youtube Video](https://www.youtube.com/watch?v=OwnaUVt6VVE)
 Time Series Part 2  | [Time Series Data Basics with Pandas Part 2](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Time_Series/Part2_Time_Series_Data_Price_Variation_ShiftingGroupBy.ipynb "Time Series Data Basics with Pandas Part 2") | [Youtube Video](https://www.youtube.com/watch?v=1S5UKLqe-gg)
+
+## Sklearn
+What is it? | Blog Post/IPython Notebook | Youtube Video
+--- | --- | ---
+Linear Regression | [Linear Regression Python (sklearn, numpy, pandas)](https://medium.com/@GalarnykMichael/linear-regression-using-python-b29174c3797a#.vczf85s0s) | [Linear Regression](https://www.youtube.com/watch?v=dSYJVbj4Eew&t=2s)
+Logistic Regression | [Logistic Regression using Python (Sklearn, NumPy, Handwriting Recognition, Matplotlib)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_toy_digits.ipynb) | [Logistic Regression using Python (Sklearn, NumPy, Handwriting Recognition, Matplotlib)](https://www.youtube.com/watch?v=71iXeuKFcQM)
 
 ## Spark (Python)
 Tutorial | IPython Notebook | Youtube Video
