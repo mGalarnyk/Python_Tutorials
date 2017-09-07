@@ -7,6 +7,8 @@
 
 1. Install Anaconda (Python) on your operating system. You can either download anaconda from the official site and install on your own or you can follow these anaconda installation tutorials below.
 
+Windows: if you dont have 
+
 Operating System | Blog Post | Youtube Video
 --- | --- | ---
 Mac | [Install Anaconda on Mac](https://medium.com/@GalarnykMichael/install-python-on-mac-anaconda-ccd9f2014072#.lvhw2gt3k "Install Anaconda on Mac") | [Youtube Video](https://www.youtube.com/watch?v=B6d5LrA8bNE "Youtube Video")
@@ -21,6 +23,11 @@ conda install -c conda-forge scrapy
 
 3. Make sure you have Google chrome or Firefox. In this tutorial I am using Google Chrome. If you dont have google chrome want to install it, you can install it here using this [link](https://support.google.com/chrome/answer/95346?co=GENIE.Platform%3DDesktop&hl=en).
 
-4. Open a terminal (mac/linux) or command line (windows)
+4. Open a terminal (mac/linux) or command line (windows).  Navigate to a desired folder (see the image below if you need help) and type 
 
+```
+scrapy startproject fundrazr
+```
+
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/scrapyStartProject.png)
 
