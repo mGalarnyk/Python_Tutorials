@@ -3,7 +3,7 @@
 
 ## Getting Started
 
-### Prerequisites: Anaconda. If you already have anaconda, skip to step 5.
+### Prerequisites: Anaconda. If you already have anaconda and google chrome (or Firefox), skip to step 4.
 
 1. Install Anaconda (Python) on your operating system. You can either download anaconda from the official site and install on your own or you can follow these anaconda installation tutorials below.
 
@@ -19,10 +19,8 @@ All | [Environment Management with Conda (Python 2 + 3, Configuring Jupyter Note
 conda install -c conda-forge scrapy
 ```
 
-## Basics 
-What is it? | Blog Post/IPython Notebook | Youtube Video
---- | --- | ---
-1: Hello World and Strings | [1: Hello World and Strings](https://medium.com/@GalarnykMichael/python-basics-1-hello-world-and-strings-de0d17857c93) | [1: Hello World and Strings](https://www.youtube.com/watch?v=JqGjkNzzU4s)
-2: Simple Math | [2: Simple Math](https://medium.com/@GalarnykMichael/python-basics-2-simple-math-4ac7cc928738) | [2: Simple Math](https://www.youtube.com/watch?v=30ghRykclIU)
+3. Make sure you have Google chrome or Firefox. In this tutorial I am using Google Chrome. If you dont have google chrome want to install it, you can install it here using this [link](https://support.google.com/chrome/answer/95346?co=GENIE.Platform%3DDesktop&hl=en).
+
+4. Open a terminal (mac/linux) or command line (windows)
 
 
