@@ -15,9 +15,9 @@ Ubuntu | [Install Anaconda on Ubuntu](https://medium.com/@GalarnykMichael/instal
 All | [Environment Management with Conda (Python 2 + 3, Configuring Jupyter Notebooks)](https://medium.com/towards-data-science/environment-management-with-conda-python-2-3-b9961a8a5097) | [Youtube Video](https://www.youtube.com/watch?v=rFCBiP9Gkoo)
 
 2. Install Scrapy (anaconda comes with it, but just in case). You can also install on your terminal (mac/linux) or command line (windows)
-
-<b>conda install -c conda-forge scrapy<b>
-
+```
+conda install -c conda-forge scrapy
+```
 
 ## Basics 
 What is it? | Blog Post/IPython Notebook | Youtube Video
