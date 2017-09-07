@@ -46,3 +46,8 @@ This Makes a fundrazr directory with the following contents:
 scrapy crawl spidername
 ```
 
+<h1 align="center"> Scrapy Shell</h1>
+
+1. Possible start url: https://fundrazr.com/find?category=Health
+
+2. Inspect using google chrome and such. 
