@@ -8,8 +8,6 @@ The first part of this tutorial is highly similar to the [official scrapy docume
 
 1. Install Anaconda (Python) on your operating system. You can either download anaconda from the official site and install on your own or you can follow these anaconda installation tutorials below.
 
-Windows: if you dont have 
-
 Operating System | Blog Post | Youtube Video
 --- | --- | ---
 Mac | [Install Anaconda on Mac](https://medium.com/@GalarnykMichael/install-python-on-mac-anaconda-ccd9f2014072#.lvhw2gt3k "Install Anaconda on Mac") | [Youtube Video](https://www.youtube.com/watch?v=B6d5LrA8bNE "Youtube Video")
