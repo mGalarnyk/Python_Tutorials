@@ -1,5 +1,6 @@
-# Scrapy for Data Analysis Talk
+<h1 align="center"> Scrapy for Data Analysis Talk</h1>
 
+The first part of this tutorial is highly similar to the [official scrapy documentation](https://doc.scrapy.org/en/latest/intro/tutorial.html)
 
 ## Getting Started
 
@@ -29,5 +30,6 @@ conda install -c conda-forge scrapy
 scrapy startproject fundrazr
 ```
 
-![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/scrapyStartProject.png)
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/startProject.png)
+
 
