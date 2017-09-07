@@ -31,6 +31,9 @@ scrapy startproject fundrazr
 ```
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/startProject.png)
+
 <br>
+
 This Makes a fundrazr directory with the following contents:
+
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/fundrazrProjectDirectory.png)
