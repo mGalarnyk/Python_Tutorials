@@ -37,7 +37,6 @@ This Makes a fundrazr directory with the following contents:
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/fundrazrProjectDirectory.png)
 
 ## Choosing a Start Url 
-<h1 align="center"> Scrapy Shell</h1>
 
 1. Possible start url: https://fundrazr.com/find?category=Health
 
