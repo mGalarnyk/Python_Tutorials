@@ -36,6 +36,8 @@ This Makes a fundrazr directory with the following contents:
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/fundrazrProjectDirectory.png)
 
+## First Spider
+
 5. (placeholder, will change when make code) This is the code for our first Spider. Save it in a file named quotes_spider.py under the fundrazr/spiders directory in your project:
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/1stSpiderPlaceholder.png)
