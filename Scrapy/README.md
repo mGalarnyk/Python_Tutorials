@@ -40,10 +40,12 @@ This Makes a fundrazr directory with the following contents:
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/1stSpiderPlaceholder.png)
 
-6. Running the Spider (this needs to be updated fixed when make code)
+6. Navigate to cd Code/Python/GoFundMe
+
+7. Running the Spider (this needs to be updated fixed when make code)
 
 ```
-scrapy crawl spidername
+scrapy crawl spidername -o MonthDay_Year.csv
 ```
 
 <h1 align="center"> Scrapy Shell</h1>
@@ -51,3 +53,4 @@ scrapy crawl spidername
 1. Possible start url: https://fundrazr.com/find?category=Health
 
 2. Inspect using google chrome and such. 
+
