@@ -36,6 +36,15 @@ This Makes a fundrazr directory with the following contents:
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/fundrazrProjectDirectory.png)
 
+## Choosing a Start Url 
+<h1 align="center"> Scrapy Shell</h1>
+
+1. Possible start url: https://fundrazr.com/find?category=Health
+
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/StartUrlsFundrazr.png)
+
+2. Inspect using google chrome and such. 
+
 ## First Spider
 
 5. (placeholder, will change when make code) This is the code for our first Spider. Save it in a file named quotes_spider.py under the fundrazr/spiders directory in your project:
@@ -49,15 +58,6 @@ This Makes a fundrazr directory with the following contents:
 ```
 scrapy crawl spidername -o MonthDay_Year.csv
 ```
-
-<h1 align="center"> Scrapy Shell</h1>
-
-1. Possible start url: https://fundrazr.com/find?category=Health
-
-![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/StartUrlsFundrazr.png)
-
-2. Inspect using google chrome and such. 
-
 
 <h1 align="center"> Things to add </h1>
 name, allowed_domains, start_urls
