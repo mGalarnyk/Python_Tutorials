@@ -54,3 +54,7 @@ scrapy crawl spidername -o MonthDay_Year.csv
 
 2. Inspect using google chrome and such. 
 
+
+<h1 align="center"> Things to add </h1>
+name, allowed_domains, start_urls
+
