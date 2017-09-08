@@ -41,6 +41,8 @@ This Makes a fundrazr directory with the following contents:
 1. Possible start url: https://fundrazr.com/find?category=Health
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/StartUrlsFundrazr.png)
+<br>
+The highlighted part in red are the possible categories to 
 
 2. Inspect using google chrome and such. 
 
