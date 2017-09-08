@@ -52,6 +52,8 @@ scrapy crawl spidername -o MonthDay_Year.csv
 
 1. Possible start url: https://fundrazr.com/find?category=Health
 
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/StartUrlsFundrazr.png)
+
 2. Inspect using google chrome and such. 
 
 
