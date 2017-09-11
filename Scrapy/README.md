@@ -48,11 +48,11 @@ The highlighted part in red are the possible categories to
 
 ## First Spider
 
-5. (placeholder, will change when make code) This is the code for our first Spider. Save it in a file named quotes_spider.py under the fundrazr/spiders directory in your project:
-
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/1stSpiderPlaceholder.png)
 
-The current fundrazr directory has the following contents:
+5. (placeholder, will change when make code) This is the code for our first Spider. Save it in a file named fundrazr_scrape.py under the fundrazr/spiders directory in your project:
+
+The current fundrazr directory should have the following contents:
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/DirectoryafterMakingFile.png)
 
 6. Navigate to cd Code/Python/GoFundMe
