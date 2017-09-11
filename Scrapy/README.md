@@ -50,14 +50,14 @@ The highlighted part in red are the possible categories to
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/1stSpiderPlaceholder.png)
 
-5. (placeholder, will change when make code) This is the code for our first Spider. Save it in a file named fundrazr_scrape.py under the fundrazr/spiders directory in your project:
+1. (placeholder, will change when make code) This is the code for our first Spider. Save it in a file named fundrazr_scrape.py under the fundrazr/spiders directory in your project:
 
-The current fundrazr directory should have the following contents:
+The current fundrazr directory should now have the following contents:
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/DirectoryafterMakingFile.png)
 
-6. Navigate to cd Code/Python/GoFundMe
+2. Navigate to cd Code/Python/GoFundMe
 
-7. Running the Spider (this needs to be updated fixed when make code)
+## Running the Spider (this needs to be updated fixed when make code)
 
 ```
 scrapy crawl spidername -o MonthDay_Year.csv
