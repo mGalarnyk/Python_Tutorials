@@ -52,8 +52,7 @@ The highlighted part in red are the possible categories to
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/1stSpiderPlaceholder.png)
 
-<br>
-The current fundrazr directory has the following contents: 
+The current fundrazr directory has the following contents:
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/DirectoryafterMakingFile.png)
 
 6. Navigate to cd Code/Python/GoFundMe
