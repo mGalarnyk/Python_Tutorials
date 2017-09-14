@@ -36,7 +36,7 @@ This Makes a fundrazr directory with the following contents:
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/fundrazrProjectDirectory.png)
 
-## Understanding Website Structure by Inspecting using Google Chrome 
+## Finding good start URLs: Understanding Website Structure by Inspecting using Google Chrome 
 The purpose of this is really just to find something to scrape. 
 
 1. Possible start url: https://fundrazr.com/find?category=Health
@@ -53,7 +53,7 @@ The highlighted part in black are the possible categories of fundrazrs to scrape
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/inspectCampaigns.png)
 
-## Scrapy Shell
+## Scrapy Shell for finding start URLs on Page
 The best way to learn how to extract data with Scrapy is trying selectors using the shell Scrapy shell. 
 
 In terminal type (mac/linux): 
@@ -61,7 +61,6 @@ In terminal type (mac/linux):
 ```
 scrapy shell 'https://fundrazr.com/find?category=Health'
 ```
-
 
 In command line type (windows): 
 
@@ -85,7 +84,18 @@ This is the code that reflects getting all the campaign links (more on this late
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/codeToGetCampaignLinks.png)
 <br>
 
-2. Next we go to an individual campaign page to scrape 
+2. Exiting Scrapy Shell using <b>exit()<b>. We do this because now we want to understand the structure of an average campaign page. 
+
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/exitScrapyShell.png)
+<br>
+
+## Inspecting Individual Campaigns
+
+1. Next we go to an individual campaign page to scrape (I should note that some of these campaigns are difficult to view)
+
+https://fundrazr.com/savemyarm
+
+2. 
 
 ## First Spider
 
