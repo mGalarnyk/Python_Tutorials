@@ -67,3 +67,4 @@ scrapy crawl spidername -o MonthDay_Year.csv
 <h1 align="center"> Things to add </h1>
 name, allowed_domains, start_urls
 
+ pip install urllib2
