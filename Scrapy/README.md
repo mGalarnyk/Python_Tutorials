@@ -84,18 +84,51 @@ This is the code that reflects getting all the campaign links (more on this late
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/codeToGetCampaignLinks.png)
 <br>
 
-2. Exiting Scrapy Shell using <b>exit()<b>. We do this because now we want to understand the structure of an average campaign page. 
+2. Exiting Scrapy Shell using <b>exit()</b>. We do this because now we want to understand the structure of an average campaign page. 
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/exitScrapyShell.png)
 <br>
 
 ## Inspecting Individual Campaigns
 
-1. Next we go to an individual campaign page to scrape (I should note that some of these campaigns are difficult to view)
+1. Next we go to an individual campaign page (see link below) to scrape (I should note that some of these campaigns are difficult to view)
 
 https://fundrazr.com/savemyarm
 
-2. 
+2. On the page using the same inspect process as before we inspect the title on the page
+
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/InspectCampaignTitle.png)
+<br>
+
+3. Now we are going to use scrapy shell again, but this time with an individual campaign. We do this because we want to find out how individual campaigns are formatted. 
+
+In terminal type (mac/linux): 
+
+```
+scrapy shell 'https://fundrazr.com/savemyarm'
+```
+
+In command line type (windows): 
+
+```
+scrapy shell "https://fundrazr.com/savemyarm"
+```
+
+The code to get the title is
+
+```
+response.xpath("//div[contains(@id, 'campaign-title')]/descendant::text()").extract()[0]
+```
+
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/GettingTitleIndividualCampaignShell.png)
+<br>
+
+4. We can do the same for the other parts of the page. <b>Need to put in exceptions after  </b> finding out rest of page
+
+## Need Scrapy Item Part
+
+items.py pic needs to be here. 
+
 
 ## First Spider
 
