@@ -79,6 +79,13 @@ The image below is inside scrapy shell
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/individualCampaignLinks.png)
 <br>
 
+This is the code that reflects getting in all the campaign links (more on this later in the First Spider section)
+
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/codeToGetCampaignLinks.png)
+<br>
+
+2. Next we 
+
 ## First Spider
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/1stSpiderPlaceholder.png)
