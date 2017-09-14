@@ -21,9 +21,14 @@ class Fundrazr(scrapy.Spider):
 	# getting individual campaigns
 	def parse(self, response):
 		for href in response.xpath("//h2[contains(@class, 'title headline-font')]/a[contains(@class, 'campaign-link')]//@href").extract():
-			url = response.urljoin(href.extract())
+			url = response.urljoin(href[2:].extract())
 			yield scrapy.Request(url, callback=self.parse_dir_contents)	
 					
 	def parse_dir_contents(self, response):
-		item = FundrazrItem()
+
+		# Getting Campaign Title
+		 = response.xpath("//div[contains(@id, 'campaign-title')]/descendant::text()").extract()[0]
+
+
+		item = FundrazrItem()		
 		yield item
