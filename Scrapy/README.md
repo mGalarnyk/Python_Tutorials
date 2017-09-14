@@ -49,7 +49,7 @@ The highlighted part in black are the possible categories of fundrazrs to scrape
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/inspectNextFigure.png)
 <br>
-3. Finding out where the links to individual campaigns are on a page
+3. Finding out where the links to individual campaigns are on a page 
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/inspectCampaigns.png)
 
@@ -79,12 +79,13 @@ The image below is inside scrapy shell
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/individualCampaignLinks.png)
 <br>
 
-This is the code that reflects getting in all the campaign links (more on this later in the First Spider section)
+This is the code that reflects getting all the campaign links (more on this later in the First Spider section) 
+(need to do add in [2:] for all links since we start with // instead of instead of a normal url)
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/codeToGetCampaignLinks.png)
 <br>
 
-2. Next we 
+2. Next we go to an individual campaign page to scrape 
 
 ## First Spider
 
