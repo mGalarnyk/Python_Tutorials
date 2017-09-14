@@ -20,7 +20,7 @@ class Fundrazr(scrapy.Spider):
 
 	# getting individual campaigns
 	def parse(self, response):
-		for href in response.xpath('//html/body').css('.tile-img-contain').xpath('./a[1]/@href'):
+		for href in response.xpath("//h2[contains(@class, 'title headline-font')]/a[contains(@class, 'campaign-link')]//@href").extract():
 			url = response.urljoin(href.extract())
 			yield scrapy.Request(url, callback=self.parse_dir_contents)	
 					
