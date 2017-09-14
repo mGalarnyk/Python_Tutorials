@@ -69,8 +69,15 @@ In command line type (windows):
 scrapy shell "https://fundrazr.com/find?category=Health"
 ```
 
-1. Our first learning is extracting links to individual campaigns in the <b>next</b> button. 
+1. Our first learning is extracting links to individual campaigns. 
 
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/campaignLink.png)
+<br>
+
+The image below is inside scrapy shell
+
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/individualCampaignLinks.png)
+<br>
 
 ## First Spider
 
