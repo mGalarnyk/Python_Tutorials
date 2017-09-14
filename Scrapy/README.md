@@ -17,7 +17,7 @@ All | [Environment Management with Conda (Python 2 + 3, Configuring Jupyter Note
 
 2. Install Scrapy (anaconda comes with it, but just in case). You can also install on your terminal (mac/linux) or command line (windows)
 ```
-conda install -c conda-forge scrapy
+conda install scrapy
 ```
 
 3. Make sure you have Google chrome or Firefox. In this tutorial I am using Google Chrome. If you dont have google chrome want to install it, you can install it here using this [link](https://support.google.com/chrome/answer/95346?co=GENIE.Platform%3DDesktop&hl=en).
@@ -36,7 +36,8 @@ This Makes a fundrazr directory with the following contents:
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/fundrazrProjectDirectory.png)
 
-## Inspect using Google Chrome (finding something to scrape)
+## Understanding Website Structure by Inspecting using Google Chrome 
+The purpose of this is really just to find something to scrape. 
 
 1. Possible start url: https://fundrazr.com/find?category=Health
 
@@ -51,6 +52,25 @@ The highlighted part in black are the possible categories of fundrazrs to scrape
 3. Finding out where the links to individual campaigns are on a page
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/inspectCampaigns.png)
+
+## Scrapy Shell
+The best way to learn how to extract data with Scrapy is trying selectors using the shell Scrapy shell. 
+
+In terminal type (mac/linux): 
+
+```
+scrapy shell 'https://fundrazr.com/find?category=Health'
+```
+
+
+In command line type (windows): 
+
+```
+scrapy shell "https://fundrazr.com/find?category=Health"
+```
+
+1. Our first learning is extracting links to individual campaigns in the <b>next</b> button. 
+
 
 ## First Spider
 
