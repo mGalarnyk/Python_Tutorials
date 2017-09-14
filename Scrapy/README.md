@@ -45,9 +45,11 @@ This Makes a fundrazr directory with the following contents:
 The highlighted part in black are the possible categories of fundrazrs to scrape. 
 
 2. Finding out how to go to the next page. 
-![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/inspectNextFigure.png)
 
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/inspectNextFigure.png)
+<br>
 3. Finding out where the links to individual campaigns are on a page
+
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/inspectCampaigns.png)
 
 ## First Spider
