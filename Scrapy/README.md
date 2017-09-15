@@ -142,8 +142,6 @@ The main goal in scraping is to extract structured data from unstructured source
 The current fundrazr directory should now have the following contents:
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/DirectoryafterMakingFile.png)
 
-2. Navigate to cd Code/Python/GoFundMe
-
 ## Running the Spider (this needs to be updated fixed when make code)
 
 1. go to the cd cd fundrazr/fundrazr
@@ -154,6 +152,4 @@ scrapy crawl my_scraper -o MonthDay_Year.csv
 ```
 
 <h1 align="center"> Things to add </h1>
-name, allowed_domains, start_urls
-
- pip install urllib2
+name, allowed_domains
