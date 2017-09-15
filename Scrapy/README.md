@@ -123,7 +123,7 @@ response.xpath("//div[contains(@id, 'campaign-title')]/descendant::text()").extr
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/GettingTitleIndividualCampaignShell.png)
 <br>
 
-4. We can do the same for the other parts of the page. <b>Need to put in exceptions after  </b> finding out rest of page
+4. We can do the same for the other parts of the page. 
 
 ## Items
 The main goal in scraping is to extract structured data from unstructured sources, typically, web pages. Scrapy spiders can return the extracted data as Python dicts. While convenient and familiar, Python dicts lack structure: it is easy to make a typo in a field name or return inconsistent data, especially in a larger project with many spiders.
