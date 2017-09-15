@@ -158,6 +158,13 @@ scrapy crawl my_scraper -o MonthDay_Year.csv
 scrapy crawl my_scraper -o MonthDay_Year.csv
 ```
 
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/ScraperRunning.png)
+<br>
+
 ## Our data.
 
 You can download the data by clicking on this [link](https://github.com/mGalarnyk/Python_Tutorials/raw/master/Scrapy/fundrazr/fundrazr/MiniMorningScrape.csv). This was made by running the code for npages = 450. 
+
+You can open the dataset by double clicking on it. 
+
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/dataset.png)
