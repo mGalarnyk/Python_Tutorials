@@ -137,19 +137,17 @@ The item class (basically how we store our data before outputting it) used in th
 <br>
 
 ## First Spider
-
-![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/1stSpiderPlaceholder.png)
-
-1. (placeholder, will change when make code) This is the code for our first Spider. Save it in a file named fundrazr_scrape.py under the fundrazr/spiders directory in your project:
-
-The current fundrazr directory should now have the following contents:
-![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/DirectoryafterMakingFile.png)
-
-
-2. Our code looks like this, you can copy it [here](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/fundrazr/fundrazr/spiders/fundrazr_scrape.py)
+This is the code for our first Spider.
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/fundrazrScrapyCode.png)
 <br>
+
+Download the code [here](https://raw.githubusercontent.com/mGalarnyk/Python_Tutorials/master/Scrapy/fundrazr/fundrazr/spiders/fundrazr_scrape.py)
+
+ Save it in a file named <b>fundrazr_scrape.py</b> under the fundrazr/spiders directory directory in your project.
+
+The current fundrazr directory should now have the following contents:
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/DirectoryafterMakingFile.png)
 
 ## Running the Spider (this needs to be updated fixed when make code)
 
@@ -160,8 +158,6 @@ scrapy crawl my_scraper -o MonthDay_Year.csv
 scrapy crawl my_scraper -o MonthDay_Year.csv
 ```
 
-<h1 align="center"> Things to add </h1>
-Show the data. Scrape 
-
 ## Our data.
-I ran the scraper for a (insert amount of time). Say what it is. (insert link to small file)
+
+You can download the data by clicking on this [link](https://github.com/mGalarnyk/Python_Tutorials/raw/master/Scrapy/fundrazr/fundrazr/MiniMorningScrape.csv). This was made by running the code for npages = 450. 
