@@ -17,9 +17,9 @@ class Fundrazr(scrapy.Spider):
 	npages = 50
 	for i in range(2, npages +1 ):
 		start_urls.append("https://fundrazr.com/find?category=Health&page="+str(i)+"")
+	def parse(self, response):
 
 	# getting individual campaigns
-	def parse(self, response):
 		for href in response.xpath("//h2[contains(@class, 'title headline-font')]/a[contains(@class, 'campaign-link')]//@href").extract():
 			url = response.urljoin(href[2:].extract())
 			yield scrapy.Request(url, callback=self.parse_dir_contents)	
@@ -44,8 +44,21 @@ class Fundrazr(scrapy.Spider):
 		# Number of contributors
 		# response.xpath("//div[contains(@class, 'stats-secondary with-goal')]//span[contains(@class, 'donation-count stat')]/text()").extract()
 
-		# Stat for how long left (but there is no Label) need to work on
-		# response.xpath("//div[contains(@class, 'stats-secondary with-goal')]//span[contains(@class,'stats-label visible-phone')]/span[@class='stats-label']/text()").extract()
+		# Stat for how long left (but there is no Label) 
+		# response.xpath("//div[contains(@class, 'stats-secondary with-goal')]//span[contains(@class,'stats-label visible-phone')]/span[@class='stat']/text()").extract()[0]
+
+		# How long left unit like days months years etc
+		# "".join(response.xpath("//div[contains(@class, 'stats-secondary with-goal')]//span[@class='stats-label visible-phone']/span[@class='stats-label']/text()").extract())
+
+		# Non Mobile how long left as in exact date
+		# "".join(response.xpath("//div[contains(@id, 'campaign-stats')]//span[contains(@class,'stats-label hidden-phone')]/span[@class='nowrap']/text()").extract())
+
+		# Getting Story
+		story_list = response.xpath("//div[contains(@id, 'full-story')]/descendant::text()").extract()
+		#remove empty paragraph in story_obj
+		story_list = [x.strip() for x in story_obj if len(x.strip()) > 0]
+
+		story  = " ".join(story_list)
 
 
 		item = FundrazrItem()		
