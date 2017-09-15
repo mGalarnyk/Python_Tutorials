@@ -7,61 +7,49 @@ import re
 class Fundrazr(scrapy.Spider):
 	name = "my_scraper"
 
-	allowed_domains = ["https://fundrazr.com/"]
-
-	# Potential Start Urls
+	# First Start Url
 	start_urls = ["https://fundrazr.com/find?category=Health"]
 
-	npages = 50
+	npages = 2
+
+	# This mimics getting the pages using the next button. 
 	for i in range(2, npages +1 ):
 		start_urls.append("https://fundrazr.com/find?category=Health&page="+str(i)+"")
 	
 	def parse(self, response):
-
-	# getting individual campaigns
-		for href in response.xpath("//h2[contains(@class, 'title headline-font')]/a[contains(@class, 'campaign-link')]//@href").extract():
+		for href in response.xpath("//h2[contains(@class, 'title headline-font')]/a[contains(@class, 'campaign-link')]//@href"):
 			# add the scheme, eg http://
-			url  = "https:" + href 
-
+			url  = "https:" + href.extract() 
 			yield scrapy.Request(url, callback=self.parse_dir_contents)	
 					
 	def parse_dir_contents(self, response):
+		item = FundrazrItem()
 
 		# Getting Campaign Title
-		# = response.xpath("//div[contains(@id, 'campaign-title')]/descendant::text()").extract()[0]
+		item['campaignTitle'] = response.xpath("//div[contains(@id, 'campaign-title')]/descendant::text()").extract()[0].strip()
 
 		# Getting Amount Raised
-		# response.xpath("//span[contains(@class, 'stat')]/span[contains(@class, 'amount-raised')]/descendant::text()").extract()
+		item['amountRaised']= response.xpath("//span[contains(@class, 'stat')]/span[contains(@class, 'amount-raised')]/descendant::text()").extract()
 
-		# Currency Symbol
-		# response.xpath("//span[contains(@class, 'stat')]/span[contains(@class, 'currency-symbol')]/descendant::text()").extract()
+		# Goal
+		item['goal'] = " ".join(response.xpath("//div[contains(@class, 'stats-primary with-goal')]//span[contains(@class, 'stats-label hidden-phone')]/text()").extract()).strip()
 
-		# Raised Progress
-		# response.xpath("//span[contains(@class, 'stats-label hidden-phone')]/span[contains(@class, 'raised-progress')]/descendant::text()").extract()[0]
+		# Currency Type (US Dollar Etc)
+		item['currencyType'] = response.xpath("//div[contains(@class, 'stats-primary with-goal')]/@title").extract()
 
-		# Goal (will need to filter this)
-		# response.xpath("//div[contains(@class, 'stats-primary with-goal')]//span[contains(@class, 'stats-label hidden-phone')]/text()").extract()
+		# Campaign End (Month year etc)
+		item['endDate'] = "".join(response.xpath("//div[contains(@id, 'campaign-stats')]//span[contains(@class,'stats-label hidden-phone')]/span[@class='nowrap']/text()").extract()).strip()
 
 		# Number of contributors
-		# response.xpath("//div[contains(@class, 'stats-secondary with-goal')]//span[contains(@class, 'donation-count stat')]/text()").extract()
-
-		# Stat for how long left (but there is no Label) 
-		# response.xpath("//div[contains(@class, 'stats-secondary with-goal')]//span[contains(@class,'stats-label visible-phone')]/span[@class='stat']/text()").extract()[0]
-
-		# How long left unit like days months years etc
-		# "".join(response.xpath("//div[contains(@class, 'stats-secondary with-goal')]//span[@class='stats-label visible-phone']/span[@class='stats-label']/text()").extract())
-
-		# Non Mobile how long left as in exact date
-		# "".join(response.xpath("//div[contains(@id, 'campaign-stats')]//span[contains(@class,'stats-label hidden-phone')]/span[@class='nowrap']/text()").extract())
+		item['numberContributors'] = response.xpath("//div[contains(@class, 'stats-secondary with-goal')]//span[contains(@class, 'donation-count stat')]/text()").extract()
 
 		# Getting Story
 		story_list = response.xpath("//div[contains(@id, 'full-story')]/descendant::text()").extract()
-		#remove empty paragraph in story_obj
-		story_list = [x.strip() for x in story_obj if len(x.strip()) > 0]
+		story_list = [x.strip() for x in story_list if len(x.strip()) > 0]
+		item['story']  = " ".join(story_list)
 
-		story  = " ".join(story_list)
-		print(story)
+		# Url (The link to the page)
+		item['url'] = response.xpath("//meta[@property='og:url']/@content").extract()
 
-
-		item = FundrazrItem()		
 		yield item
+
