@@ -146,8 +146,11 @@ The current fundrazr directory should now have the following contents:
 
 ## Running the Spider (this needs to be updated fixed when make code)
 
+1. go to the cd cd fundrazr/fundrazr
+scrapy crawl my_scraper -o MonthDay_Year.csv
+
 ```
-scrapy crawl spidername -o MonthDay_Year.csv
+scrapy crawl my_scraper -o MonthDay_Year.csv
 ```
 
 <h1 align="center"> Things to add </h1>
