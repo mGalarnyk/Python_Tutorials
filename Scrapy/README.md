@@ -149,7 +149,7 @@ Download the code [here](https://raw.githubusercontent.com/mGalarnyk/Python_Tuto
 The current fundrazr directory should now have the following contents:
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/DirectoryafterMakingFile.png)
 
-## Running the Spider (this needs to be updated fixed when make code)
+## Running the Spider
 
 1. go to the cd cd fundrazr/fundrazr
 scrapy crawl my_scraper -o MonthDay_Year.csv
