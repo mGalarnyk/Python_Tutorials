@@ -12,3 +12,8 @@ fundrazr/
 
         spiders/          # a directory where you'll later put your spiders (we will use this)
             __init__.py
+
+
+
+
+
