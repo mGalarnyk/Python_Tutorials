@@ -12,16 +12,17 @@ class Fundrazr(scrapy.Spider):
 	# Potential Start Urls
 	start_urls = ["https://fundrazr.com/find?category=Health"]
 
-	# response.xpath('//html/body').css('.tile-img-contain').xpath('./a[1]/@href')
-
 	npages = 50
 	for i in range(2, npages +1 ):
 		start_urls.append("https://fundrazr.com/find?category=Health&page="+str(i)+"")
+	
 	def parse(self, response):
 
 	# getting individual campaigns
 		for href in response.xpath("//h2[contains(@class, 'title headline-font')]/a[contains(@class, 'campaign-link')]//@href").extract():
-			url = response.urljoin(href[2:].extract())
+			# add the scheme, eg http://
+			url  = "https:" + href 
+
 			yield scrapy.Request(url, callback=self.parse_dir_contents)	
 					
 	def parse_dir_contents(self, response):
@@ -59,6 +60,7 @@ class Fundrazr(scrapy.Spider):
 		story_list = [x.strip() for x in story_obj if len(x.strip()) > 0]
 
 		story  = " ".join(story_list)
+		print(story)
 
 
 		item = FundrazrItem()		
