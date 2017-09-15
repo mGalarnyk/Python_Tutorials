@@ -131,7 +131,10 @@ The main goal in scraping is to extract structured data from unstructured source
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/items.png) 
 <br>
 
-1. To be added
+The item class (basically how we store our data before outputting it) used in this tutorial looks like this. 
+
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/itemsFundrazr.png)
+<br>
 
 ## First Spider
 
@@ -141,6 +144,12 @@ The main goal in scraping is to extract structured data from unstructured source
 
 The current fundrazr directory should now have the following contents:
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/DirectoryafterMakingFile.png)
+
+
+2. Our code looks like this, you can copy it here (insert link to code repo) 
+
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/fundrazrScrapyCode.png)
+<br>
 
 ## Running the Spider (this needs to be updated fixed when make code)
 
@@ -152,4 +161,7 @@ scrapy crawl my_scraper -o MonthDay_Year.csv
 ```
 
 <h1 align="center"> Things to add </h1>
-name, allowed_domains
+Show the data. Scrape 
+
+## Our data.
+I ran the scraper for a (insert amount of time). Say what it is. (insert link to small file)
