@@ -27,7 +27,25 @@ class Fundrazr(scrapy.Spider):
 	def parse_dir_contents(self, response):
 
 		# Getting Campaign Title
-		 = response.xpath("//div[contains(@id, 'campaign-title')]/descendant::text()").extract()[0]
+		# = response.xpath("//div[contains(@id, 'campaign-title')]/descendant::text()").extract()[0]
+
+		# Getting Amount Raised
+		# response.xpath("//span[contains(@class, 'stat')]/span[contains(@class, 'amount-raised')]/descendant::text()").extract()
+
+		# Currency Symbol
+		# response.xpath("//span[contains(@class, 'stat')]/span[contains(@class, 'currency-symbol')]/descendant::text()").extract()
+
+		# Raised Progress
+		# response.xpath("//span[contains(@class, 'stats-label hidden-phone')]/span[contains(@class, 'raised-progress')]/descendant::text()").extract()[0]
+
+		# Goal (will need to filter this)
+		# response.xpath("//div[contains(@class, 'stats-primary with-goal')]//span[contains(@class, 'stats-label hidden-phone')]/text()").extract()
+
+		# Number of contributors
+		# response.xpath("//div[contains(@class, 'stats-secondary with-goal')]//span[contains(@class, 'donation-count stat')]/text()").extract()
+
+		# Stat for how long left (but there is no Label) need to work on
+		# response.xpath("//div[contains(@class, 'stats-secondary with-goal')]//span[contains(@class,'stats-label visible-phone')]/span[@class='stats-label']/text()").extract()
 
 
 		item = FundrazrItem()		
