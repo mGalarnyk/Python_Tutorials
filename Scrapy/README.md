@@ -146,7 +146,7 @@ The current fundrazr directory should now have the following contents:
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/DirectoryafterMakingFile.png)
 
 
-2. Our code looks like this, you can copy it here (insert link to code repo) 
+2. Our code looks like this, you can copy it [here](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/fundrazr/fundrazr/spiders/fundrazr_scrape.py)
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/fundrazrScrapyCode.png)
 <br>
