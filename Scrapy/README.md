@@ -134,7 +134,8 @@ The main goal in scraping is to extract structured data from unstructured source
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/items.png) 
 <br>
 
-The code for items.py is [here](https://github.com/mGalarnyk/Python_Tutorials/raw/master/Scrapy/fundrazr/fundrazr/items.py)
+The code for items.py is [here](https://github.com/mGalarnyk/Python_Tutorials/raw/master/Scrapy/fundrazr/fundrazr/items.py).
+
 Save it under the fundrazr/fundrazr directory (overwrite the original iems.py file). 
 
 The item class (basically how we store our data before outputting it) used in this tutorial looks like this. 
@@ -152,7 +153,7 @@ Download the code [here](https://raw.githubusercontent.com/mGalarnyk/Python_Tuto
 
 Save it in a file named <b>fundrazr_scrape.py</b> under the fundrazr/fundrazr/spiders directory.
 
-The current fundrazr directory should now have the following contents:
+The current project should now have the following contents:
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/DirectoryafterMakingFile.png)
 
 ## Running the Spider
