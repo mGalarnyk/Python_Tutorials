@@ -156,8 +156,7 @@ The current fundrazr directory should now have the following contents:
 
 ## Running the Spider
 
-1. go to the cd cd fundrazr/fundrazr
-scrapy crawl my_scraper -o MonthDay_Year.csv
+1. go to the fundrazr/fundrazr directory and type: 
 
 ```
 scrapy crawl my_scraper -o MonthDay_Year.csv
