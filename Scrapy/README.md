@@ -150,7 +150,7 @@ This is the code for our first Spider.
 
 Download the code [here](https://raw.githubusercontent.com/mGalarnyk/Python_Tutorials/master/Scrapy/fundrazr/fundrazr/spiders/fundrazr_scrape.py).
 
-Save it in a file named <b>fundrazr_scrape.py</b> under the fundrazr/fundrazr/spiders directory in your project.
+Save it in a file named <b>fundrazr_scrape.py</b> under the fundrazr/fundrazr/spiders directory.
 
 The current fundrazr directory should now have the following contents:
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/DirectoryafterMakingFile.png)
@@ -178,6 +178,6 @@ scrapy crawl my_scraper -o MonthDay_Year.csv
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/WebScrapingData1st.png)
 <br>
 
-2. If you want to download a larger file (it was made by changing npages = 2 to npages = 450), you can download a bigger file with roughly 6000 campaigns scraped by clicking on this link [link](https://github.com/mGalarnyk/Python_Tutorials/raw/master/Scrapy/fundrazr/fundrazr/MiniMorningScrape.csv)
+2. If you want to download a larger file (it was made by changing npages = 2 to npages = 450), you can download a bigger file with roughly 6000 campaigns scraped by clicking on this [link](https://github.com/mGalarnyk/Python_Tutorials/raw/master/Scrapy/fundrazr/fundrazr/MiniMorningScrape.csv)
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/dataset.png)
