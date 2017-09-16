@@ -35,7 +35,7 @@ scrapy startproject fundrazr
 
 <br>
 
-This Makes a fundrazr directory with the following contents:
+This makes a directory with the following contents:
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/fundrazrProjectDirectory.png)
 
@@ -52,6 +52,7 @@ The highlighted part in black are the possible categories of fundrazrs to scrape
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/inspectNextFigure.png)
 <br>
+
 3. Finding out where the links to individual campaigns are on a page 
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/inspectCampaigns.png)
