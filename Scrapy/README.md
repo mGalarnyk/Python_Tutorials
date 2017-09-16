@@ -173,7 +173,7 @@ scrapy crawl my_scraper -o MonthDay_Year.csv
 
 ## Our data
 
-1. The data outputted in this tutorial should look roughly like the image below. The individual campaigns scraped will vary as the website is constantly updated. Also it is possible there will be spaces between each individual campaign as excel is interpretting the excel file. 
+1. The data outputted in this tutorial should look roughly like the image below. The individual campaigns scraped will vary as the website is constantly updated. Also it is possible there will be spaces between each individual campaign as excel is interpretting the csv file. 
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/WebScrapingData1st.png)
 <br>
