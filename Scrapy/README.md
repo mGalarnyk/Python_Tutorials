@@ -1,6 +1,6 @@
 <h1 align="center"> Scrapy for Data Analysis Talk</h1>
 
-The first part of this tutorial is highly similar to the [official scrapy documentation](https://doc.scrapy.org/en/latest/intro/tutorial.html) has been tested in Python 2 and 3 and work in both.
+The first part of this tutorial is highly similar to the [official scrapy documentation](https://doc.scrapy.org/en/latest/intro/tutorial.html) has been tested in Python 2 and 3 (work in both).
 
 ## Getting Started
 
@@ -80,13 +80,14 @@ The image below is inside scrapy shell
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/individualCampaignLinks.png)
 <br>
 
+<b> Need to update this with new code </b>
 This is the code that reflects getting all the campaign links (more on this later in the First Spider section) 
 (need to do add in [2:] for all links since we start with // instead of instead of a normal url)
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/codeToGetCampaignLinks.png)
 <br>
 
-2. Exiting Scrapy Shell using <b>exit()</b>. We do this because now we want to understand the structure of an average campaign page. 
+2. Exiting Scrapy Shell using <b>exit()</b>. We do this while we should now understand the structure of where individual campaigns links are, we havent looked at where things are on individual campaigns.
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/exitScrapyShell.png)
 <br>
