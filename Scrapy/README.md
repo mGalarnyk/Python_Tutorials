@@ -131,6 +131,8 @@ The main goal in scraping is to extract structured data from unstructured source
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/items.png) 
 <br>
 
+The code for items.py is [here](https://github.com/mGalarnyk/Python_Tutorials/raw/master/Scrapy/fundrazr/fundrazr/items.py)
+
 The item class (basically how we store our data before outputting it) used in this tutorial looks like this. 
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/itemsFundrazr.png)
