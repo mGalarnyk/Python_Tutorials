@@ -17,7 +17,8 @@ Windows | [Install Anaconda on Windows](https://medium.com/@GalarnykMichael/inst
 Ubuntu | [Install Anaconda on Ubuntu](https://medium.com/@GalarnykMichael/install-python-on-ubuntu-anaconda-65623042cb5a#.4kwsp0wjl) | [Youtube Video](https://www.youtube.com/watch?v=jo4RMiM-ihs)
 All | [Environment Management with Conda (Python 2 + 3, Configuring Jupyter Notebooks)](https://medium.com/towards-data-science/environment-management-with-conda-python-2-3-b9961a8a5097) | [Youtube Video](https://www.youtube.com/watch?v=rFCBiP9Gkoo)
 
-2. Install Scrapy (anaconda comes with it, but just in case). You can also install on your terminal (mac/linux) or command line (windows)
+2. Install Scrapy (anaconda comes with it, but just in case). You can also install on your terminal (mac/linux) or command line (windows). 
+
 ```
 conda install scrapy
 ```
@@ -165,7 +166,16 @@ scrapy crawl my_scraper -o MonthDay_Year.csv
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/ScraperRunning.png)
 <br>
 
+2. The data should be outputted in the fundrazr/fundrazr directory. 
+
+![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/DataOutputtedLocation.png)
+<br>
+
 ## Our data.
+
+1. The data outputted in this tutorial should look roughly like the image below. The individual campaigns scraped will vary as the website is constantly updated. Also it is possible there will be spaces between each individual campaign as excel is interpretting the excel file. 
+
+![]()
 
 You can download the data by clicking on this [link](https://github.com/mGalarnyk/Python_Tutorials/raw/master/Scrapy/fundrazr/fundrazr/MiniMorningScrape.csv). This was made by running the code for npages = 450. 
 
