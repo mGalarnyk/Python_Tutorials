@@ -56,7 +56,7 @@ The highlighted part in black are the possible categories of fundrazrs to scrape
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/inspectCampaigns.png)
 
 ## Scrapy Shell for finding start URLs on Page
-The best way to learn how to extract data with Scrapy is trying selectors using the shell Scrapy shell. 
+The best way to learn how to extract data with Scrapy is trying selectors using the shell Scrapy shell. We will use XPaths which can be used to select elements from HTML documents. 
 
 In terminal type (mac/linux): 
 
