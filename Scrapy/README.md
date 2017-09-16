@@ -2,6 +2,8 @@
 
 The first part of this tutorial is highly similar to the [official scrapy documentation](https://doc.scrapy.org/en/latest/intro/tutorial.html)
 
+This tutorial has been tested in Python 2 and 3 and work in both.
+
 ## Getting Started
 
 ### Prerequisites: Anaconda. If you already have anaconda and google chrome (or Firefox), skip to step 4.
