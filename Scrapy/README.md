@@ -1,8 +1,6 @@
 <h1 align="center"> Scrapy for Data Analysis Talk</h1>
 
-The first part of this tutorial is highly similar to the [official scrapy documentation](https://doc.scrapy.org/en/latest/intro/tutorial.html)
-
-This tutorial has been tested in Python 2 and 3 and work in both.
+The first part of this tutorial is highly similar to the [official scrapy documentation](https://doc.scrapy.org/en/latest/intro/tutorial.html) has been tested in Python 2 and 3 and work in both.
 
 ## Getting Started
 
@@ -35,7 +33,7 @@ scrapy startproject fundrazr
 
 <br>
 
-This makes a directory with the following contents:
+This makes a fundrazr directory with the following contents:
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/fundrazrProjectDirectory.png)
 
@@ -152,7 +150,7 @@ This is the code for our first Spider.
 
 Download the code [here](https://raw.githubusercontent.com/mGalarnyk/Python_Tutorials/master/Scrapy/fundrazr/fundrazr/spiders/fundrazr_scrape.py).
 
-Save it in a file named <b>fundrazr_scrape.py</b> under the fundrazr/fundrazr/spiders directory.
+Save it in a file named <b>fundrazr_scrape.py</b> under the fundrazr/spiders directory.
 
 The current project should now have the following contents:
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/DirectoryafterMakingFile.png)
@@ -173,7 +171,7 @@ scrapy crawl my_scraper -o MonthDay_Year.csv
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/DataOutputtedLocation.png)
 <br>
 
-## Our data.
+## Our data
 
 1. The data outputted in this tutorial should look roughly like the image below. The individual campaigns scraped will vary as the website is constantly updated. Also it is possible there will be spaces between each individual campaign as excel is interpretting the excel file. 
 
