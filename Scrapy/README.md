@@ -37,23 +37,40 @@ This makes a fundrazr directory with the following contents:
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/fundrazrProjectDirectory.png)
 
-## Finding good start URLs: Understanding Website Structure by Inspecting using Google Chrome 
-The purpose of this is really just to find something to scrape. 
+## Finding good start URLs using Inspect on Google Chrome (or Firefox)
+In the spider framework, <b>start_urls</b> is a list of URLs where the spider will begin to crawl from, when no particular URLs are specified. We will use each element in the <b>start_urls</b> list as a means to get individual campaign links. 
 
-1. Possible start url: https://fundrazr.com/find?category=Health
+1. The image below shows that based on the category you choose, you get a different start url. The highlighted part in black are the possible categories of fundrazrs to scrape.    
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/StartUrlsFundrazr.png)
 <br>
-The highlighted part in black are the possible categories of fundrazrs to scrape. 
 
-2. Finding out how to go to the next page. 
+For this tutorial, the first in the list <b>start_urls</b> is: https://fundrazr.com/find?category=Health
+
+2. This part is about getting additional elements to put in the <b>start_urls</b> list. We are finding out how to go to the next page so we can get additional urls to put in <b>start_urls</b>. 
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/inspectNextFigure.png)
 <br>
 
-3. Finding out where the links to individual campaigns are on a page 
+The second start url is: https://fundrazr.com/find?category=Health&page=2
+
+The code below will be used in the spider later. All it does is make a list of start_urls. npages is just how many additional pages (after the first https://fundrazr.com/find?category=Health) we want to get campaign links from. 
+
+```
+# First Start Url
+start_urls = ["https://fundrazr.com/find?category=Health"]
+
+npages = 2
+
+# This mimics getting the pages using the next button. 
+for i in range(2, npages +1 ):
+  start_urls.append("https://fundrazr.com/find?category=Health&page="+str(i)+"")
+```
+
+## Finding out where on the page individual Campaign Links Are
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/inspectCampaigns.png)
+<br>
 
 ## Scrapy Shell for finding Individual Campaign Links
 The best way to learn how to extract data with Scrapy is trying selectors using the shell Scrapy shell. We will use XPaths which can be used to select elements from HTML documents. 
