@@ -99,19 +99,19 @@ Type the following into scrapy shell (to help understand the code, please see th
 response.xpath("//h2[contains(@class, 'title headline-font')]/a[contains(@class, 'campaign-link')]//@href")
 ```
 
-Rough expected output. Remember overtime the individual pages update and you can get different results. 
-
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/individualCampaignLinks.png)
 <br>
 
-<b> Need to update this with new code </b>
-This is the code that reflects getting all the campaign links (more on this later in the First Spider section) 
-(need to do add in [2:] for all links since we start with // instead of instead of a normal url)
 
-![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/codeToGetCampaignLinks.png)
-<br>
+The code below is for getting all the campaign links for a given start url (more on this later in the First Spider section) 
 
-2. Exiting Scrapy Shell using <b>exit()</b>. We do this while we should now understand the structure of where individual campaigns links are, we havent looked at where things are on individual campaigns.
+```
+for href in response.xpath("//h2[contains(@class, 'title headline-font')]/a[contains(@class, 'campaign-link')]//@href"):
+			# add the scheme, eg http://
+			url  = "https:" + href.extract() 
+```
+
+2. Exit Scrapy Shell using <b>exit()</b>. We do this while we should now understand the structure of where individual campaigns links are, we havent looked at where things are on individual campaigns.
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/exitScrapyShell.png)
 <br>
