@@ -93,7 +93,13 @@ In command line type (windows):
 scrapy shell "https://fundrazr.com/find?category=Health"
 ```
 
-The image below is inside scrapy shell
+Type the following into scrapy shell (to help understand the code, please see the video):
+
+```
+response.xpath("//h2[contains(@class, 'title headline-font')]/a[contains(@class, 'campaign-link')]//@href")
+```
+
+Rough expected output. Remember overtime the individual pages update and you can get different results. 
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/individualCampaignLinks.png)
 <br>
