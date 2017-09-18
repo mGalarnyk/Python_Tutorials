@@ -112,7 +112,7 @@ for href in response.xpath("//h2[contains(@class, 'title headline-font')]/a[cont
 	url  = "https:" + href.extract() 
 ```
 
-2. Exit Scrapy Shell using <b>exit()</b>. We do this while we should now understand the structure of where individual campaigns links are, we havent looked at where things are on individual campaigns.
+2. Exit Scrapy Shell by typing <b>exit()</b>. We do this while we should now understand the structure of where individual campaigns links are, we havent looked at where things are on individual campaigns.
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/exitScrapyShell.png)
 <br>
@@ -142,7 +142,7 @@ In command line type (windows):
 scrapy shell "https://fundrazr.com/savemyarm"
 ```
 
-The code to get the title is
+The code to get the campaign title is
 
 ```
 response.xpath("//div[contains(@id, 'campaign-title')]/descendant::text()").extract()[0]
@@ -151,7 +151,50 @@ response.xpath("//div[contains(@id, 'campaign-title')]/descendant::text()").extr
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/GettingTitleIndividualCampaignShell.png)
 <br>
 
-4. We can do the same for the other parts of the page. 
+4. We can do the same for the other parts of the page.
+
+amount Raised: 
+
+```
+
+```
+
+goal: 
+```
+
+```
+
+currency type: 
+
+```
+
+```
+
+campaign end date:
+```
+
+```
+
+number of contributors: 
+```
+
+```
+
+story: 
+```
+
+```
+
+url: 
+```
+
+```
+
+5. Exit scrapy shell by typing: 
+
+```
+exit()
+```
 
 ## Items
 The main goal in scraping is to extract structured data from unstructured sources, typically, web pages. Scrapy spiders can return the extracted data as Python dicts. While convenient and familiar, Python dicts lack structure: it is easy to make a typo in a field name or return inconsistent data, especially in a larger project with many spiders.
