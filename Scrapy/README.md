@@ -76,7 +76,9 @@ The first thing we will try and get the xpaths for are the individual campaign l
 <br>
 
 We will use xpaths to extract the part enclosed in the red rectangle below.  
+
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/campaignLink.png)
+<br>
 <br>
 
 The best way to see if our to make xpaths and to check if they work is to test it inside scrapy shell. 
