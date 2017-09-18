@@ -107,8 +107,8 @@ The code below is for getting all the campaign links for a given start url (more
 
 ```
 for href in response.xpath("//h2[contains(@class, 'title headline-font')]/a[contains(@class, 'campaign-link')]//@href"):
-			# add the scheme, eg http://
-			url  = "https:" + href.extract() 
+	# add the scheme, eg http://
+	url  = "https:" + href.extract() 
 ```
 
 2. Exit Scrapy Shell using <b>exit()</b>. We do this while we should now understand the structure of where individual campaigns links are, we havent looked at where things are on individual campaigns.
