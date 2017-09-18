@@ -54,7 +54,7 @@ For this tutorial, the first in the list <b>start_urls</b> is: https://fundrazr.
 
 The second start url is: https://fundrazr.com/find?category=Health&page=2
 
-The code below will be used in the spider later. All it does is make a list of start_urls. npages is just how many additional pages (after the first https://fundrazr.com/find?category=Health) we want to get campaign links from. 
+The code below will be used in the spider later. All it does is make a list of start_urls. npages is just how many additional pages (after the first page) we want to get campaign links from. 
 
 ```
 # First Start Url
