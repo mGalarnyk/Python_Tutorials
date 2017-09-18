@@ -67,23 +67,19 @@ for i in range(2, npages +1 ):
   start_urls.append("https://fundrazr.com/find?category=Health&page="+str(i)+"")
 ```
 
-## Finding out where on the page individual Campaign Links Are
-
-![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/inspectCampaigns.png)
-<br>
-
 ## Scrapy Shell for finding Individual Campaign Links
 The best way to learn how to extract data with Scrapy is trying selectors using the shell Scrapy shell. We will use XPaths which can be used to select elements from HTML documents. 
 
-The first thing we will try and get the xpaths for are the individual campaign links. 
+The first thing we will try and get the xpaths for are the individual campaign links. First we do inspect to see roughly where the campaigns are in the HTML. 
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/inspectCampaigns.png)
 <br>
 
+We will use xpaths to extract the part enclosed in the red rectangle below.  
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/campaignLink.png)
 <br>
 
-Our first learning is extracting links to individual campaigns. 
+The best way to see if our to make xpaths and to check if they work is to test it inside scrapy shell. 
 
 In terminal type (mac/linux): 
 
@@ -96,10 +92,6 @@ In command line type (windows):
 ```
 scrapy shell "https://fundrazr.com/find?category=Health"
 ```
-
-1. Our first learning is extracting links to individual campaigns. 
-
-
 
 The image below is inside scrapy shell
 
