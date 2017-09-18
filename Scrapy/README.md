@@ -68,7 +68,7 @@ for i in range(2, npages + 2 ):
 ```
 
 ## Scrapy Shell for finding Individual Campaign Links
-The best way to learn how to extract data with Scrapy is trying selectors using the shell Scrapy shell. We will use XPaths which can be used to select elements from HTML documents. 
+The best way to learn how to extract data with Scrapy is using the Scrapy shell. We will use XPaths which can be used to select elements from HTML documents. 
 
 The first thing we will try and get the xpaths for are the individual campaign links. First we do inspect to see roughly where the campaigns are in the HTML. 
 
