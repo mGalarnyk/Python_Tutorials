@@ -96,7 +96,7 @@ scrapy shell "https://fundrazr.com/find?category=Health"
 Type the following into scrapy shell (to help understand the code, please see the video):
 
 ```
-response.xpath("//h2[contains(@class, 'title headline-font')]/a[contains(@class, 'campaign-link')]//@href")
+response.xpath("//h2[contains(@class, 'title headline-font')]/a[contains(@class, 'campaign-link')]//@href").extract()
 ```
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/individualCampaignLinks.png)
