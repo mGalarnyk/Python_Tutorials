@@ -210,8 +210,8 @@ The item class (basically how we store our data before outputting it) used in th
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/itemsFundrazr.png)
 <br>
 
-## First Spider
-This is the code for our first Spider.
+## The Spider 
+Spiders are classes that you define and that Scrapy uses to scrape information from a website (or a group of websites). The code for our spider is below.
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/fundrazrScrapyCode.png)
 <br>
