@@ -156,38 +156,37 @@ response.xpath("//div[contains(@id, 'campaign-title')]/descendant::text()").extr
 amount Raised: 
 
 ```
-
+response.xpath("//span[contains(@class, 'stat')]/span[contains(@class, 'amount-raised')]/descendant::text()").extract()
 ```
 
 goal: 
 ```
-
+response.xpath("//div[contains(@class, 'stats-primary with-goal')]//span[contains(@class, 'stats-label hidden-phone')]/text()").extract()
 ```
 
 currency type: 
-
 ```
-
+response.xpath("//div[contains(@class, 'stats-primary with-goal')]/@title").extract()
 ```
 
 campaign end date:
 ```
-
+response.xpath("//div[contains(@id, 'campaign-stats')]//span[contains(@class,'stats-label hidden-phone')]/span[@class='nowrap']/text()").extract()
 ```
 
 number of contributors: 
 ```
-
+response.xpath("//div[contains(@class, 'stats-secondary with-goal')]//span[contains(@class, 'donation-count stat')]/text()").extract()
 ```
 
 story: 
 ```
-
+response.xpath("//div[contains(@id, 'full-story')]/descendant::text()").extract()
 ```
 
 url: 
 ```
-
+response.xpath("//meta[@property='og:url']/@content").extract()
 ```
 
 5. Exit scrapy shell by typing: 
