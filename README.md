@@ -27,6 +27,11 @@ Heatmaps Part 2  | [Heatmaps Part 2](https://github.com/mGalarnyk/Python_Tutoria
 Time Series Part 1 | [Time Series Data Basics with Pandas Part 1](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Time_Series/Part1_Time_Series_Data_BasicPlotting.ipynb "Time Series Data Basics with Pandas Part 1") | [Youtube Video](https://www.youtube.com/watch?v=OwnaUVt6VVE)
 Time Series Part 2  | [Time Series Data Basics with Pandas Part 2](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Time_Series/Part2_Time_Series_Data_Price_Variation_ShiftingGroupBy.ipynb "Time Series Data Basics with Pandas Part 2") | [Youtube Video](https://www.youtube.com/watch?v=1S5UKLqe-gg)
 
+## Scrapy
+What is it? | Blog Post/IPython Notebook | Youtube Video
+--- | --- | ---
+Scraping Fundrazr (GoFundMe/Kickstarter like Website) | [Step by Step Instructions](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/README.md) | [Scraping a Crowdfunding Website](https://www.youtube.com/watch?v=O_j3OTXw2_E)
+
 ## Sklearn
 What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
