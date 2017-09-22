@@ -2,6 +2,8 @@
 
 The first part of this tutorial is highly similar to the [official scrapy documentation](https://doc.scrapy.org/en/latest/intro/tutorial.html) has been tested in Python 2 and 3 (work in both).
 
+You can see this code in action by clicking on the following link: [youtube video](https://youtu.be/O_j3OTXw2_E). 
+
 ## Getting Started
 
 ### Prerequisites: Anaconda. If you already have anaconda and google chrome (or Firefox), skip to step 4.
