@@ -4,9 +4,9 @@ The first part of this tutorial is highly similar to the [official scrapy docume
 
 You can see this code in action by clicking on the following link: [youtube video](https://youtu.be/O_j3OTXw2_E). 
 
-## Getting Started
+## Getting Started (Prerequisites)
 
-### Prerequisites: Anaconda. If you already have anaconda and google chrome (or Firefox), skip to step 4.
+### If you already have anaconda and google chrome (or Firefox), skip to step 4.
 
 1. Install Anaconda (Python) on your operating system. You can either download anaconda from the official site and install on your own or you can follow these anaconda installation tutorials below.
 
@@ -25,7 +25,9 @@ conda install scrapy
 
 3. Make sure you have Google chrome or Firefox. In this tutorial I am using Google Chrome. If you dont have google chrome and want to install it, you can either google it or install it here using this [link](https://support.google.com/chrome/answer/95346?co=GENIE.Platform%3DDesktop&hl=en).
 
-4. Open a terminal (mac/linux) or command line (windows).  Navigate to a desired folder (see the image below if you need help) and type 
+## Creating a new Scrapy project
+
+1. Open a terminal (mac/linux) or command line (windows).  Navigate to a desired folder (see the image below if you need help) and type 
 
 ```
 scrapy startproject fundrazr
@@ -56,7 +58,7 @@ For this tutorial, the first in the list <b>start_urls</b> is: https://fundrazr.
 
 The second start url is: https://fundrazr.com/find?category=Health&page=2
 
-The code below will be used in the spider later. All it does is make a list of start_urls. npages is just how many additional pages (after the first page) we want to get campaign links from. 
+The code below will be used in the spider later. All it does is make a list of start_urls. The variable npages is just how many additional pages (after the first page) we want to get campaign links from. 
 
 ```
 # First Start Url
