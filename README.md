@@ -30,7 +30,7 @@ Time Series Part 2  | [Time Series Data Basics with Pandas Part 2](https://githu
 ## Scrapy
 What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
-Scraping Fundrazr (GoFundMe/Kickstarter like Website) | [Step by Step Instructions](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/README.md) | [Scraping a Crowdfunding Website](https://www.youtube.com/watch?v=O_j3OTXw2_E)
+Scraping Fundrazr (GoFundMe/Kickstarter like Website) | [Step by Step Instructions](https://medium.com/@GalarnykMichael/using-scrapy-to-build-your-own-dataset-64ea2d7d4673) | [Scraping a Crowdfunding Website](https://www.youtube.com/watch?v=O_j3OTXw2_E)
 
 ## Sklearn
 What is it? | Blog Post/IPython Notebook | Youtube Video
