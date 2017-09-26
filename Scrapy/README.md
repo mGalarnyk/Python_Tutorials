@@ -84,7 +84,7 @@ We will use xpaths to extract the part enclosed in the red rectangle below.
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/campaignLink.png)
 <br>
 
-The best way to see if our to make xpaths and to check if they work is to test it inside scrapy shell. 
+The best way to to make xpaths and to check if they work is to test it inside scrapy shell. 
 
 In terminal type (mac/linux): 
 
@@ -245,7 +245,7 @@ scrapy crawl my_scraper -o MonthDay_Year.csv
 
 ## Our data
 
-1. The data outputted in this tutorial should look roughly like the image below. The individual campaigns scraped will vary as the website is constantly updated. Also it is possible there will be spaces between each individual campaign as excel is interpretting the csv file. 
+1. The data outputted in this tutorial should look roughly like the image below. The individual campaigns scraped will vary as the website is constantly updated. Also it is possible there will be spaces between each individual campaign as excel is interpreting the csv file. 
 
 ![](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Scrapy/Tutorial_Images/WebScrapingData1st.png)
 <br>
