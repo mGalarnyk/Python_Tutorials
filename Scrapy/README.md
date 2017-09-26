@@ -23,7 +23,7 @@ All | [Environment Management with Conda (Python 2 + 3, Configuring Jupyter Note
 conda install scrapy
 ```
 
-3. Make sure you have Google chrome or Firefox. In this tutorial I am using Google Chrome. If you dont have google chrome want to install it, you can install it here using this [link](https://support.google.com/chrome/answer/95346?co=GENIE.Platform%3DDesktop&hl=en).
+3. Make sure you have Google chrome or Firefox. In this tutorial I am using Google Chrome. If you dont have google chrome and want to install it, you can either google it or install it here using this [link](https://support.google.com/chrome/answer/95346?co=GENIE.Platform%3DDesktop&hl=en).
 
 4. Open a terminal (mac/linux) or command line (windows).  Navigate to a desired folder (see the image below if you need help) and type 
 
