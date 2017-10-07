@@ -1,0 +1,8 @@
+title: Python tutorials
+description: "Python tutorials in both Jupyter Notebook and youtube format. "
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-cayman
+
+gems:
+  - jekyll-mentions
