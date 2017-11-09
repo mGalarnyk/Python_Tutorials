@@ -1,5 +1,6 @@
 # ud730 Deep Learning Udacity Assignment Walkthroughs
 
+To download Tensorflow, an open source Deep Learning library created by Google, use the following link: http://www.tensorfly.cn/
 ### Assignment 1
 [1_notmnist Complete](https://github.com/mGalarnyk/Python_Tutorials/blob/master/TensorFlow/Udacity/1_notmnist-Michael.ipynb "1_notmnist Complete")
 
