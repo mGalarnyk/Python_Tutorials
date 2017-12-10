@@ -37,7 +37,7 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
 Linear Regression | [Linear Regression Python (sklearn, numpy, pandas)](https://medium.com/@GalarnykMichael/linear-regression-using-python-b29174c3797a#.vczf85s0s) | [Linear Regression](https://www.youtube.com/watch?v=dSYJVbj4Eew&t=2s)
 Logistic Regression | [Digits](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_toy_digits.ipynb) / [MNIST](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_MNIST.ipynb) | [Logistic Regression using Python (Sklearn, NumPy, Handwriting Recognition, Matplotlib)](https://www.youtube.com/watch?v=71iXeuKFcQM)
-Principal Component Analysis | [Data Visualization](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_Data_Visualization_Iris_Dataset_Blog.ipynb) / [Speed-up Machine Learning Algorithms](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_to_Speed-up_Machine_Learning_Algorithms.ipynb) | Coming soon
+Principal Component Analysis | [Data Visualization](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_Data_Visualization_Iris_Dataset_Blog.ipynb) / [Speed-up Machine Learning Algorithms](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_to_Speed-up_Machine_Learning_Algorithms.ipynb) | [PCA using Python](https://www.youtube.com/watch?v=kApPBm1YsqU)
 Descision Trees and Random Forest | In Progress | In Progress
 
 ## Spark (Python)
