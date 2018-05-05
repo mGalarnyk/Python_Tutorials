@@ -18,6 +18,7 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)  | [11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsWordCount.ipynb) | [11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)](https://www.youtube.com/watch?v=l_dIleafLZ8)
 12: While Loops and Prime Numbers | Coming Soon | [12: While Loops and Prime Numbers](https://youtu.be/apEjxRmIp0I)
 Solving System of Equations | [Solving System of Equations](https://medium.com/@GalarnykMichael/solving-system-of-linear-equations-using-python-645ad1904cec#.z6lw1zyw6) | [Solving System of Equations](https://www.youtube.com/watch?v=AqIrdW2-K6k&)
+Prime Numbers | [Prime Numbers](https://hackernoon.com/prime-numbers-using-python-824ff4b3ea19) | coming soon
 
 ## Pandas
 Domain | Blog Post/IPython Notebook | Youtube Video
