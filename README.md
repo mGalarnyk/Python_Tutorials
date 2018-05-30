@@ -16,7 +16,8 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 9: Tuples + Fibonacci Sequence | [9: Tuples + Fibonacci Sequence](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsTuples.ipynb) | [9: Tuples + Fibonacci Sequence](https://www.youtube.com/watch?v=gUHeaQ0qZaw)
 10: Dictionaries + Dictionary Manipulation | [10: Dictionaries + Dictionary Manipulation](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsDictionaries.ipynb) | [10: Dictionaries + Dictionary Manipulation](https://www.youtube.com/watch?v=LlIqrWJaBcQ)
 11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)  | [11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsWordCount.ipynb) | [11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)](https://www.youtube.com/watch?v=l_dIleafLZ8)
-12: While Loops and Prime Numbers | Coming Soon | [12: While Loops and Prime Numbers](https://youtu.be/apEjxRmIp0I)
+12: While Loops and Prime Numbers | None | [12: While Loops and Prime Numbers](https://youtu.be/apEjxRmIp0I)
+13: Python Sets and Set Theory | [DataCamp Blog]() | Coming Soon
 Solving System of Equations | [Solving System of Equations](https://medium.com/@GalarnykMichael/solving-system-of-linear-equations-using-python-645ad1904cec#.z6lw1zyw6) | [Solving System of Equations](https://www.youtube.com/watch?v=AqIrdW2-K6k&)
 Prime Numbers | [Prime Numbers](https://hackernoon.com/prime-numbers-using-python-824ff4b3ea19) | coming soon
 
@@ -38,8 +39,9 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
 Linear Regression | [Linear Regression Python (sklearn, numpy, pandas)](https://medium.com/@GalarnykMichael/linear-regression-using-python-b29174c3797a#.vczf85s0s) | [Linear Regression](https://www.youtube.com/watch?v=dSYJVbj4Eew&t=2s)
 Logistic Regression | [Digits](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_toy_digits.ipynb) / [MNIST](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_MNIST.ipynb) | [Logistic Regression using Python (Sklearn, NumPy, Handwriting Recognition, Matplotlib)](https://www.youtube.com/watch?v=71iXeuKFcQM)
+k-Nearest Neighbors | August 2018 | August 2018
 Principal Component Analysis | [Data Visualization](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_Data_Visualization_Iris_Dataset_Blog.ipynb) / [Speed-up Machine Learning Algorithms](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_to_Speed-up_Machine_Learning_Algorithms.ipynb) | [PCA using Python](https://www.youtube.com/watch?v=kApPBm1YsqU)
-Descision Trees and Random Forest | In Progress | In Progress
+Decision Trees and Random Forest | August 2018 | August 2018 
 
 ## Spark (Python)
 Tutorial | IPython Notebook | Youtube Video
