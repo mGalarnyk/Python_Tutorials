@@ -34,11 +34,6 @@ What is it? | Blog Post | Youtube Video
 --- | --- | ---
 Scraping Fundrazr (GoFundMe/Kickstarter like Website) | [Step by Step Instructions](https://medium.com/@GalarnykMichael/using-scrapy-to-build-your-own-dataset-64ea2d7d4673) | [Scraping a Crowdfunding Website](https://www.youtube.com/watch?v=O_j3OTXw2_E)
 
-## Statistics
-What is it? | Blog Post | Youtube Video
---- | --- | ---
-68-95-99.7 rule for a Normal Distribution | [68-95-99.7 rule for a Normal Distribution](https://medium.com/@GalarnykMichael/understanding-the-68-95-99-7-rule-for-a-normal-distribution-b7b7cbf760c2) | Coming Soon
-
 ## Sklearn
 What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
@@ -52,6 +47,11 @@ Decision Trees and Random Forest | August 2018 | August 2018
 Tutorial | IPython Notebook | Youtube Video
 --- | --- | ---
 Word Count | [Word Count using PySpark](https://github.com/mGalarnyk/Python_Tutorials/blob/master/PySpark_Basics/PySpark_Part1_Word_Count_Removing_Punctuation_Pride_Prejudice.ipynb) | [Word Count using PySpark](https://www.youtube.com/watch?v=jg7Z8ctKpEs&t=1s)
+
+## Statistics
+What is it? | Blog Post | Youtube Video
+--- | --- | ---
+68-95-99.7 rule for a Normal Distribution | [68-95-99.7 rule for a Normal Distribution](https://medium.com/@GalarnykMichael/understanding-the-68-95-99-7-rule-for-a-normal-distribution-b7b7cbf760c2) | Coming Soon
 
 ## Other Python Resources
 What is it? | Repo | Youtube Video
