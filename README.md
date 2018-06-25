@@ -15,7 +15,7 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 8: FizzBizz | [8: FizzBizz](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsFizzBuzz.ipynb) | [8: FizzBizz](https://www.youtube.com/watch?v=XR1QFrbPRnw)
 9: Tuples + Fibonacci Sequence | [9: Tuples + Fibonacci Sequence](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsTuples.ipynb) | [9: Tuples + Fibonacci Sequence](https://www.youtube.com/watch?v=gUHeaQ0qZaw)
 10: Dictionaries + Dictionary Manipulation | [10: Dictionaries + Dictionary Manipulation](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsDictionaries.ipynb) | [10: Dictionaries + Dictionary Manipulation](https://www.youtube.com/watch?v=LlIqrWJaBcQ)
-11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)  | [11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsWordCount.ipynb) | [11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)](https://www.youtube.com/watch?v=l_dIleafLZ8)
+11: Word Count (PunctuationFilter out , Dictionary Manipulation, and Sorting Lists)  | [11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsWordCount.ipynb) | [11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)](https://www.youtube.com/watch?v=l_dIleafLZ8)
 12: While Loops and Prime Numbers | None | [12: While Loops and Prime Numbers](https://youtu.be/apEjxRmIp0I)
 13: Python Sets and Set Theory | [DataCamp Blog](https://www.datacamp.com/community/tutorials/sets-in-python) | Coming Soon
 Solving System of Equations | [Solving System of Equations](https://medium.com/@GalarnykMichael/solving-system-of-linear-equations-using-python-645ad1904cec#.z6lw1zyw6) | [Solving System of Equations](https://www.youtube.com/watch?v=AqIrdW2-K6k&)
@@ -60,10 +60,10 @@ Course| [Python for Informatics](https://github.com/mGalarnyk/Python_Tutorials/b
 Installations (Anaconda, Spark Etc) | [General Installations](https://github.com/mGalarnyk/Installations_Mac_Ubuntu_Windows "Python Installations") | See the link for more installations. 
 
 ## Contributors
-FirstName | LastName | Email
---- | --- | ---
-Michael  |  Galarnyk | <mgalarny@gmail.com>
-Submit  |  Pull Request | <youremailhere@gmail.com>
+FirstName | LastName
+--- | --- 
+Michael  |  Galarnyk
+Submit  |  Pull Request
 
 ## License
 Anyone may contribute to our project. Submit a pull request or raise an issue. 
