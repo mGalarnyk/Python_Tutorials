@@ -1,0 +1,32 @@
+digraph Tree {
+node [shape=box] ;
+0 [label="grade <= 8.5\nmse = 1.33298974684e+11\nsamples = 16209\nvalue = 540055.7"] ;
+1 [label="sqft_living <= 2039.0\nmse = 37910424896.3\nsamples = 13000\nvalue = 437309.625"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="grade <= 7.5\nmse = 23212685432.1\nsamples = 8802\nvalue = 383161.431"] ;
+1 -> 2 ;
+3 [label="mse = 19932041477.7\nsamples = 6912\nvalue = 359093.15"] ;
+2 -> 3 ;
+4 [label="mse = 25344229649.3\nsamples = 1890\nvalue = 471182.575"] ;
+2 -> 4 ;
+5 [label="yr_built <= 1954.5\nmse = 49689955341.6\nsamples = 4198\nvalue = 550842.831"] ;
+1 -> 5 ;
+6 [label="mse = 74162064921.7\nsamples = 933\nvalue = 694733.537"] ;
+5 -> 6 ;
+7 [label="mse = 35089682005.4\nsamples = 3265\nvalue = 509724.905"] ;
+5 -> 7 ;
+8 [label="sqft_living <= 4227.5\nmse = 3.03709786537e+11\nsamples = 3209\nvalue = 956290.969"] ;
+0 -> 8 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+9 [label="yr_built <= 1973.5\nmse = 1.34615876632e+11\nsamples = 2778\nvalue = 848405.628"] ;
+8 -> 9 ;
+10 [label="mse = 2.02064929065e+11\nsamples = 447\nvalue = 1187878.268"] ;
+9 -> 10 ;
+11 [label="mse = 95344723775.6\nsamples = 2331\nvalue = 783307.271"] ;
+9 -> 11 ;
+12 [label="sqft_living <= 9280.0\nmse = 8.35037287484e+11\nsamples = 431\nvalue = 1651663.311"] ;
+8 -> 12 ;
+13 [label="mse = 6.21501635135e+11\nsamples = 428\nvalue = 1612662.119"] ;
+12 -> 13 ;
+14 [label="mse = 1.22459722222e+11\nsamples = 3\nvalue = 7215833.333"] ;
+12 -> 14 ;
+}
