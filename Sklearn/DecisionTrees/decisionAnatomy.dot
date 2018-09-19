@@ -1,0 +1,12 @@
+digraph Tree {
+node [shape=box, style="filled", color="black"] ;
+0 [label = "Root Node", fillcolor="cyan"] ;
+1 [label = "Leaf/Terminal\nNode", fillcolor="springgreen"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="Decision Node", fillcolor="pink"] ;
+0 -> 2 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+3 [label = "Leaf/Terminal\nNode", fillcolor="springgreen"] ;
+2 -> 3 ;
+4 [label = "Leaf/Terminal\nNode", fillcolor="springgreen"] ;
+2 -> 4 ;
+}
