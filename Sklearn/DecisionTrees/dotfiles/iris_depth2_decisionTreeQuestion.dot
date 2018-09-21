@@ -1,0 +1,12 @@
+digraph Tree {
+node [shape=box, style="filled", color="black"] ;
+0 [label="Is the petal length (cm) <= 2.35?", fillcolor="pink"] ;
+1 [label="setosa", fillcolor="springgreen"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="Is the petal length (cm) <= 4.95", fillcolor="pink"] ;
+0 -> 2 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+3 [label="versicolor", fillcolor="springgreen"] ;
+2 -> 3 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+4 [label="virginica", fillcolor="springgreen"] ;
+2 -> 4 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+}
