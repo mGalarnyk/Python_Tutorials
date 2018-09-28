@@ -7,6 +7,6 @@ node [shape=box] ;
 0 -> 2 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
 3 [label="gini = 0.153\nsamples = 36\nvalue = [0, 33, 3]\nclass = versicolor"] ;
 2 -> 3 ;
-4 [label="gini = 0.05\nsamples = 39\nvalue = [0, 1, 38]\nclass = virginica"] ;
+4 [label="node type: <FONT COLOR='green'>leaf/terminal</FONT>\ngini = 0.05\nsamples = 39\nvalue = [0, 1, 38]\nclass = virginica"] ;
 2 -> 4 ;
 }
