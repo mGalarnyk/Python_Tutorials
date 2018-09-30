@@ -9,5 +9,3 @@ line break with graphviz, html: https://stackoverflow.com/questions/16067483/lin
 Converting dot to png in python: https://stackoverflow.com/questions/5316206/converting-dot-to-png-in-python
 
 graphviz python: https://graphviz.readthedocs.io/en/stable/examples.html
-
-Times-Roman
