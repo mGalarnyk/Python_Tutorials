@@ -21,6 +21,12 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 Solving System of Equations | [Solving System of Equations](https://medium.com/@GalarnykMichael/solving-system-of-linear-equations-using-python-645ad1904cec#.z6lw1zyw6) | [Solving System of Equations](https://www.youtube.com/watch?v=AqIrdW2-K6k&)
 Prime Numbers | [Prime Numbers](https://hackernoon.com/prime-numbers-using-python-824ff4b3ea19) | coming soon
 
+## Finance
+What is it? | Blog Post/IPython Notebook | Youtube Video
+--- | --- | ---
+Understanding Car Loans with Python | [Understanding Car Loans with Python](https://towardsdatascience.com/the-cost-of-financing-a-new-car-car-loans-c00997f1aee) | Coming Soon
+
+
 ## Pandas
 Domain | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
