@@ -19,7 +19,7 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 12: While Loops and Prime Numbers | None | [12: While Loops and Prime Numbers](https://youtu.be/apEjxRmIp0I)
 13: Python Sets and Set Theory | [Python Sets and Set Theory](https://towardsdatascience.com/python-sets-and-set-theory-2ace093d1607) | [Python Sets and Set Theory](https://youtu.be/hZPNPh5Zg3M)
 Solving System of Equations | [Solving System of Equations](https://medium.com/@GalarnykMichael/solving-system-of-linear-equations-using-python-645ad1904cec#.z6lw1zyw6) | [Solving System of Equations](https://www.youtube.com/watch?v=AqIrdW2-K6k&)
-Prime Numbers | [Prime Numbers](https://hackernoon.com/prime-numbers-using-python-824ff4b3ea19) | coming soon
+Prime Numbers | [Prime Numbers](https://hackernoon.com/prime-numbers-using-python-824ff4b3ea19) | None
 
 ## Finance
 What is it? | Blog Post/IPython Notebook | Youtube Video
@@ -45,10 +45,10 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
 Linear Regression | [Linear Regression Python (sklearn, numpy, pandas)](https://medium.com/@GalarnykMichael/linear-regression-using-python-b29174c3797a#.vczf85s0s) | [Linear Regression](https://www.youtube.com/watch?v=dSYJVbj4Eew&t=2s)
 Logistic Regression | [Digits](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_toy_digits.ipynb) / [MNIST](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_MNIST.ipynb) | [Logistic Regression using Python (Sklearn, NumPy, Handwriting Recognition, Matplotlib)](https://www.youtube.com/watch?v=71iXeuKFcQM)
-k-Nearest Neighbors | January 2019 | January 2019
+k-Nearest Neighbors | Soon | Soon
 Principal Component Analysis | [Data Visualization](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_Data_Visualization_Iris_Dataset_Blog.ipynb) / [Speed-up Machine Learning Algorithms](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_to_Speed-up_Machine_Learning_Algorithms.ipynb) | [PCA using Python](https://www.youtube.com/watch?v=kApPBm1YsqU)
-Decision Trees | November 2018 | November 2018
-Random Forest | January 2019 | January 2019
+Decision Trees | Soon | Soon
+Random Forest | Soon | Soon
 
 ## Spark (Python)
 Tutorial | IPython Notebook | Youtube Video
