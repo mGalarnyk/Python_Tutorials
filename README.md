@@ -18,8 +18,9 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 11: Word Count (PunctuationFilter out , Dictionary Manipulation, and Sorting Lists)  | [11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsWordCount.ipynb) | [11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)](https://www.youtube.com/watch?v=l_dIleafLZ8)
 12: While Loops and Prime Numbers | None | [12: While Loops and Prime Numbers](https://youtu.be/apEjxRmIp0I)
 13: Python Sets and Set Theory | [Python Sets and Set Theory](https://towardsdatascience.com/python-sets-and-set-theory-2ace093d1607) | [Python Sets and Set Theory](https://youtu.be/hZPNPh5Zg3M)
-Solving System of Equations | [Solving System of Equations](https://medium.com/@GalarnykMichael/solving-system-of-linear-equations-using-python-645ad1904cec#.z6lw1zyw6) | [Solving System of Equations](https://www.youtube.com/watch?v=AqIrdW2-K6k&)
+Anagrams | [Using Python to Detect Anagrams](https://medium.com/@GalarnykMichael/using-python-to-detect-anagrams-a002ddedb4cb) | None
 Prime Numbers | [Prime Numbers](https://hackernoon.com/prime-numbers-using-python-824ff4b3ea19) | None
+Solving System of Equations | [Solving System of Equations](https://medium.com/@GalarnykMichael/solving-system-of-linear-equations-using-python-645ad1904cec#.z6lw1zyw6) | [Solving System of Equations](https://www.youtube.com/watch?v=AqIrdW2-K6k&)
 
 ## Finance
 What is it? | Blog Post/IPython Notebook | Youtube Video
