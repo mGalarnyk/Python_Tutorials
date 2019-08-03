@@ -48,7 +48,7 @@ Linear Regression | [Linear Regression Python (sklearn, numpy, pandas)](https://
 Logistic Regression | [Digits](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_toy_digits.ipynb) / [MNIST](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_MNIST.ipynb) | [Logistic Regression using Python (Sklearn, NumPy, Handwriting Recognition, Matplotlib)](https://www.youtube.com/watch?v=71iXeuKFcQM)
 k-Nearest Neighbors | Soon | Soon
 Principal Component Analysis | [Data Visualization](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_Data_Visualization_Iris_Dataset_Blog.ipynb) / [Speed-up Machine Learning Algorithms](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_to_Speed-up_Machine_Learning_Algorithms.ipynb) | [PCA using Python](https://www.youtube.com/watch?v=kApPBm1YsqU)
-Decision Trees | Soon | Soon
+Decision Trees (Classification) | [Decision Trees (Classification)](https://towardsdatascience.com/understanding-decision-trees-for-classification-python-9663d683c952) | Soon
 Random Forest | Soon | Soon
 
 ## Spark (Python)
