@@ -65,10 +65,11 @@ Understanding Boxplots | [Blog Post](https://medium.com/@GalarnykMichael/underst
 Confidence Intervals | Coming Soon | Coming Soon
 
 ## Other Python Resources
-What is it? | Repo | Youtube Video
+What is it? | Repo/Website | Youtube Video
 --- | --- | ---
-Course| [Python for Informatics](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Informatics/README.md "Python for Informatics") | None
+Course | [Python for Data Visualization LinkedIn Learning](https://www.linkedin.com/learning/python-for-data-visualization/effectively-present-data-with-python) | [Free Preview Video](https://youtu.be/BE8CVGJuftI)
 Installations (Anaconda, Spark Etc) | [General Installations](https://github.com/mGalarnyk/Installations_Mac_Ubuntu_Windows "Python Installations") | See the link for more installations. 
+Course| [Python for Informatics](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Informatics/README.md "Python for Informatics") | None
 
 ## Contributors
 FirstName | LastName
