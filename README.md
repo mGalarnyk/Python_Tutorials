@@ -2,6 +2,12 @@
 
 Useful Python Tutorials. Feel free to submit a pull request. Also please subscribe to my <a href="https://www.youtube.com/c/MichaelGalarnyk?sub_confirmation=1"> youtube channel!</a>
 
+## Apis
+What is it? | Blog Post/Jupyter Notebook | Youtube Video
+--- | --- | ---
+Fitbit API Tutorial | [Blog Post](https://towardsdatascience.com/using-the-fitbit-web-api-with-python-f29f119621ea) | None
+Twitter API Tutorial | [Blog Post](https://towardsdatascience.com/access-data-from-twitter-api-using-r-and-or-python-b8ac342d3efe) | None
+
 ## Basics 
 What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
