@@ -57,7 +57,7 @@ k-Nearest Neighbors | Soon | Soon
 Principal Component Analysis | [Data Visualization](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_Data_Visualization_Iris_Dataset_Blog.ipynb) / [Speed-up Machine Learning Algorithms](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_to_Speed-up_Machine_Learning_Algorithms.ipynb) | [PCA using Python](https://www.youtube.com/watch?v=kApPBm1YsqU)
 Decision Trees (Classification) | [Decision Trees (Classification)](https://towardsdatascience.com/understanding-decision-trees-for-classification-python-9663d683c952) | Soon
 Random Forest | Soon | Soon
-Visualizing Decision Trees with Python (Scikit-learn, Graphviz, Matplotlib) | [Visualizing Decision Trees](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/CART/Visualization/DecisionTreesVisualization.ipynb) | Maybe Soon
+Visualizing Decision Trees with Python (Scikit-learn, Graphviz, Matplotlib) | [Visualizing Decision Trees](https://towardsdatascience.com/visualizing-decision-trees-with-python-scikit-learn-graphviz-matplotlib-1c50b4aa68dc) | Maybe Soon
 
 ## Spark (Python)
 Tutorial | IPython Notebook | Youtube Video
