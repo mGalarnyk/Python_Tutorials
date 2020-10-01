@@ -27,6 +27,7 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 Anagrams | [Using Python to Detect Anagrams](https://medium.com/@GalarnykMichael/using-python-to-detect-anagrams-a002ddedb4cb) | None
 Prime Numbers | [Prime Numbers](https://medium.com/@GalarnykMichael/prime-numbers-using-python-824ff4b3ea19) | None
 Solving System of Equations | [Solving System of Equations](https://medium.com/@GalarnykMichael/solving-system-of-linear-equations-using-python-645ad1904cec#.z6lw1zyw6) | [Solving System of Equations](https://www.youtube.com/watch?v=AqIrdW2-K6k&)
+Python quiz| [Basic Python Questions](https://www.w3schools.com/python/exercise.asp)|None
 
 ## Finance
 What is it? | Blog Post/IPython Notebook | Youtube Video
