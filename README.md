@@ -52,6 +52,7 @@ Scraping Fundrazr (GoFundMe/Kickstarter like Website) | [Step by Step Instructio
 What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
 How to Speed up Scikit-Learn Model Training | [How to Speed up Scikit-Learn Model Training](https://medium.com/distributed-computing-with-ray/how-to-speed-up-scikit-learn-model-training-aaf17e2d1e1) | None
+Introduction to Scikit-Learn | [GitHub Repository](https://github.com/mGalarnyk/DSGO_IntroductionScikitLearn) | [Introduction to Scikit-Learn](https://www.youtube.com/watch?v=FFKMk6mcJlM&t=4597s)
 Linear Regression | [Linear Regression Python (sklearn, numpy, pandas)](https://medium.com/@GalarnykMichael/linear-regression-using-python-b29174c3797a#.vczf85s0s) | [Linear Regression](https://www.youtube.com/watch?v=dSYJVbj4Eew&t=2s)
 Logistic Regression | [Digits](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_toy_digits.ipynb) / [MNIST](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_MNIST.ipynb) | [Logistic Regression using Python (Sklearn, NumPy, Handwriting Recognition, Matplotlib)](https://www.youtube.com/watch?v=71iXeuKFcQM)
 k-Nearest Neighbors | Soon | Soon
