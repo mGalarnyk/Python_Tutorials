@@ -40,6 +40,7 @@ Domain | Blog Post/IPython Notebook | Youtube Video
 Boxplots using Matplotlib, Pandas, and Seaborn Libraries  | [Understanding Boxplots](https://towardsdatascience.com/understanding-boxplots-5e2df7bcbd51 "Understanding Boxplots") | [Youtube Video](https://youtu.be/BE8CVGJuftI)
 Heatmaps Part 1  | [Heatmaps Part 1](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Request/Heat%20Maps%20using%20Matplotlib%20and%20Seaborn.ipynb) | [Youtube Video](https://www.youtube.com/watch?v=m7uXFyPN2Sk)
 Heatmaps Part 2  | [Heatmaps Part 2](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Request/Heat%20Maps%20using%20Matplotlib%20and%20Seaborn.ipynb) | [Youtube Video](https://www.youtube.com/watch?v=NHwXkvwSd7E)
+How to Speed Up Pandas with Modin | [How to Speed Up Pandas with Modin](https://medium.com/distributed-computing-with-ray/how-to-speed-up-pandas-with-modin-84aa6a87bcdb) | None
 Time Series Part 1 | [Time Series Data Basics with Pandas Part 1](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Time_Series/Part1_Time_Series_Data_BasicPlotting.ipynb "Time Series Data Basics with Pandas Part 1") | [Youtube Video](https://www.youtube.com/watch?v=OwnaUVt6VVE)
 Time Series Part 2  | [Time Series Data Basics with Pandas Part 2](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Time_Series/Part2_Time_Series_Data_Price_Variation_ShiftingGroupBy.ipynb "Time Series Data Basics with Pandas Part 2") | [Youtube Video](https://www.youtube.com/watch?v=1S5UKLqe-gg)
 
