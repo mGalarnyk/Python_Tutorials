@@ -49,6 +49,11 @@ What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
 Writing your First Distributed Python Application with Ray | [Blog Post](https://towardsdatascience.com/using-the-fitbit-web-api-with-python-f29f119621ea) | None
 
+## Reinforcement Learning
+What is it? | Blog Post/Jupyter Notebook | Youtube Video
+--- | --- | ---
+An Introduction to Reinforcement Learning with OpenAI Gym, RLlib, and Google Colab | [Blog Post](https://towardsdatascience.com/an-introduction-to-reinforcement-learning-with-openai-gym-rllib-and-google-colab-48fc1ddfb889) | None
+
 ## Scrapy
 What is it? | Blog Post | Youtube Video
 --- | --- | ---
