@@ -47,6 +47,7 @@ Time Series Part 2  | [Time Series Data Basics with Pandas Part 2](https://githu
 ## Parallel and Distributed Python
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
+Common options for Parallelizing Python Code | [Blog Post](https://towardsdatascience.com/parallelizing-python-code-3eb3c8e5f9cd) | None
 Writing your First Distributed Python Application with Ray | [Blog Post](https://towardsdatascience.com/using-the-fitbit-web-api-with-python-f29f119621ea) | None
 
 ## Reinforcement Learning
