@@ -50,6 +50,13 @@ What is it? | Blog Post/Jupyter Notebook | Youtube Video
 Common options for Parallelizing Python Code | [Blog Post](https://towardsdatascience.com/parallelizing-python-code-3eb3c8e5f9cd) | None
 Writing your First Distributed Python Application with Ray | [Blog Post](https://towardsdatascience.com/using-the-fitbit-web-api-with-python-f29f119621ea) | None
 
+## PyTorch
+What is it? | Blog Post/Jupyter Notebook | Youtube Video
+--- | --- | ---
+Getting Started with Distributed Machine Learning with PyTorch and Ray | [Blog Post](https://medium.com/pytorch/getting-started-with-distributed-machine-learning-with-pytorch-and-ray-fd83c98fdead) | None
+Getting Started With Ray Lightning: Easy Multi-Node PyTorch Lightning Training | [Blog Post](https://medium.com/pytorch/getting-started-with-ray-lightning-easy-multi-node-pytorch-lightning-training-e639031aff8b) | None
+
+
 ## Reinforcement Learning
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
