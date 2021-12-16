@@ -36,7 +36,7 @@ Understanding Car Loans with Python | [Understanding Car Loans with Python](http
 ## Gradient Boosting
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
-Coming soon | Coming soon | None
+How to Speed Up XGBoost Model Training | [Speed Up XGBoost Model Training](https://www.anyscale.com/blog/how-to-speed-up-xgboost-model-training)| None
 
 ## Pandas
 Domain | Blog Post/IPython Notebook | Youtube Video
