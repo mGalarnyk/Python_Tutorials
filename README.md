@@ -33,6 +33,10 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
 Understanding Car Loans with Python | [Understanding Car Loans with Python](https://towardsdatascience.com/the-cost-of-financing-a-new-car-car-loans-c00997f1aee) | Coming Soon
 
+## Gradient Boosting
+What is it? | Blog Post/Jupyter Notebook | Youtube Video
+--- | --- | ---
+Coming soon | Coming soon | None
 
 ## Pandas
 Domain | Blog Post/IPython Notebook | Youtube Video
