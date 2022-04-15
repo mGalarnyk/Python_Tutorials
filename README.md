@@ -6,7 +6,7 @@ Useful Python Tutorials. Feel free to submit a pull request. Also please subscri
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
 Fitbit API Tutorial | [Blog Post](https://towardsdatascience.com/using-the-fitbit-web-api-with-python-f29f119621ea) | None
-Twitter API Tutorial | [Blog Post](https://towardsdatascience.com/access-data-from-twitter-api-using-r-and-or-python-b8ac342d3efe) | None
+Twitter API Tutorial | [Blog Post](https://towardsdatascience.com/how-to-access-data-from-the-twitter-api-using-tweepy-python-e2d9e4d54978) | None
 
 ## Basics 
 What is it? | Blog Post/IPython Notebook | Youtube Video
