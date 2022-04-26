@@ -1,0 +1,16 @@
+digraph Tree {
+node [shape=box, style="filled,solid", fillcolor="#FFFFFF"] ;
+0 [label=<<FONT COLOR="#D2691E">sqft_living &le; 3415.0<br/>mse = 1.35e+11<br/>samples = 16209<br/>price=541751.575<br/></FONT>>];
+1 [label=<<FONT COLOR="#0000FF">sqft_living &le; 2259.5<br/>mse = 5.58e+10<br/>samples = 14863<br/>price=479699.297<br/></FONT>>];
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True", arrowsize=1.7, penwidth = 3] ;
+2 [label=<<FONT COLOR="#008000">mse = 2.86e+10<br/>samples = 10527<br/>price = 406622.583<br/></FONT>>];
+1 -> 2 [labeldistance=2.5, labelangle=45, headlabel="True", arrowsize=1.7, penwidth = 3];
+3 [label=<<FONT COLOR="#008000">mse = 7.76e+10<br/>samples = 4336<br/>price = 657115.943<br/></FONT>>];
+1 -> 3 [labeldistance=2.5, labelangle=-45, headlabel="False"];
+4 [label=<<FONT COLOR="#0000FF">sqft_living &le; 4755.0<br/>mse = 501992165625.422<br/>samples = 1346<br/>price= 1226954.277<br/></FONT>>];
+0 -> 4 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+5 [label=<<FONT COLOR="#008000">mse = 2.71e+11<br/>samples = 1144<br/>price = 1095030.548<br/></FONT>>];
+4 -> 5 [labeldistance=2.5, labelangle=45, headlabel="True"];
+6 [label=<<FONT COLOR="#008000">mse = 1.15e+12<br/>samples = 202<br/>price = 1974086.683<br/></FONT>>];
+4 -> 6 [labeldistance=2.5, labelangle=-45, headlabel="False"];
+}
