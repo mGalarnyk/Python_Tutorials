@@ -74,14 +74,15 @@ Scraping Fundrazr (GoFundMe/Kickstarter like Website) | [Step by Step Instructio
 ## Sklearn
 What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
+Decision Trees (Classification) | [Decision Trees (Classification)](https://towardsdatascience.com/understanding-decision-trees-for-classification-python-9663d683c952) | None
 How to Speed up Scikit-Learn Model Training | [How to Speed up Scikit-Learn Model Training](https://medium.com/distributed-computing-with-ray/how-to-speed-up-scikit-learn-model-training-aaf17e2d1e1) | None
 Introduction to Scikit-Learn | [GitHub Repository](https://github.com/mGalarnyk/DSGO_IntroductionScikitLearn) | [Introduction to Scikit-Learn](https://www.youtube.com/watch?v=FFKMk6mcJlM&t=4597s)
+k-Nearest Neighbors | Soon | Soon
 Linear Regression | [Linear Regression Python (sklearn, numpy, pandas)](https://medium.com/@GalarnykMichael/linear-regression-using-python-b29174c3797a#.vczf85s0s) | [Linear Regression](https://www.youtube.com/watch?v=dSYJVbj4Eew&t=2s)
 Logistic Regression | [Digits](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_toy_digits.ipynb) / [MNIST](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_MNIST.ipynb) | [Logistic Regression using Python (Sklearn, NumPy, Handwriting Recognition, Matplotlib)](https://www.youtube.com/watch?v=71iXeuKFcQM)
-k-Nearest Neighbors | Soon | Soon
 Principal Component Analysis | [Data Visualization](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_Data_Visualization_Iris_Dataset_Blog.ipynb) / [Speed-up Machine Learning Algorithms](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_to_Speed-up_Machine_Learning_Algorithms.ipynb) | [PCA using Python](https://www.youtube.com/watch?v=kApPBm1YsqU)
-Decision Trees (Classification) | [Decision Trees (Classification)](https://towardsdatascience.com/understanding-decision-trees-for-classification-python-9663d683c952) | None
 Random Forest | None | None
+Train Test Split (Scikit-Learn + Python) | [Understanding Train Test Split (Scikit-Learn + Python)](https://towardsdatascience.com/understanding-train-test-split-scikit-learn-python-ea676d5e3d1) | None
 Visualizing Decision Trees with Python (Scikit-learn, Graphviz, Matplotlib) | [Visualizing Decision Trees](https://towardsdatascience.com/visualizing-decision-trees-with-python-scikit-learn-graphviz-matplotlib-1c50b4aa68dc) | None
 
 ## Spark (Python)
