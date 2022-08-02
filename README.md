@@ -82,7 +82,7 @@ Linear Regression | [Linear Regression Python (sklearn, numpy, pandas)](https://
 Logistic Regression | [Digits](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_toy_digits.ipynb) / [MNIST](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_MNIST.ipynb) | [Logistic Regression using Python (Sklearn, NumPy, Handwriting Recognition, Matplotlib)](https://www.youtube.com/watch?v=71iXeuKFcQM)
 Principal Component Analysis | [Data Visualization](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_Data_Visualization_Iris_Dataset_Blog.ipynb) / [Speed-up Machine Learning Algorithms](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/PCA/PCA_to_Speed-up_Machine_Learning_Algorithms.ipynb) | [PCA using Python](https://www.youtube.com/watch?v=kApPBm1YsqU)
 Random Forest | None | None
-Train Test Split (Scikit-Learn + Python) | [Understanding Train Test Split (Scikit-Learn + Python)](https://towardsdatascience.com/understanding-train-test-split-scikit-learn-python-ea676d5e3d1) | None
+Train Test Split (Scikit-Learn + Python) | [Understanding Train Test Split (Scikit-Learn + Python)](https://builtin.com/data-science/train-test-split) | [Train Test Split using Python (Scikit-Learn)](https://youtu.be/rCevxk3jeKs)
 Visualizing Decision Trees with Python (Scikit-learn, Graphviz, Matplotlib) | [Visualizing Decision Trees](https://towardsdatascience.com/visualizing-decision-trees-with-python-scikit-learn-graphviz-matplotlib-1c50b4aa68dc) | None
 
 ## Spark (Python)
