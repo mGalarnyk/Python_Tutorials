@@ -41,7 +41,7 @@ How to Speed Up XGBoost Model Training | [Speed Up XGBoost Model Training](https
 ## Pandas
 Domain | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
-Boxplots using Matplotlib, Pandas, and Seaborn Libraries  | [Understanding Boxplots](https://towardsdatascience.com/understanding-boxplots-5e2df7bcbd51 "Understanding Boxplots") | [Youtube Video](https://youtu.be/BE8CVGJuftI)
+Boxplots using Matplotlib, Pandas, and Seaborn Libraries  | [Understanding Boxplots](https://builtin.com/data-science/boxplot "Understanding Boxplots") | [Youtube Video](https://youtu.be/BE8CVGJuftI)
 Heatmaps Part 1  | [Heatmaps Part 1](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Request/Heat%20Maps%20using%20Matplotlib%20and%20Seaborn.ipynb) | [Youtube Video](https://www.youtube.com/watch?v=m7uXFyPN2Sk)
 Heatmaps Part 2  | [Heatmaps Part 2](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Request/Heat%20Maps%20using%20Matplotlib%20and%20Seaborn.ipynb) | [Youtube Video](https://www.youtube.com/watch?v=NHwXkvwSd7E)
 How to Speed Up Pandas with Modin | [How to Speed Up Pandas with Modin](https://medium.com/distributed-computing-with-ray/how-to-speed-up-pandas-with-modin-84aa6a87bcdb) | None
@@ -93,7 +93,7 @@ Word Count | [Word Count using PySpark](https://github.com/mGalarnyk/Python_Tuto
 ## Statistics
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
-68-95-99.7 rule for a Normal Distribution | [Blog Post](https://medium.com/@GalarnykMichael/understanding-the-68-95-99-7-rule-for-a-normal-distribution-b7b7cbf760c2)/[Jupyter Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Statistics/normal_Distribution_Area_Under_Curve.ipynb) | Coming Soon
+68-95-99.7 rule for a Normal Distribution | [Blog Post](https://builtin.com/data-science/empirical-rule)/[Jupyter Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Statistics/normal_Distribution_Area_Under_Curve.ipynb) | Coming Soon
 Confidence Intervals | Coming Soon | Coming Soon
 Understanding Boxplots | [Blog Post](https://medium.com/@GalarnykMichael/understanding-boxplots-5e2df7bcbd51) | Coming Soon
 Understanding Sampling With and Without Replacement (Python) | [Blog Post](https://towardsdatascience.com/understanding-sampling-with-and-without-replacement-python-7aff8f47ebe4)/[Jupyter Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Statistics/Sample_With_Replacement/SampleWithReplacement.ipynb) | Coming Soon
