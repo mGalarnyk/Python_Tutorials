@@ -42,7 +42,7 @@ How to Speed Up XGBoost Model Training | [Speed Up XGBoost Model Training](https
 Domain | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
 Boxplots using Matplotlib, Pandas, and Seaborn Libraries  | [Understanding Boxplots](https://builtin.com/data-science/boxplot "Understanding Boxplots") | [Youtube Video](https://youtu.be/BE8CVGJuftI)
-Data Manipulation with Pandas | [Data Manipulation with Pandas]( "Data Manipulation with Pandas Notebooks") | [Youtube Video](https://youtu.be/3qdzsvlOlS4?si=mwxbYF3xAcY0HfN_)
+Data Manipulation with Pandas | [Data Manipulation with Pandas](https://github.com/mGalarnyk/Python_Tutorials/tree/master/Pandas "Data Manipulation with Pandas Notebooks") | [Youtube Video](https://youtu.be/3qdzsvlOlS4?si=mwxbYF3xAcY0HfN_)
 Heatmaps Part 1  | [Heatmaps Part 1](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Request/Heat%20Maps%20using%20Matplotlib%20and%20Seaborn.ipynb) | [Youtube Video](https://www.youtube.com/watch?v=m7uXFyPN2Sk)
 Heatmaps Part 2  | [Heatmaps Part 2](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Request/Heat%20Maps%20using%20Matplotlib%20and%20Seaborn.ipynb) | [Youtube Video](https://www.youtube.com/watch?v=NHwXkvwSd7E)
 How to Speed Up Pandas with Modin | [How to Speed Up Pandas with Modin](https://medium.com/distributed-computing-with-ray/how-to-speed-up-pandas-with-modin-84aa6a87bcdb) | None
