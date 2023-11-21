@@ -94,10 +94,15 @@ Word Count | [Word Count using PySpark](https://github.com/mGalarnyk/Python_Tuto
 ## Statistics
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
-68-95-99.7 rule for a Normal Distribution | [Blog Post](https://builtin.com/data-science/empirical-rule)/[Jupyter Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Statistics/normal_Distribution_Area_Under_Curve.ipynb) | Coming Soon
+68-95-99.7 rule for a Normal Distribution | [Blog Post](https://builtin.com/data-science/empirical-rule)/[Jupyter Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Statistics/normal_Distribution_Area_Under_Curve.ipynb) | None
 Confidence Intervals | Coming Soon | Coming Soon
-Understanding Boxplots | [Blog Post](https://medium.com/@GalarnykMichael/understanding-boxplots-5e2df7bcbd51) | Coming Soon
-Understanding Sampling With and Without Replacement (Python) | [Blog Post](https://towardsdatascience.com/understanding-sampling-with-and-without-replacement-python-7aff8f47ebe4)/[Jupyter Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Statistics/Sample_With_Replacement/SampleWithReplacement.ipynb) | Coming Soon
+Understanding Boxplots | [Blog Post](https://builtin.com/data-science/boxplot) | None
+Understanding Sampling With and Without Replacement (Python) | [Blog Post](https://towardsdatascience.com/understanding-sampling-with-and-without-replacement-python-7aff8f47ebe4)/[Jupyter Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Statistics/Sample_With_Replacement/SampleWithReplacement.ipynb) | None
+
+## Visualization
+What is it? | Blog Post/Jupyter Notebook | Youtube Video
+--- | --- | ---
+Data Visualization with Matplotlib and Seaborn | [Data Visualization with Matplotlib and Seaborn](https://github.com/mGalarnyk/Python_Tutorials/tree/master/Visualization) | [Youtube Video](https://youtu.be/OOLlVlleaN4)
 
 ## Other Python Resources
 What is it? | Repo/Website | Youtube Video
