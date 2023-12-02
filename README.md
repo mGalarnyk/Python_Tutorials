@@ -75,7 +75,7 @@ Scraping Fundrazr (GoFundMe/Kickstarter like Website) | [Step by Step Instructio
 ## Sklearn
 What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
-Decision Trees (Classification) | [Decision Trees (Classification)](https://towardsdatascience.com/understanding-decision-trees-for-classification-python-9663d683c952) | None
+Decision Trees (Classification) | [Decision Trees (Classification)](https://towardsdatascience.com/understanding-decision-trees-for-classification-python-9663d683c952) | [Understanding Decision Trees using Python (scikit-learn)](https://youtu.be/yi7KsXtaOCo)
 How to Speed up Scikit-Learn Model Training | [How to Speed up Scikit-Learn Model Training](https://medium.com/distributed-computing-with-ray/how-to-speed-up-scikit-learn-model-training-aaf17e2d1e1) | None
 Introduction to Scikit-Learn | [GitHub Repository](https://github.com/mGalarnyk/DSGO_IntroductionScikitLearn) | [Introduction to Scikit-Learn](https://www.youtube.com/watch?v=FFKMk6mcJlM&t=4597s)
 k-Nearest Neighbors | Soon | Soon
