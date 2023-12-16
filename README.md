@@ -1,6 +1,6 @@
-<h1 align="center"> Python Tutorials</h1>
+<h1 align="center"> Python and Machine Learning Tutorials</h1>
 
-Useful Python Tutorials. Feel free to submit a pull request. Also please subscribe to my <a href="https://www.youtube.com/c/MichaelGalarnyk?sub_confirmation=1"> youtube channel!</a>
+Useful Python and Machine Learning Tutorials. Feel free to submit a pull request. Also please subscribe to my <a href="https://www.youtube.com/c/MichaelGalarnyk?sub_confirmation=1"> youtube channel!</a>
 
 ## Apis
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
@@ -38,6 +38,11 @@ What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
 How to Speed Up XGBoost Model Training | [Speed Up XGBoost Model Training](https://www.anyscale.com/blog/how-to-speed-up-xgboost-model-training)| None
 
+## Natural Language Processing
+What is it? | Blog Post/Jupyter Notebook | Youtube Video
+--- | --- | ---
+TBD| TBD | TBD
+
 ## Pandas
 Domain | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
@@ -72,17 +77,19 @@ What is it? | Blog Post | Youtube Video
 --- | --- | ---
 Scraping Fundrazr (GoFundMe/Kickstarter like Website) | [Step by Step Instructions](https://medium.com/@GalarnykMichael/using-scrapy-to-build-your-own-dataset-64ea2d7d4673) | [Scraping a Crowdfunding Website](https://www.youtube.com/watch?v=O_j3OTXw2_E)
 
-## Sklearn
+## Sklearn (Scikit-Learn)
 What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
 Decision Trees (Classification) | [Decision Trees (Classification)](https://towardsdatascience.com/understanding-decision-trees-for-classification-python-9663d683c952) | [Understanding Decision Trees using Python (scikit-learn)](https://youtu.be/yi7KsXtaOCo)
+K-Means Clustering | [K-Means Clustering Notebook]() | [K-Means Clustering Video]()
+Hierarchical clustering  | [Hierarchical clustering Notebook]() | [Hierarchical clustering Video]()
 How to Speed up Scikit-Learn Model Training | [How to Speed up Scikit-Learn Model Training](https://medium.com/distributed-computing-with-ray/how-to-speed-up-scikit-learn-model-training-aaf17e2d1e1) | None
 Introduction to Scikit-Learn | [GitHub Repository](https://github.com/mGalarnyk/DSGO_IntroductionScikitLearn) | [Introduction to Scikit-Learn](https://www.youtube.com/watch?v=FFKMk6mcJlM&t=4597s)
 k-Nearest Neighbors | Soon | Soon
 Linear Regression | [Linear Regression Python (sklearn, numpy, pandas)](https://medium.com/@GalarnykMichael/linear-regression-using-python-b29174c3797a#.vczf85s0s) | [Linear Regression](https://www.youtube.com/watch?v=dSYJVbj4Eew&t=2s)
-Logistic Regression | [Digits](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_toy_digits.ipynb) / [MNIST](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_MNIST.ipynb) | [Logistic Regression using Python (Sklearn, NumPy, Handwriting Recognition, Matplotlib)](https://www.youtube.com/watch?v=71iXeuKFcQM)
+Logistic Regression | [Digits](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_toy_digits.ipynb) / [MNIST](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_MNIST.ipynb) / [Titanic]() | [Digits and MNIST Dataset](https://www.youtube.com/watch?v=71iXeuKFcQM) / [Titanic]()
 Principal Component Analysis | [PCA Using Python: A Tutorial](https://builtin.com/machine-learning/pca-in-python) | [PCA using Python](https://www.youtube.com/watch?v=kApPBm1YsqU)
-Random Forest | None | None
+Random Forest | [Random Forest Notebook]() | [Random Forest Video]()
 Train Test Split (Scikit-Learn + Python) | [Understanding Train Test Split (Scikit-Learn + Python)](https://builtin.com/data-science/train-test-split) / [Train Test Split using Python (Scikit-Learn)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Train_Test_Split/02_04_Train_Test_Split.ipynb)| [Train Test Split using Python (Scikit-Learn)](https://youtu.be/rCevxk3jeKs)
 Visualizing Decision Trees with Python (Scikit-learn, Graphviz, Matplotlib) | [Visualizing Decision Trees](https://towardsdatascience.com/visualizing-decision-trees-with-python-scikit-learn-graphviz-matplotlib-1c50b4aa68dc) | None
 
@@ -99,6 +106,11 @@ Confidence Intervals | Coming Soon | Coming Soon
 Understanding Boxplots | [Blog Post](https://builtin.com/data-science/boxplot) | None
 Understanding Sampling With and Without Replacement (Python) | [Blog Post](https://towardsdatascience.com/understanding-sampling-with-and-without-replacement-python-7aff8f47ebe4)/[Jupyter Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Statistics/Sample_With_Replacement/SampleWithReplacement.ipynb) | None
 
+## Synthetic Data
+What is it? | Blog Post/Jupyter Notebook | Youtube Video
+--- | --- | ---
+Introduction to Synthetic Data | TBA | TBD
+
 ## Visualization
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
@@ -109,7 +121,6 @@ What is it? | Repo/Website | Youtube Video
 --- | --- | ---
 Course | [Python for Data Visualization LinkedIn Learning](https://www.linkedin.com/learning/python-for-data-visualization/effectively-present-data-with-python) | [Free Preview Video](https://youtu.be/BE8CVGJuftI)
 Installations (Anaconda, Spark Etc) | [General Installations](https://github.com/mGalarnyk/Installations_Mac_Ubuntu_Windows "Python Installations") | See the link for more installations. 
-Course| [Python for Informatics](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Informatics/README.md "Python for Informatics") | None
 
 ## Contributors
 FirstName | LastName
