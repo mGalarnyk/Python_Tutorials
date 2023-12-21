@@ -81,13 +81,13 @@ Scraping Fundrazr (GoFundMe/Kickstarter like Website) | [Step by Step Instructio
 What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
 Decision Trees (Classification) | [Decision Trees (Classification)](https://towardsdatascience.com/understanding-decision-trees-for-classification-python-9663d683c952) | [Understanding Decision Trees using Python (scikit-learn)](https://youtu.be/yi7KsXtaOCo)
-K-Means Clustering | [K-Means Clustering Notebook]() | [K-Means Clustering Video]()
-Hierarchical clustering  | [Hierarchical clustering Notebook]() | [Hierarchical clustering Video]()
+K-Means Clustering | [Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/KMeans/KMeans.ipynb) | [Video](https://youtu.be/VfC6xta9PFk?si=DGUGuaRTKoEkCoSC)
+Hierarchical clustering  | [Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/HierarchicalClustering/HierarchicalClustering.ipynb) | [Video](https://youtu.be/PLahk7WczWc?si=OkPjwgY6zmhuVRRJ)
 How to Speed up Scikit-Learn Model Training | [Blog](https://medium.com/distributed-computing-with-ray/how-to-speed-up-scikit-learn-model-training-aaf17e2d1e1) | [Video](https://youtu.be/gj4ekRfOB20?si=KaUpt6ufXwVkuPBq)
 Introduction to Scikit-Learn | [GitHub Repository](https://github.com/mGalarnyk/DSGO_IntroductionScikitLearn) | [Introduction to Scikit-Learn](https://www.youtube.com/watch?v=FFKMk6mcJlM&t=4597s)
 k-Nearest Neighbors | [Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/KNN/KNN.ipynb) | [Video](https://youtu.be/w6bOBZX-1kY?si=kBd52xkrxiD80gG-)
 Linear Regression | [Linear Regression Python (sklearn, numpy, pandas)](https://medium.com/@GalarnykMichael/linear-regression-using-python-b29174c3797a#.vczf85s0s) | [Linear Regression](https://www.youtube.com/watch?v=dSYJVbj4Eew&t=2s)
-Logistic Regression | [Digits](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_toy_digits.ipynb) / [MNIST](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_MNIST.ipynb) / [Titanic]() | [Digits and MNIST Dataset](https://www.youtube.com/watch?v=71iXeuKFcQM) / [Titanic]()
+Logistic Regression | [Digits](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_toy_digits.ipynb) / [MNIST](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_MNIST.ipynb) / [Titanic](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression.ipynb) | [Digits and MNIST Dataset](https://www.youtube.com/watch?v=71iXeuKFcQM) / [Titanic](https://youtu.be/GAiMnImkIZM?si=K1IlLpOQV342kyZL)
 Principal Component Analysis | [PCA Using Python: A Tutorial](https://builtin.com/machine-learning/pca-in-python) | [PCA using Python](https://www.youtube.com/watch?v=kApPBm1YsqU)
 Random Forest | Notebook | Video
 Train Test Split (Scikit-Learn + Python) | [Understanding Train Test Split (Scikit-Learn + Python)](https://builtin.com/data-science/train-test-split) / [Train Test Split using Python (Scikit-Learn)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Train_Test_Split/02_04_Train_Test_Split.ipynb)| [Train Test Split using Python (Scikit-Learn)](https://youtu.be/rCevxk3jeKs)
