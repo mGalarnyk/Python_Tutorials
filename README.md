@@ -85,11 +85,11 @@ K-Means Clustering | [K-Means Clustering Notebook]() | [K-Means Clustering Video
 Hierarchical clustering  | [Hierarchical clustering Notebook]() | [Hierarchical clustering Video]()
 How to Speed up Scikit-Learn Model Training | [How to Speed up Scikit-Learn Model Training](https://medium.com/distributed-computing-with-ray/how-to-speed-up-scikit-learn-model-training-aaf17e2d1e1) | None
 Introduction to Scikit-Learn | [GitHub Repository](https://github.com/mGalarnyk/DSGO_IntroductionScikitLearn) | [Introduction to Scikit-Learn](https://www.youtube.com/watch?v=FFKMk6mcJlM&t=4597s)
-k-Nearest Neighbors | Soon | Soon
+k-Nearest Neighbors | [Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/KNN/KNN.ipynb) | [Video](https://youtu.be/w6bOBZX-1kY?si=kBd52xkrxiD80gG-)
 Linear Regression | [Linear Regression Python (sklearn, numpy, pandas)](https://medium.com/@GalarnykMichael/linear-regression-using-python-b29174c3797a#.vczf85s0s) | [Linear Regression](https://www.youtube.com/watch?v=dSYJVbj4Eew&t=2s)
 Logistic Regression | [Digits](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_toy_digits.ipynb) / [MNIST](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Logistic_Regression/LogisticRegression_MNIST.ipynb) / [Titanic]() | [Digits and MNIST Dataset](https://www.youtube.com/watch?v=71iXeuKFcQM) / [Titanic]()
 Principal Component Analysis | [PCA Using Python: A Tutorial](https://builtin.com/machine-learning/pca-in-python) | [PCA using Python](https://www.youtube.com/watch?v=kApPBm1YsqU)
-Random Forest | [Random Forest Notebook]() | [Random Forest Video]()
+Random Forest | Notebook | Video
 Train Test Split (Scikit-Learn + Python) | [Understanding Train Test Split (Scikit-Learn + Python)](https://builtin.com/data-science/train-test-split) / [Train Test Split using Python (Scikit-Learn)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Train_Test_Split/02_04_Train_Test_Split.ipynb)| [Train Test Split using Python (Scikit-Learn)](https://youtu.be/rCevxk3jeKs)
 Visualizing Decision Trees with Python (Scikit-learn, Graphviz, Matplotlib) | [Visualizing Decision Trees](https://towardsdatascience.com/visualizing-decision-trees-with-python-scikit-learn-graphviz-matplotlib-1c50b4aa68dc) | None
 
