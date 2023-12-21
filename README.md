@@ -83,7 +83,7 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 Decision Trees (Classification) | [Decision Trees (Classification)](https://towardsdatascience.com/understanding-decision-trees-for-classification-python-9663d683c952) | [Understanding Decision Trees using Python (scikit-learn)](https://youtu.be/yi7KsXtaOCo)
 K-Means Clustering | [K-Means Clustering Notebook]() | [K-Means Clustering Video]()
 Hierarchical clustering  | [Hierarchical clustering Notebook]() | [Hierarchical clustering Video]()
-How to Speed up Scikit-Learn Model Training | [How to Speed up Scikit-Learn Model Training](https://medium.com/distributed-computing-with-ray/how-to-speed-up-scikit-learn-model-training-aaf17e2d1e1) | None
+How to Speed up Scikit-Learn Model Training | [Blog](https://medium.com/distributed-computing-with-ray/how-to-speed-up-scikit-learn-model-training-aaf17e2d1e1) | [Video](https://youtu.be/r8ivLBjBOGQ?si=KLbmXvrqQz8fhOxx)
 Introduction to Scikit-Learn | [GitHub Repository](https://github.com/mGalarnyk/DSGO_IntroductionScikitLearn) | [Introduction to Scikit-Learn](https://www.youtube.com/watch?v=FFKMk6mcJlM&t=4597s)
 k-Nearest Neighbors | [Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/KNN/KNN.ipynb) | [Video](https://youtu.be/w6bOBZX-1kY?si=kBd52xkrxiD80gG-)
 Linear Regression | [Linear Regression Python (sklearn, numpy, pandas)](https://medium.com/@GalarnykMichael/linear-regression-using-python-b29174c3797a#.vczf85s0s) | [Linear Regression](https://www.youtube.com/watch?v=dSYJVbj4Eew&t=2s)
