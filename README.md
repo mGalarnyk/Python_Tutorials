@@ -1,4 +1,4 @@
-<h1 align="center"> Python and Machine Learning Tutorials</h1>
+<h1 align="center"> Python, Machine Learning, and AI (LLM) Tutorials</h1>
 
 Useful Python and Machine Learning Tutorials. Feel free to submit a pull request. Also please subscribe to my <a href="https://www.youtube.com/c/MichaelGalarnyk?sub_confirmation=1"> youtube channel!</a>
 
@@ -110,7 +110,8 @@ Understanding Sampling With and Without Replacement (Python) | [Blog Post](https
 ## Synthetic Data
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
-Introduction to Synthetic Data | TBA | TBD
+The Value of Synthetic Data | TBA | [Video](https://youtu.be/PIzDYbATawY)
+Synthetic Data for Edge Cases | TBA | [Video](https://youtu.be/bX28Pt8OsR8)
 
 ## Visualization
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
