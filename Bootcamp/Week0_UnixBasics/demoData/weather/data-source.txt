@@ -1,0 +1,8 @@
+I got the data from this ftp site:
+
+ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/
+
+Opening the ftp site in a browser is helpful: you can easily browse the directory structure and look at txt and
+pdf files.
+
+Yoav Freund
