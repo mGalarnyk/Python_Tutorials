@@ -2,6 +2,10 @@
 .env
 .env.*
 *.env
+!.env.example
+!env.example
+!**/.env.example
+!**/env.example
 
 # Flyte / Union CLI config — contains YOUR cluster endpoint, project, org
 .flyte/
@@ -43,7 +47,11 @@ scheduler.pt
 trainer_state.json
 
 # Downloaded datasets (FOMC xlsx is CC BY-NC; do not vendor)
+data/
 **/data/*.xlsx
+**/data/*.csv
+**/data/*.json
+**/data/*.parquet
 
 # Virtualenvs created inside this folder
 .venv/

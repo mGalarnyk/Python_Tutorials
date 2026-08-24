@@ -69,6 +69,8 @@ coverage.xml
 # Editors / OS
 # ───────────────────────────────────────────────────────────────
 .vscode/
+.cursor/
+**/.cursor/
 .idea/
 *.swp
 *.swo
@@ -87,12 +89,21 @@ Thumbs.db
 *.ckpt
 *.pt
 *.pth
+*.bin
 *.safetensors
 *.onnx
 *.gguf
+*.ggml
+*.msgpack
 .cache/
 huggingface/
+huggingface_hub/
 sentence-transformers/
+hf_home/
+hf_cache/
+huggingface_cache/
+HF_HOME/
+**/models/
 
 # ───────────────────────────────────────────────────────────────
 # Fine-tuning / GPU / Flyte local state
@@ -108,3 +119,12 @@ wandb/
 mlruns/
 **/lightning_logs/
 **/checkpoint-*/
+checkpoints/
+**/checkpoints/
+outputs/
+**/outputs/
+runs/
+**/runs/
+offload/
+**/offload/
+offload_folder/

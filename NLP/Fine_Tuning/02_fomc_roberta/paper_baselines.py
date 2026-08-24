@@ -10,6 +10,22 @@ import config as cfg
 from load_data import LABEL_NAMES, load_splits
 from train_run import evaluate_split, log
 
+# MacBook Pro M4 Max (MPS) Combined-S test weighted F1, seeds 5768 / 78516 / 944601.
+# Same cells as the Results table. Used when those checkpoints are not on this disk.
+MAC_TEST_F1 = {
+    ("roberta-base", "full"): (0.680, 0.695, 0.716),
+    ("roberta-base", "lora"): (0.664, 0.694, 0.697),
+    ("roberta-large", "full"): (0.695, 0.726, 0.717),
+    ("roberta-large", "lora"): (0.715, 0.719, 0.745),
+}
+# Typical lid-open wall minutes and epochs (same rows as the Results table).
+MAC_TRAIN = {
+    ("roberta-base", "full"): (11, 8.0),
+    ("roberta-base", "lora"): (28, 13.0),
+    ("roberta-large", "full"): (14, 25.0),
+    ("roberta-large", "lora"): (24, 25.0),
+}
+
 
 def paper_table(split: str = cfg.DEFAULT_SPLIT) -> pd.DataFrame:
     rows = []

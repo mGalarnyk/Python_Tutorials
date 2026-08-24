@@ -5,8 +5,8 @@ Part 1 and part 2 are **Flyte 2** pipelines so the same `workflow.py` is a lapto
 | Folder | Status | What it is |
 |--------|--------|------------|
 | [01_text_to_sql](01_text_to_sql/) | Ready to run | Text-to-SQL on SmolLM2-135M. Adapted from [Union AI's workshop](https://github.com/unionai/workshops/tree/main/tutorials/llm-fine-tuning-lora-qlora). Already **Flyte 2**. |
-| [02_fomc_roberta](02_fomc_roberta/) | Ready to run | Classification: **RoBERTa-base and RoBERTa-large**, full / LoRA / QLoRA vs Shah et al. Combined-S F1. **Flyte 2**. Checkpoints resume. |
-| [03_llm_8b](03_llm_8b/) | Scaffold | Same SQL task as part 1 on **Llama-3.1-8B** (fallback: Mistral-7B). Full / LoRA / QLoRA; full FT is the remote CUDA run. |
+| [02_fomc_roberta](02_fomc_roberta/) | Ready to run | Classification: **RoBERTa-base / large**, then **Nemotron-3-Nano-4B** on the same Combined-S table. Full / LoRA / QLoRA. **Flyte 2**: laptop `--local`, then a remote NVIDIA GPU. |
+| [03_llm_8b](03_llm_8b/) | Deferred | Was Llama-3.1-8B / SQL. The 4B model lives in the part 2 FOMC table instead. |
 
 ## Why this lives under `NLP/`
 
@@ -24,9 +24,9 @@ This repo's public tutorials already point at paths like `Pandas/`, `Sklearn/`, 
 
 QLoRA is [Dettmers et al., 2023](https://arxiv.org/abs/2305.14314). It needs **NVIDIA CUDA**: 4-bit quantization goes through [bitsandbytes](https://github.com/bitsandbytes-foundation/bitsandbytes), which we do not install on macOS (`bitsandbytes>=0.44.0; sys_platform != "darwin"`). On a Mac or CPU, use full or LoRA. The FOMC paper is a different arXiv id ([2305.07972](https://arxiv.org/abs/2305.07972)).
 
-On SmolLM2-135M and RoBERTa-base, QLoRA is pedagogical — both already fit in memory. RoBERTa-large starts to show a memory gap. **Llama-3.1-8B** is where full fine-tuning needs a workstation (~96 GB for weights + AdamW before activations), LoRA fits in ~24 GB, and QLoRA fits in ~6–12 GB.
+On SmolLM2-135M and RoBERTa-base, QLoRA is pedagogical — both already fit in memory. RoBERTa-large starts to show a memory gap. **Nemotron-3-Nano-4B** is the first causal LM on that same FOMC table: full fine-tune fits on a 96 GB Blackwell; LoRA and QLoRA are the cheaper rows.
 
-Follow along on this **16-inch MacBook Pro** (Apple **M4 Max**, **128 GB** unified memory, 16-core CPU (12P + 4E), 40-core GPU, MPS) for part 1 and for RoBERTa full + LoRA. On the remote **NVIDIA RTX PRO 6000 Blackwell (96 GB)** — one card or **four on one node** (16-core, 256 GB host) — run the FOMC **2×3** (base and large, each of full / LoRA / QLoRA) and the ~8B full fine-tune (CUDA / bitsandbytes).
+Follow along on this **16-inch MacBook Pro** (Apple **M4 Max**, **128 GB** unified memory, MPS) for part 1 and for RoBERTa full + LoRA (`flyte run --local`). On a remote **NVIDIA RTX PRO 6000 Blackwell (96 GB)** or H200, run the FOMC 2×3 plus the Nemotron rows: same `workflow.py`, GPU job instead of the laptop.
 
 ## What is gitignored
 

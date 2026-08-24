@@ -16,7 +16,7 @@ import pandas as pd
 
 import config as cfg
 from device_utils import detect_device, describe, has_nvidia
-from paper_baselines import eval_released_checkpoint, paper_table
+from paper_baselines import MAC_TEST_F1, MAC_TRAIN, eval_released_checkpoint, paper_table
 from train_run import log, run_one
 
 RUNS_PATH = cfg.OUTPUTS_DIR / "grid_runs.csv"
@@ -136,6 +136,87 @@ def collect_completed(split: str = cfg.DEFAULT_SPLIT) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def _run_identity(row: dict[str, Any]) -> tuple[str, str, int, str]:
+    return (
+        str(row.get("model") or ""),
+        str(row.get("method") or ""),
+        int(row.get("seed") or 0),
+        machine_label(row.get("device"), str(row.get("who") or "ours")),
+    )
+
+
+def _mac_published_runs(split: str = cfg.DEFAULT_SPLIT) -> pd.DataFrame:
+    rows: list[dict[str, Any]] = []
+    for (model, method), f1s in MAC_TEST_F1.items():
+        epochs, minutes = MAC_TRAIN[(model, method)]
+        for seed, f1 in zip(cfg.PAPER_SEEDS, f1s):
+            rows.append(
+                {
+                    "who": "ours",
+                    "model": model,
+                    "method": method,
+                    "seed": int(seed),
+                    "split": split,
+                    "weighted_f1": float(f1),
+                    "epochs_trained": float(epochs),
+                    "wall_seconds": float(minutes) * 60.0,
+                    "device": "mps",
+                    "status": "complete",
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _snapshot_runs() -> pd.DataFrame:
+    """Bundled CUDA (or mixed) runs. Display fallback only, not for skip-finished."""
+    try:
+        from report_snapshot import SNAPSHOT
+    except ImportError:
+        return pd.DataFrame()
+    rows: list[dict[str, Any]] = []
+    for rec in SNAPSHOT.get("runs", []):
+        if rec.get("status") != "complete":
+            continue
+        rows.append(
+            {
+                "who": "ours",
+                "model": rec.get("model"),
+                "method": rec.get("method"),
+                "seed": rec.get("seed"),
+                "split": rec.get("split", cfg.DEFAULT_SPLIT),
+                "weighted_f1": rec.get("weighted_f1"),
+                "epochs_trained": rec.get("epochs_trained"),
+                "trainable_pct": rec.get("trainable_pct"),
+                "wall_seconds": rec.get("wall_seconds"),
+                "device": rec.get("device"),
+                "status": "complete",
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def merge_report_runs(runs: pd.DataFrame, split: str = cfg.DEFAULT_SPLIT) -> pd.DataFrame:
+    """Union live checkpoints with the CUDA snapshot and Mac 3-seed F1s.
+
+    Training skip logic still uses collect_completed() (disk only). This merge
+    is for the Results plot/table so Mac and CUDA both show when only one
+    machine's checkpoints are on disk.
+    """
+    frames = [df for df in (runs, _snapshot_runs(), _mac_published_runs(split)) if df is not None and not df.empty]
+    if not frames:
+        return pd.DataFrame()
+    seen: set[tuple[str, str, int, str]] = set()
+    kept: list[dict[str, Any]] = []
+    for frame in frames:
+        for rec in frame.to_dict(orient="records"):
+            key = _run_identity(rec)
+            if key in seen:
+                continue
+            seen.add(key)
+            kept.append(rec)
+    return pd.DataFrame(kept)
+
+
 def typical_minutes(seconds: pd.Series) -> float | None:
     """Mean wall time, dropping seeds that sat with the lid closed (>> fastest seed)."""
     mins = pd.to_numeric(seconds, errors="coerce").dropna() / 60.0
@@ -204,6 +285,19 @@ def format_results(summary: pd.DataFrame) -> pd.DataFrame:
             return "—"
         return f"{float(m):.0f} min" if float(m) >= 10 else f"{float(m):.1f} min"
 
+    def per_epoch_cell(row: pd.Series) -> str:
+        s = row.get("sec_per_epoch")
+        if s is None or (isinstance(s, float) and pd.isna(s)):
+            return "—"
+        s = float(s)
+        if s >= 3600:
+            return f"{s / 3600:.1f} h"
+        if s >= 90:
+            return f"{s / 60:.1f} min"
+        if s >= 20:
+            return f"{s:.0f} s"
+        return f"{s:.1f} s"
+
     out = pd.DataFrame(
         {
             "who": summary["who"],
@@ -213,6 +307,7 @@ def format_results(summary: pd.DataFrame) -> pd.DataFrame:
             "vs paper": summary.apply(delta_cell, axis=1),
             "epochs": summary.apply(epochs_cell, axis=1),
             "time": summary.apply(time_cell, axis=1),
+            "time/epoch": summary.apply(per_epoch_cell, axis=1),
             "trainable": summary.apply(pct_cell, axis=1),
             "machine": summary["machine"]
             if "machine" in summary.columns
@@ -333,8 +428,9 @@ def summarize_runs(runs: pd.DataFrame, split: str = cfg.DEFAULT_SPLIT) -> pd.Dat
     ours = runs[(runs["who"] == "ours") & (runs["status"] == "complete")].copy()
     if ours.empty:
         return pd.DataFrame(rows)
+    ours["machine"] = ours["device"].map(lambda d: machine_label(d, "ours"))
 
-    for (model, method), group in ours.groupby(["model", "method"], sort=False):
+    for (model, method, machine), group in ours.groupby(["model", "method", "machine"], sort=False):
         group = group.sort_values("seed")
         f1 = pd.to_numeric(group["weighted_f1"], errors="coerce").dropna()
         n = int(len(f1))
@@ -342,6 +438,32 @@ def summarize_runs(runs: pd.DataFrame, split: str = cfg.DEFAULT_SPLIT) -> pd.Dat
         mean_f1 = float(f1.mean()) if n else None
         std_f1 = float(f1.std(ddof=1)) if n > 1 else 0.0
         seed_list = [int(s) for s in group["seed"].tolist()]
+
+        def _mean(col: str) -> float | None:
+            if col not in group.columns:
+                return None
+            vals = pd.to_numeric(group[col], errors="coerce").dropna()
+            return float(vals.mean()) if len(vals) else None
+
+        def _max(col: str) -> float | None:
+            if col not in group.columns:
+                return None
+            vals = pd.to_numeric(group[col], errors="coerce").dropna()
+            return float(vals.max()) if len(vals) else None
+
+        def _first(col: str):
+            if col not in group.columns:
+                return None
+            return group[col].iloc[0]
+
+        train_minutes = (
+            typical_minutes(group["wall_seconds"]) if "wall_seconds" in group.columns else None
+        )
+        epochs_mean = _mean("epochs_trained")
+        sec_per_epoch = None
+        if train_minutes and epochs_mean and float(epochs_mean) > 0:
+            sec_per_epoch = float(train_minutes) * 60.0 / float(epochs_mean)
+
         rows.append(
             {
                 "who": "ours",
@@ -353,22 +475,24 @@ def summarize_runs(runs: pd.DataFrame, split: str = cfg.DEFAULT_SPLIT) -> pd.Dat
                 "f1_by_seed": ",".join(f"{v:.4f}" for v in f1.tolist()),
                 "weighted_f1": mean_f1,
                 "weighted_f1_std": std_f1,
-                "accuracy": float(pd.to_numeric(group["accuracy"]).mean()),
-                "macro_f1": float(pd.to_numeric(group["macro_f1"]).mean()),
+                "accuracy": _mean("accuracy"),
+                "macro_f1": _mean("macro_f1"),
                 "paper_weighted_f1": paper,
                 "delta_vs_paper": None if paper is None or mean_f1 is None else mean_f1 - paper,
-                "trainable_params": group["trainable_params"].iloc[0],
-                "trainable_pct": group["trainable_pct"].iloc[0],
-                "peak_mem_gb": float(pd.to_numeric(group["peak_mem_gb"]).max()),
-                "wall_seconds_mean": float(pd.to_numeric(group["wall_seconds"]).mean()),
-                "wall_seconds_total": float(pd.to_numeric(group["wall_seconds"]).sum()),
-                "train_minutes": typical_minutes(group["wall_seconds"]),
-                "epochs_trained_mean": float(pd.to_numeric(group["epochs_trained"]).mean()),
-                "device": str(group["device"].iloc[0]) if "device" in group else None,
-                "machine": machine_label(
-                    str(group["device"].iloc[0]) if "device" in group else None,
-                    "ours",
+                "trainable_params": _first("trainable_params"),
+                "trainable_pct": _first("trainable_pct"),
+                "peak_mem_gb": _max("peak_mem_gb"),
+                "wall_seconds_mean": _mean("wall_seconds"),
+                "wall_seconds_total": (
+                    float(pd.to_numeric(group["wall_seconds"], errors="coerce").sum())
+                    if "wall_seconds" in group.columns
+                    else None
                 ),
+                "train_minutes": train_minutes,
+                "epochs_trained_mean": epochs_mean,
+                "sec_per_epoch": sec_per_epoch,
+                "device": str(_first("device") or "") or None,
+                "machine": machine,
                 "status": "complete"
                 if n >= len(cfg.PAPER_SEEDS)
                 else f"partial ({n}/{len(cfg.PAPER_SEEDS)})",
