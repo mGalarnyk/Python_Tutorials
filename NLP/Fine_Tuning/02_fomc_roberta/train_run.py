@@ -139,46 +139,175 @@ def _is_complete(metrics_path: Path) -> bool:
     return data.get("status") == "complete"
 
 
-def _load_model_and_tokenizer(
+def _replace_linears_with_nf4(module, skip=("classifier",)) -> int:
+    """Swap nn.Linear for LinearNF4 (unquantized). `.to(cuda:0)` quantizes later."""
+    import bitsandbytes as bnb
+    import torch.nn as nn
+
+    n = 0
+    for name, child in list(module.named_children()):
+        if name in skip:
+            continue
+        if isinstance(child, bnb.nn.Linear4bit):
+            continue
+        if isinstance(child, nn.Linear):
+            new = bnb.nn.LinearNF4(
+                child.in_features,
+                child.out_features,
+                bias=child.bias is not None,
+                compute_dtype=child.weight.dtype,
+                compress_statistics=True,
+            )
+            new.weight = bnb.nn.Params4bit(
+                child.weight.data.detach().contiguous(),
+                requires_grad=False,
+                compress_statistics=True,
+                quant_type="nf4",
+                module=new,
+                bnb_quantized=False,
+            )
+            if child.bias is not None:
+                new.bias = nn.Parameter(child.bias.data.detach().clone())
+            setattr(module, name, new)
+            n += 1
+        else:
+            n += _replace_linears_with_nf4(child, skip=skip)
+    return n
+
+
+def _assert_4bit_ready(model) -> None:
+    import bitsandbytes as bnb
+
+    names = []
+    bad = []
+    for name, mod in model.named_modules():
+        if isinstance(mod, bnb.nn.Linear4bit):
+            names.append(name)
+            if getattr(mod.weight, "quant_state", None) is None:
+                bad.append(name)
+    if not names:
+        raise RuntimeError("QLoRA: no Linear4bit layers after replace")
+    if bad:
+        raise RuntimeError(
+            f"QLoRA: {len(bad)}/{len(names)} Linear4bit layers have no quant_state "
+            f"(first: {bad[:6]})"
+        )
+    log(f"QLoRA: {len(names)} LinearNF4 layers quantized")
+
+
+def _ensure_pad_token(tokenizer):
+    """Causal LMs often have no pad token. Reuse EOS so paper_loop can pad."""
+    if tokenizer.pad_token is None:
+        if tokenizer.eos_token is None:
+            raise ValueError("Tokenizer has neither pad_token nor eos_token")
+        tokenizer.pad_token = tokenizer.eos_token
+        log(f"tokenizer.pad_token = eos_token ({tokenizer.eos_token!r})")
+    return tokenizer
+
+
+def _load_tokenizer(model_id: str, model_key: str):
+    from transformers import AutoTokenizer
+
+    _quiet_transformers()
+    if cfg.is_causal(model_key):
+        tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
+        tokenizer.padding_side = "right"
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(
+            model_id, do_lower_case=True, do_basic_tokenize=True
+        )
+    return _ensure_pad_token(tokenizer)
+
+
+def _prepare_frame(df, model_key: str, tokenizer):
+    if not cfg.is_causal(model_key):
+        return df
+    from fomc_prompt import encode_classify
+
+    out = df.copy()
+    out["text"] = [encode_classify(text, tokenizer) for text in out["text"]]
+    return out
+
+
+def _quantize_on_cuda(model) -> None:
+    import bitsandbytes as bnb
+
+    model.to("cuda:0")
+    for mod in model.modules():
+        if not isinstance(mod, bnb.nn.Linear4bit):
+            continue
+        weight = mod.weight
+        if getattr(weight, "quant_state", None) is not None:
+            continue
+        if isinstance(weight, bnb.nn.Params4bit):
+            weight.bnb_quantized = False
+            new_w = weight.to(device="cuda:0")
+            mod.weight = new_w
+            if getattr(new_w, "quant_state", None) is not None:
+                mod.quant_state = new_w.quant_state
+    _assert_4bit_ready(model)
+
+
+def _load_model(
     model_id: str,
+    model_key: str,
     method: str,
+    tokenizer,
     num_labels: int = 3,
 ):
     import torch
-    from transformers import AutoModelForSequenceClassification, AutoTokenizer
+    from transformers import AutoModelForCausalLM, AutoModelForSequenceClassification
 
     _quiet_transformers()
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_id, do_lower_case=True, do_basic_tokenize=True
-    )
     quantized = method == "qlora"
+    if cfg.is_causal(model_key):
+        from causal_cls import LastTokenClassifier
+        from peft import LoraConfig, TaskType, get_peft_model
 
+        dtype = torch.bfloat16 if torch.cuda.is_available() else torch.float32
+        backbone = AutoModelForCausalLM.from_pretrained(
+            model_id,
+            dtype=dtype,
+            trust_remote_code=True,
+        )
+        if tokenizer.pad_token_id is not None:
+            backbone.config.pad_token_id = tokenizer.pad_token_id
+        if hasattr(backbone, "gradient_checkpointing_enable"):
+            backbone.gradient_checkpointing_enable()
+            log("Nemotron: gradient checkpointing on")
+        if quantized:
+            require_qlora()
+            n = _replace_linears_with_nf4(backbone, skip=("lm_head", "classifier"))
+            log(f"QLoRA: replaced {n} Linear layers with LinearNF4 (classifier kept)")
+        if method in {"lora", "qlora"}:
+            targets = list(cfg.lora_target_modules(model_key))
+            log(f"LoRA targets={targets}")
+            lora = LoraConfig(
+                task_type=TaskType.CAUSAL_LM,
+                r=cfg.LORA_R,
+                lora_alpha=cfg.LORA_ALPHA,
+                lora_dropout=cfg.LORA_DROPOUT,
+                target_modules=targets,
+            )
+            backbone = get_peft_model(backbone, lora)
+            backbone.print_trainable_parameters()
+        model = LastTokenClassifier(backbone, num_labels=num_labels)
+        if quantized:
+            _quantize_on_cuda(model)
+        return model
+
+    # Paper script: fp32, .to(device), no device_map. QLoRA replaces encoder
+    # linears with LinearNF4 and quantizes on the CPU→GPU move — transformers'
+    # BitsAndBytesConfig leaves LinearFP4 with quant_state=None on this bnb.
+    model = AutoModelForSequenceClassification.from_pretrained(
+        model_id,
+        num_labels=num_labels,
+        dtype=torch.float32,
+    )
     if quantized:
         require_qlora()
-        from transformers import BitsAndBytesConfig
-
-        bnb = BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_quant_type="nf4",
-            bnb_4bit_use_double_quant=True,
-            bnb_4bit_compute_dtype=torch.float32,
-        )
-        model = AutoModelForSequenceClassification.from_pretrained(
-            model_id,
-            num_labels=num_labels,
-            quantization_config=bnb,
-            device_map="auto",
-        )
-        from peft import prepare_model_for_kbit_training
-
-        model = prepare_model_for_kbit_training(model)
-    else:
-        # Paper script: fp32, .to(device), no device_map.
-        model = AutoModelForSequenceClassification.from_pretrained(
-            model_id,
-            num_labels=num_labels,
-            dtype=torch.float32,
-        )
+        n = _replace_linears_with_nf4(model)
+        log(f"QLoRA: replaced {n} Linear layers with LinearNF4 (classifier kept fp32)")
 
     if method in {"lora", "qlora"}:
         from peft import LoraConfig, TaskType, get_peft_model
@@ -188,13 +317,15 @@ def _load_model_and_tokenizer(
             r=cfg.LORA_R,
             lora_alpha=cfg.LORA_ALPHA,
             lora_dropout=cfg.LORA_DROPOUT,
-            target_modules=list(cfg.LORA_TARGET_MODULES),
+            target_modules=cfg.lora_target_modules(model_key),
             modules_to_save=list(cfg.LORA_MODULES_TO_SAVE),
         )
         model = get_peft_model(model, lora)
         model.print_trainable_parameters()
 
-    return model, tokenizer
+    if quantized:
+        _quantize_on_cuda(model)
+    return model
 
 
 def _hf_dataset(df, tokenizer):
@@ -224,7 +355,40 @@ def load_trained(
     final_dir = run_directory / "final"
     src = final_dir if final_dir.exists() else run_directory
     adapter_cfg = src / "adapter_config.json"
-    tokenizer = AutoTokenizer.from_pretrained(src)
+    tokenizer = AutoTokenizer.from_pretrained(src, trust_remote_code=True)
+    _ensure_pad_token(tokenizer)
+
+    causal_marker = src / "causal_cls.json"
+    if causal_marker.exists() or (src / "backbone").exists():
+        import torch
+        from causal_cls import LastTokenClassifier
+        from transformers import AutoModelForCausalLM
+
+        meta = {"num_labels": 3}
+        if causal_marker.exists():
+            meta = json.loads(causal_marker.read_text())
+        backbone_dir = src / "backbone"
+        if (backbone_dir / "adapter_config.json").exists():
+            from peft import PeftModel
+
+            adapter = json.loads((backbone_dir / "adapter_config.json").read_text())
+            base_id = base_model or adapter.get("base_model_name_or_path")
+            if not base_id:
+                raise ValueError(f"No base model recorded in {backbone_dir / 'adapter_config.json'}")
+            base = AutoModelForCausalLM.from_pretrained(
+                base_id, trust_remote_code=True, **from_pretrained_kwargs(model_dtype())
+            )
+            backbone = PeftModel.from_pretrained(base, str(backbone_dir))
+        else:
+            load_from = str(backbone_dir if backbone_dir.exists() else src)
+            backbone = AutoModelForCausalLM.from_pretrained(
+                load_from, trust_remote_code=True, **from_pretrained_kwargs(model_dtype())
+            )
+        model = LastTokenClassifier(backbone, num_labels=int(meta.get("num_labels", 3)))
+        clf_path = src / "classifier.pt"
+        if clf_path.exists():
+            model.classifier.load_state_dict(torch.load(clf_path, map_location="cpu", weights_only=True))
+        return place_model(model), tokenizer
 
     if adapter_cfg.exists():
         from peft import PeftModel
@@ -249,6 +413,11 @@ def load_trained(
 def predict_texts(model, tokenizer, texts: list[str]) -> list[dict[str, Any]]:
     import torch
 
+    _ensure_pad_token(tokenizer)
+    if getattr(model, "backbone", None) is not None:
+        from fomc_prompt import encode_classify
+
+        texts = [encode_classify(text, tokenizer) for text in texts]
     model.eval()
     device = next(model.parameters()).device
     encoded = tokenizer(
@@ -256,7 +425,7 @@ def predict_texts(model, tokenizer, texts: list[str]) -> list[dict[str, Any]]:
         return_tensors="pt",
         truncation=True,
         padding=True,
-        max_length=cfg.MAX_LENGTH,
+        max_length=cfg.NEMOTRON_MAX_LENGTH if getattr(model, "backbone", None) is not None else cfg.MAX_LENGTH,
     )
     encoded = {k: v.to(device) for k, v in encoded.items()}
     with torch.no_grad():
@@ -280,12 +449,18 @@ def evaluate_split(model, tokenizer, df) -> dict[str, Any]:
     import torch
     from torch.utils.data import DataLoader, TensorDataset
 
+    texts = df["text"].tolist()
+    if getattr(model, "backbone", None) is not None:
+        from fomc_prompt import encode_classify
+
+        texts = [encode_classify(text, tokenizer) for text in texts]
+    _ensure_pad_token(tokenizer)
     encoded = tokenizer(
-        df["text"].tolist(),
+        texts,
         return_tensors="pt",
         truncation=True,
         padding=True,
-        max_length=cfg.MAX_LENGTH,
+        max_length=cfg.NEMOTRON_MAX_LENGTH if getattr(model, "backbone", None) is not None else cfg.MAX_LENGTH,
     )
     labels = torch.tensor(df["label"].tolist(), dtype=torch.long)
     dataset = TensorDataset(encoded["input_ids"], encoded["attention_mask"], labels)
@@ -332,8 +507,13 @@ def run_one(
     run_name = cfg.run_id(model_key, method, seed, split)
 
     if _is_complete(metrics_path) and not force:
-        log(f"{run_name}: already complete — loading {metrics_path}")
-        return json.loads(metrics_path.read_text())
+        cached = json.loads(metrics_path.read_text())
+        test = cached.get("test") or {}
+        log(
+            f"DONE (cached) {model_key} {method} seed={seed}  "
+            f"F1={test.get('weighted_f1', '—')}  {metrics_path}"
+        )
+        return cached
 
     if method == "qlora":
         require_qlora()
@@ -344,6 +524,7 @@ def run_one(
     lr = hyps["lr"] if lr is None else lr
 
     log("=" * 64)
+    log(f"START {model_key} {method} seed={seed}")
     log(f"run={run_name}")
     log(
         f"recipe=paper_loop  device={describe()}  method={method}  "
@@ -357,13 +538,11 @@ def run_one(
 
     reset_peak_memory()
 
-    from transformers import AutoTokenizer
-
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_id, do_lower_case=True, do_basic_tokenize=True
-    )
+    tokenizer = _load_tokenizer(model_id, model_key)
+    train_df = _prepare_frame(train_df, model_key, tokenizer)
+    test_df = _prepare_frame(test_df, model_key, tokenizer)
     loop_out = train_paper_loop(
-        build_model=lambda: _load_model_and_tokenizer(model_id, method)[0],
+        build_model=lambda: _load_model(model_id, model_key, method, tokenizer),
         tokenizer=tokenizer,
         train_df=train_df,
         test_df=test_df,
@@ -374,6 +553,7 @@ def run_one(
         run_name=run_name,
         max_epochs=max_epochs,
         resume=resume and not force,
+        max_length=cfg.max_length_for(model_key),
     )
 
     trainable = loop_out["trainable_params"]
@@ -416,7 +596,8 @@ def run_one(
     }
     metrics_path.write_text(json.dumps(result, indent=2))
     log(
-        f"{run_name}: TEST weighted F1={test_metrics['weighted_f1']:.4f}  "
+        f"DONE {model_key} {method} seed={seed}  "
+        f"TEST weighted F1={test_metrics['weighted_f1']:.4f}  "
         f"acc={test_metrics['accuracy']:.4f}  "
         f"paper={paper}  Δ={result['delta_vs_paper']}  "
         f"time={loop_out['wall_seconds'] / 60:.1f} min"

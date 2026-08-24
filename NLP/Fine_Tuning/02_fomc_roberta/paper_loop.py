@@ -36,6 +36,39 @@ def log(msg: str) -> None:
     print(f"[fomc] {msg}", flush=True)
 
 
+def _is_quantized(model) -> bool:
+    if getattr(model, "is_loaded_in_4bit", False) or getattr(model, "is_loaded_in_8bit", False):
+        return True
+    inner = getattr(model, "get_base_model", None)
+    if callable(inner):
+        base = inner()
+        if base is not model:
+            return _is_quantized(base)
+    backbone = getattr(model, "backbone", None)
+    if backbone is not None and backbone is not model:
+        return _is_quantized(backbone)
+    return False
+
+
+def _train_device() -> torch.device:
+    # bitsandbytes LinearFP4 needs a device *index*. `cuda` (index None) leaves
+    # quant_state uninitialized → "Please call .cuda() or .to(device)".
+    name = detect_device()
+    return torch.device("cuda:0" if name == "cuda" else name)
+
+
+def _place_for_train(model, device: torch.device):
+    """LinearFP4 must see `.to(cuda:0)`. Older Params4bit rejects `.to` — skip that."""
+    try:
+        return model.to(device)
+    except ValueError as exc:
+        text = str(exc).lower()
+        if "4-bit" in text or "8-bit" in text or "not supported" in text:
+            log(f"skip model.to({device}): {exc}")
+            return model
+        raise
+
+
 def metrics_from_preds(labels, preds) -> dict[str, Any]:
     out = {
         "accuracy": float(accuracy_score(labels, preds)),
@@ -125,15 +158,16 @@ def train_paper_loop(
     run_name: str,
     max_epochs: int = MAX_EPOCHS,
     resume: bool = True,
+    max_length: int = MAX_LENGTH,
 ) -> dict[str, Any]:
     """Run their epoch loop. `build_model` is called *after* torch.manual_seed."""
-    device = torch.device(detect_device())
+    device = _train_device()
     progress_path = out_dir / "progress.jsonl"
     ckpt_path = out_dir / "loop_checkpoint.pt"
     final_dir = out_dir / "final"
 
     texts, y = _texts_labels(train_df)
-    dataset = _tensor_dataset(tokenizer, texts, y)
+    dataset = _tensor_dataset(tokenizer, texts, y, max_length=max_length)
     val_length = int(len(dataset) * 0.2)
     train_length = len(dataset) - val_length
     log(f"{run_name}: Train Size: {train_length}, Validation Size: {val_length}")
@@ -141,7 +175,7 @@ def train_paper_loop(
     torch.manual_seed(int(seed))
     np.random.seed(int(seed))
     model = build_model()
-    model = model.to(device)
+    model = _place_for_train(model, device)
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     total = sum(p.numel() for p in model.parameters())
     log(f"{run_name}: params trainable={trainable:,} / {total:,} ({100 * trainable / max(total, 1):.2f}%)")
@@ -154,7 +188,7 @@ def train_paper_loop(
         "val": DataLoader(val_set, batch_size=batch_size, shuffle=True),
     }
 
-    optimizer = optim.AdamW(model.parameters(), lr=lr)
+    optimizer = optim.AdamW((p for p in model.parameters() if p.requires_grad), lr=lr)
 
     start_epoch = 0
     early_stopping_count = 0
@@ -243,13 +277,14 @@ def train_paper_loop(
 
     # Test the last weights — they do not reload a best checkpoint.
     test_texts, test_y = _texts_labels(test_df)
-    test_ds = _tensor_dataset(tokenizer, test_texts, test_y)
+    test_ds = _tensor_dataset(tokenizer, test_texts, test_y, max_length=max_length)
     test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=True)
     _, _, _, actual, pred = _run_eval(model, test_loader, device, len(test_ds))
     test_metrics = metrics_from_preds(actual, pred)
 
     final_dir.mkdir(parents=True, exist_ok=True)
-    model.to("cpu")
+    if not _is_quantized(model):
+        model.to("cpu")
     if hasattr(model, "save_pretrained"):
         model.save_pretrained(final_dir)
     else:

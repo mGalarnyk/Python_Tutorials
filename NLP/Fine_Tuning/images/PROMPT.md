@@ -18,24 +18,26 @@ Rounded cards, plenty of padding. CPU vs GPU as small badges, not giant labels.
 
 ## `flyte_pipeline.png` (part 2 — FOMC)
 
+Card washes must match the Results table: Mac `#dbeafe`, 1 GPU `#fef3c7`, 1 GPU/job `#fde8e6`. The right card is four independent jobs, not one job split across four GPUs.
+
 ```
 Title at top in dark navy, centered: "One Flyte 2 pipeline."
-Subtitle in gray: "Same workflow.py on a laptop, one GPU, or four GPUs."
+Subtitle in gray: "Same workflow.py on a laptop, one GPU, or 1 GPU/job."
 
 THREE equal machine cards in a row, rounded corners, plenty of padding. Little body text.
 
-Left card, light blue wash. Icon: MacBook laptop. Header: "MacBook Pro". Sub: "M4 Max, 128 GB, 16-core (12P+4E), MPS". Command pill: flyte run --local. One line: "full + LoRA".
+Left card, light blue wash (#dbeafe). Icon: MacBook laptop. Header: "MacBook Pro". Sub: "M4 Max, 128 GB, 16-core (12P+4E), MPS". Command pill: flyte run --local. One line: "full + LoRA".
 
-Middle card, light green wash. Icon: a single GPU card. Header: "1× RTX PRO 6000". Sub: "Blackwell, 96 GB, CUDA". Command pill: FLYTE_GPUS=1. One line: "2×3 + QLoRA".
+Middle card, light yellow wash (#fef3c7). Icon: a single GPU card. Header: "1× RTX PRO 6000". Sub: "Blackwell, 96 GB, CUDA". Command pill: FLYTE_GPUS=1. One line: "serial 2×3 + QLoRA".
 
-Right card, slightly darker green wash. Icon: four GPU cards in a row. Header: "4× RTX PRO 6000". Sub: "one node, 96 GB each, 16-core / 256 GB host". Command pill: --parallel jobs. One line: "1 GPU/job".
+Right card, light pink wash (#fde8e6). Header: "4× RTX PRO 6000". Sub: "one node, 96 GB each, 1 GPU/job". Command pill: --parallel jobs. Visual: FOUR SEPARATE mini-job tiles in a 2×2 (GPU 0, GPU 1, GPU 2, GPU 3), each with one small GPU icon and the label "1 job". Do not draw four GPUs as one fused training job. One line: "four cells at once".
 
 A downward chevron, then a short three-step row labeled workflow.py:
 1 CPU: prepare_data
 2 GPU: train / grid
 3 CPU dashed: fetch_market_data (stub)
 
-Do not name a university or cluster.
+Do not name a university or cluster. Do not write DDP or 4 GPUs/model.
 ```
 
 ## `flyte_pipeline.png` (part 1 — text-to-SQL)
@@ -83,3 +85,21 @@ Footer in small gray: "Labeled FOMC sentences, 1996–2022. Metric: weighted F1.
 
 Example sentences are illustrative, not quoted from the paper.
 ```
+
+## `ft_memory_budget.png` (part 2 — FOMC)
+
+Unit-square GPU budget. Draw it in code (matplotlib) so LoRA yellow equals full yellow and purple is identical in all three columns. Do not copy a vendor LLaMA-65B / 780 GB slide.
+
+```
+Title: Where GPU memory goes
+Subtitle: Four buckets. Trainable percent only shrinks grads and AdamW.
+
+THREE equal cards, each a dashed 96 GB GPU outline. Stack bottom to top: yellow Parameters, blue Gradients, green AdamW (m, v), purple Activations.
+
+FULL: Parameters 2×4, Gradients 2×4, AdamW 4×4, Activations 2×4. Caption: highest static memory.
+LoRA: Parameters 2×4 (same as full), Gradients 1 square, AdamW 1 square, Activations 2×4 (same as full). Caption: same parameters and activations, tiny optimizer.
+QLoRA: Parameters 2 squares (~4-bit vs bf16), Gradients 1, AdamW 1, Activations 2×4. Caption: lowest weight storage. CUDA only.
+
+Legend + footer: Each square is one memory unit. LoRA keeps the full-size base in memory.
+```
+

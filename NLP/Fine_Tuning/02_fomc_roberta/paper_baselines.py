@@ -15,6 +15,8 @@ def paper_table(split: str = cfg.DEFAULT_SPLIT) -> pd.DataFrame:
     rows = []
     for model_key in cfg.MODELS:
         f1 = cfg.PAPER_WEIGHTED_F1.get((model_key, split))
+        if f1 is None:
+            continue
         std = cfg.PAPER_WEIGHTED_F1_STD.get((model_key, split))
         rows.append(
             {

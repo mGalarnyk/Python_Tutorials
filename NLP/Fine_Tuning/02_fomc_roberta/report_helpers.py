@@ -339,8 +339,6 @@ def machine_color_legend_html() -> str:
         ("#eef0f3", "Shah et al. · RTX A6000"),
         ("#dbeafe", "This Mac · M4 Max, MPS"),
         ("#fef3c7", "1× RTX PRO 6000 Blackwell"),
-        ("#ede9fe", "4 GPUs/model"),
-        ("#fde8e6", "1 GPU/job"),
     )
     bits = "".join(
         f'<span style="display:inline-block;margin:0 10px 6px 0;padding:2px 8px;'
@@ -351,7 +349,7 @@ def machine_color_legend_html() -> str:
 
 
 def _short_model(name: str) -> str:
-    return str(name).replace("roberta-", "")
+    return cfg.display_name(str(name))
 
 
 def _results_table_html(grid: dict, highlight: tuple[str, str] | None = None) -> str:
@@ -374,7 +372,7 @@ def _results_table_html(grid: dict, highlight: tuple[str, str] | None = None) ->
         )
     pending = [
         job
-        for job in cfg.ALL_JOBS
+        for job in cfg.TABLE_JOBS
         if not any(r["model"] == job[0] and r["method"] == job[1] and r["who"] == "ours" for r in grid["rows"])
     ]
     for model, method in pending:

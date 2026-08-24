@@ -9,7 +9,7 @@ import flyte
 
 # Flyte resource GPU count is NVIDIA. On this MacBook Pro, request 0 so
 # --local still runs; PyTorch uses MPS inside the task. Devbox: `flyte start
-# devbox` here (no --gpu — Apple Silicon unsupported). On a remote NVIDIA
+# devbox` here (no --gpu; Apple Silicon unsupported). On a remote NVIDIA
 # RTX PRO 6000 Blackwell (96 GB): `flyte start devbox --gpu`, default 1 GPU.
 # Set FLYTE_GPUS=4 only when a task should own four cards (DDP). For
 # 1 GPU/job on a 4-GPU node keep FLYTE_GPUS=1 and pass --parallel jobs.
@@ -22,7 +22,7 @@ def requested_gpus() -> int:
     return max(1, int(os.getenv("FLYTE_GPUS", "1")))
 
 
-# Level 1 (docs): TaskEnvironment — image + resources. Tasks attach with @gpu_env.task.
+# Level 1 (docs): TaskEnvironment: image + resources. Tasks attach with @gpu_env.task.
 gpu_env = flyte.TaskEnvironment(
     name="fomc-roberta-gpu",
     image=flyte.Image.from_debian_base().with_requirements("requirements.txt"),
@@ -31,11 +31,10 @@ gpu_env = flyte.TaskEnvironment(
         memory="24Gi",
         gpu=requested_gpus(),
     ),
-    description="RoBERTa Combined-S (full / LoRA / QLoRA). Same env locally (gpu=0, MPS) and remotely.",
+    description="Combined-S (RoBERTa + Nemotron). Same env locally (gpu=0, MPS) and on PACE CUDA.",
 )
 
-# Placeholder only — do not attach tasks or depend_on this until we start part 3.
-# Same GPU host later: Llama-3.1-8B full / LoRA / QLoRA in NLP/Fine_Tuning/03_llm_8b.
+# Unused. Nemotron-3-Nano-4B is another --model_key on gpu_env, not a second env.
 llm_8b_env = flyte.TaskEnvironment(
     name="llm-8b-gpu",
     image=flyte.Image.from_debian_base(),
@@ -44,7 +43,7 @@ llm_8b_env = flyte.TaskEnvironment(
         memory="64Gi",
         gpu=requested_gpus(),
     ),
-    description="Placeholder for Llama-3.1-8B later. No tasks yet.",
+    description="Unused. Nemotron uses gpu_env on the same Combined-S table.",
 )
 
 # Slim image so `flyte run` on the local devbox can write a Report tab

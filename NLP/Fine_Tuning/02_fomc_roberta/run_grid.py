@@ -436,7 +436,7 @@ def run_grid(
             if not completed.empty:
                 _write_outputs(completed, split)
         except Exception as exc:
-            log(f"grid cell {i}/{n} failed: {exc}")
+            log(f"grid cell {i}/{n} failed: {type(exc).__name__}: {exc}")
             rows.append(
                 {
                     "who": "ours",

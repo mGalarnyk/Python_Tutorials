@@ -132,6 +132,44 @@ async def _flush_talk_report(
     await flyte.report.flush.aio()
 
 
+def _say(msg: str) -> None:
+    """Loud progress so a terminal / Flyte log shows each cell and model."""
+    line = f"[fomc] {msg}"
+    log.info(line)
+    print(line, flush=True)
+
+
+def _metrics_complete(model_key: str, method: str, seed: int, split: str) -> bool:
+    path = cfg.run_dir(model_key, method, seed, split) / "metrics.json"
+    if not path.exists():
+        return False
+    try:
+        return json.loads(path.read_text()).get("status") == "complete"
+    except json.JSONDecodeError:
+        return False
+
+
+def _announce_cell(cell: CellOut, index: int, total: int, split: str, jobs: list[tuple[str, str]]) -> None:
+    f1 = cell.weighted_f1
+    f1_s = f"{f1:.4f}" if f1 is not None and f1 >= 0 else "—"
+    _say(
+        f"DONE cell {index}/{total}: {cell.model} {cell.method} seed={cell.seed}  "
+        f"F1={f1_s} vs_paper={cell.vs_paper:+.4f}  {cell.status}"
+    )
+    n_seeds = len(cfg.PAPER_SEEDS)
+    seeds_done = sum(
+        _metrics_complete(cell.model, cell.method, int(s), split) for s in cfg.PAPER_SEEDS
+    )
+    if seeds_done == n_seeds:
+        _say(f"DONE method: {cell.model} {cell.method}  (all {n_seeds} seeds)")
+    methods = [m for mk, m in jobs if mk == cell.model]
+    if methods and all(
+        all(_metrics_complete(cell.model, m, int(s), split) for s in cfg.PAPER_SEEDS)
+        for m in methods
+    ):
+        _say(f"DONE model: {cell.model}  ({len(methods)} methods × {n_seeds} seeds)")
+
+
 def _talk_reads_for_checkpoint(result: dict) -> list[dict]:
     """Score the talk sentences with this cell's weights (skip if no checkpoint)."""
     from train_run import load_trained, predict_texts
@@ -286,24 +324,38 @@ async def grid(
     mode = (parallel or "serial").strip().lower()
     if mode not in {"serial", "jobs"}:
         raise ValueError("parallel must be 'serial' or 'jobs'")
-    log.info("FOMC grid jobs=%s seeds=%s parallel=%s", jobs, list(cfg.PAPER_SEEDS), mode)
-    coros = [
-        train_one(
+    cells = [
+        (int(seed), model_key, method)
+        for seed in cfg.PAPER_SEEDS
+        for model_key, method in jobs
+    ]
+    total = len(cells)
+    _say(f"START grid  {total} cells  jobs={jobs}  seeds={list(cfg.PAPER_SEEDS)}  parallel={mode}")
+
+    async def _run_cell(index: int, seed: int, model_key: str, method: str) -> CellOut:
+        _say(f"START cell {index}/{total}: {model_key} {method} seed={seed}")
+        cell = await train_one(
             model_key=model_key,
             method=method,
-            seed=int(seed),
+            seed=seed,
             split=split,
             max_epochs=max_epochs,
             force=force,
         )
-        for seed in cfg.PAPER_SEEDS
-        for model_key, method in jobs
-    ]
+        _announce_cell(cell, index, total, split, jobs)
+        return cell
+
     if mode == "jobs":
-        await asyncio.gather(*coros)
+        await asyncio.gather(
+            *[
+                _run_cell(i, seed, model_key, method)
+                for i, (seed, model_key, method) in enumerate(cells, 1)
+            ]
+        )
     else:
-        for coro in coros:
-            await coro
+        for i, (seed, model_key, method) in enumerate(cells, 1):
+            await _run_cell(i, seed, model_key, method)
+    _say(f"DONE grid  {total}/{total} cells")
     if include_market_stub:
         await fetch_market_data()
     summary = await snapshot_grid()
