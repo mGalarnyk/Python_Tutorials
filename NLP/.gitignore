@@ -46,12 +46,9 @@ rng_state.pth
 scheduler.pt
 trainer_state.json
 
-# Downloaded datasets (FOMC xlsx is CC BY-NC; do not vendor)
-data/
-**/data/*.xlsx
-**/data/*.csv
-**/data/*.json
-**/data/*.parquet
+# FOMC Combined-S downloads (CC BY-NC; regenerate with load_data.py).
+# Tutorial sample CSVs and other small datasets stay in git.
+**/02_fomc_roberta/data/*.xlsx
 
 # Virtualenvs created inside this folder
 .venv/

@@ -30,4 +30,4 @@ Follow along on this **16-inch MacBook Pro** (Apple **M4 Max**, **128 GB** unifi
 
 ## What is gitignored
 
-Checkpoints, Hugging Face caches, Flyte/Union config (cluster URLs), and `.env` files are ignored so local GPU runs do not get committed. See `NLP/.gitignore` and the repo-root `.gitignore`.
+Checkpoints, model weights, Hugging Face caches, Flyte/Union config, `.env` files, and the downloaded FOMC xlsx files are ignored. Tutorial sample CSVs and the other small datasets already in this repo stay. See `NLP/.gitignore` and the repo-root `.gitignore`.
