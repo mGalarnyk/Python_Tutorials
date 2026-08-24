@@ -1,0 +1,50 @@
+# Local secrets and Hugging Face tokens
+.env
+.env.*
+*.env
+
+# Flyte / Union CLI config — contains YOUR cluster endpoint, project, org
+.flyte/
+**/.flyte/
+.union/
+**/.union/
+config.yaml
+
+# Hugging Face / Transformers caches (machine-specific, often tens of GB)
+hf_home/
+huggingface/
+huggingface_hub/
+transformers_cache/
+offload/
+offload_folder/
+**/.cache/
+
+# Training outputs and experiment trackers
+outputs/
+checkpoints/
+runs/
+wandb/
+mlruns/
+lightning_logs/
+checkpoint-*/
+
+# Model weights and adapters (regenerate from training)
+*.safetensors
+*.onnx
+*.gguf
+*.ggml
+pytorch_model.bin
+adapter_model.bin
+adapter_model.safetensors
+adapter_config.json
+optimizer.pt
+rng_state.pth
+scheduler.pt
+trainer_state.json
+
+# Downloaded datasets (FOMC xlsx is CC BY-NC; do not vendor)
+**/data/*.xlsx
+
+# Virtualenvs created inside this folder
+.venv/
+venv/

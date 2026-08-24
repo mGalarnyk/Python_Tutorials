@@ -87,6 +87,24 @@ Thumbs.db
 *.ckpt
 *.pt
 *.pth
+*.safetensors
+*.onnx
+*.gguf
 .cache/
 huggingface/
 sentence-transformers/
+
+# ───────────────────────────────────────────────────────────────
+# Fine-tuning / GPU / Flyte local state
+# Do not commit cluster endpoints, HF caches, or checkpoints.
+# Tutorial-specific extras live in NLP/.gitignore.
+# ───────────────────────────────────────────────────────────────
+.flyte/
+**/.flyte/
+.union/
+**/.union/
+wandb/
+**/wandb/
+mlruns/
+**/lightning_logs/
+**/checkpoint-*/

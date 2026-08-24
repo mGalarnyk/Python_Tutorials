@@ -1,0 +1,24 @@
+# Dummy Flyte 2 config. Copy to .flyte/config.yaml locally — that path is gitignored.
+#
+# Local TUI (no Docker, this laptop):
+#   flyte create config --local-persistence -o .flyte
+#   flyte run --local --tui workflow.py pipeline --model_key roberta-base --method lora --seed 5768
+#   flyte start tui
+#
+# Local web UI (needs Docker + kubectl; Apple Silicon cannot use --gpu):
+#   flyte start devbox
+#   flyte create config --devbox
+#   open http://localhost:30080
+#
+# Remote cluster:
+#   flyte create config --endpoint YOUR_CLUSTER --project YOUR_PROJECT --domain development --builder remote
+#
+# Do not put a real GPU endpoint in git.
+
+admin:
+  endpoint: dns:///YOUR_ORG.hosted.unionai.cloud
+image:
+  builder: remote
+task:
+  domain: development
+  project: YOUR_PROJECT

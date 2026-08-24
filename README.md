@@ -42,7 +42,7 @@ How to Speed Up XGBoost Model Training | [Speed Up XGBoost Model Training](https
 ## Natural Language Processing
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
-TBD| TBD | TBD
+Fine-Tuning with LoRA and QLoRA | [NLP/Fine_Tuning](https://github.com/mGalarnyk/Python_Tutorials/tree/master/NLP/Fine_Tuning) | Coming Soon
 
 ## Pandas
 Domain | Blog Post/IPython Notebook | Youtube Video

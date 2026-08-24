@@ -1,0 +1,13 @@
+# Dummy Flyte 2 config. Copy to .flyte/config.yaml locally — that path is gitignored.
+# Generate a real file with:
+#   flyte create config --endpoint YOUR_CLUSTER.hosted.unionai.cloud --project YOUR_PROJECT --domain development --builder remote
+#
+# Do not put a real GPU / Union endpoint in git.
+
+admin:
+  endpoint: dns:///YOUR_ORG.hosted.unionai.cloud
+image:
+  builder: remote
+task:
+  domain: development
+  project: YOUR_PROJECT

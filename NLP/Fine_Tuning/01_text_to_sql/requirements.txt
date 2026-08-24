@@ -1,0 +1,14 @@
+flyte[tui]>=2.0
+torch>=2.1.0
+transformers>=4.45.0
+peft>=0.13.0
+trl>=0.12.0
+datasets>=3.0.0
+accelerate>=0.34.0
+markdown
+python-dotenv
+fastapi
+uvicorn
+# QLoRA / 4-bit — NVIDIA path. Skip on macOS; use LoRA or full there.
+bitsandbytes>=0.44.0; sys_platform != "darwin"
+ 

@@ -1,0 +1,29 @@
+---
+description: Flyte 2 devbox locally and on the remote GPU — UI, reports, hardware
+alwaysApply: true
+---
+
+# Flyte 2: same UI locally and on the GPU
+
+The backend is always a **devbox**. Same console on both hosts: Summary (Sub actions, Input, Output), Logs, Metrics, Reports, Task, Code.
+
+## Hosts
+
+- This laptop: 16-inch MacBook Pro, Apple **M4 Max**, **128 GB**, 16-core CPU (12P + 4E), MPS. `flyte start devbox` — **never** `--gpu` (Apple Silicon unsupported).
+- Remote: **NVIDIA RTX PRO 6000 Blackwell, 96 GB**. One card or **four on one node** (16-core, 256 GB host). `flyte start devbox --gpu`. Never say “Dell GPU.” Do not name a university cluster.
+- Do **not** start remote CUDA / QLoRA / DDP until the user grants GPU access.
+
+## Run modes
+
+- Browser UI: `flyte run` **without** `--local` against the devbox (`-c .flyte/devbox.yaml`). UI at `http://localhost:30080`.
+- `--local --tui` is the **terminal only**. Those runs never appear at `:30080`.
+- On the GPU host: `flyte start devbox --gpu` then `FLYTE_GPUS=1 flyte run workflow.py grid` (serial) or `--parallel jobs` (1 GPU/job on a 4-GPU node). Check `flyte get devbox` first. Do not set `FLYTE_GPUS=4` until DDP exists — that would make every `train_one` request all four cards.
+
+## Task shape (so the official UI is useful)
+
+- Parent tasks call children → **Sub actions**. Do not flatten the DAG into one function.
+- Typed parameters → **Input**. Typed return values → **Output**.
+- `report=True` + `import flyte.report` (required; `import flyte` does not load it) + `replace.aio` / `get_tab` / `flush.aio` → **Reports**.
+- Same `workflow.py` everywhere. Only the invoke path and `gpu=` change.
+
+Docs: [devbox](https://www.union.ai/docs/v2/flyte/user-guide/get-started/run-modes/running-devbox/), [reports](https://www.union.ai/docs/v2/flyte/user-guide/task-programming/reports/).
