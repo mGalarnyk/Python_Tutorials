@@ -1,12 +1,22 @@
-"""FOMC label prompt for a causal LM (Nemotron). RoBERTa uses the raw sentence."""
+"""FOMC label prompt for a causal LM (Nemotron). RoBERTa uses the raw sentence.
+
+Shah et al. (2023) fine-tune RoBERTa on the raw sentence (no prompt). Their
+ChatGPT zero-shot prompt (paper section 4.4) asks for a label plus a short
+explanation. That is generation, not this last-token classifier.
+
+This wrap uses their tightening / easing / neutral definitions, then asks for
+exactly one label with Nemotron reasoning off.
+"""
 
 from __future__ import annotations
 
 LABELS = ("dovish", "hawkish", "neutral")
 
-# Reasoning off — we want a stance token, not a long trace.
 NEMOTRON_SYSTEM = (
     "You classify Federal Open Market Committee sentences. "
+    "Label hawkish if the sentence corresponds to tightening of monetary policy, "
+    "dovish if it corresponds to easing of monetary policy, "
+    "or neutral if the stance is neutral. "
     "Reply with exactly one label: dovish, hawkish, or neutral. "
     "Do not explain."
 )

@@ -125,7 +125,7 @@ def collect_completed(split: str = cfg.DEFAULT_SPLIT) -> pd.DataFrame:
     if not cfg.CHECKPOINTS_DIR.exists():
         return pd.DataFrame()
     for metrics_path in sorted(cfg.CHECKPOINTS_DIR.glob("*/metrics.json")):
-        if not metrics_path.parent.name.endswith("__paper"):
+        if not cfg.is_tracked_run_dir(metrics_path.parent.name):
             continue
         data = json.loads(metrics_path.read_text())
         if data.get("status") != "complete":
@@ -283,7 +283,10 @@ def format_results(summary: pd.DataFrame) -> pd.DataFrame:
         m = row.get("train_minutes")
         if m is None or (isinstance(m, float) and pd.isna(m)):
             return "—"
-        return f"{float(m):.0f} min" if float(m) >= 10 else f"{float(m):.1f} min"
+        m = float(m)
+        if m >= 120:
+            return f"{m / 60:.1f} h"
+        return f"{m:.0f} min" if m >= 10 else f"{m:.1f} min"
 
     def per_epoch_cell(row: pd.Series) -> str:
         s = row.get("sec_per_epoch")

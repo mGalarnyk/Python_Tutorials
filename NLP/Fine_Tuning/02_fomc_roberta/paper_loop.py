@@ -159,12 +159,21 @@ def train_paper_loop(
     max_epochs: int = MAX_EPOCHS,
     resume: bool = True,
     max_length: int = MAX_LENGTH,
+    grad_accum: int = 1,
+    cosine: bool = False,
+    load_best: bool = False,
 ) -> dict[str, Any]:
-    """Run their epoch loop. `build_model` is called *after* torch.manual_seed."""
+    """Run their epoch loop. `build_model` is called *after* torch.manual_seed.
+
+    RoBERTa keeps defaults (accum 1, no cosine, test last weights). Nemotron
+    labeltok passes accum / cosine / load_best.
+    """
     device = _train_device()
     progress_path = out_dir / "progress.jsonl"
     ckpt_path = out_dir / "loop_checkpoint.pt"
+    best_path = out_dir / "best.pt"
     final_dir = out_dir / "final"
+    accum = max(int(grad_accum), 1)
 
     texts, y = _texts_labels(train_df)
     dataset = _tensor_dataset(tokenizer, texts, y, max_length=max_length)
@@ -189,12 +198,18 @@ def train_paper_loop(
     }
 
     optimizer = optim.AdamW((p for p in model.parameters() if p.requires_grad), lr=lr)
+    scheduler = None
+    if cosine:
+        scheduler = optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=max(int(max_epochs), 1), eta_min=float(lr) * 0.1
+        )
 
     start_epoch = 0
     early_stopping_count = 0
     best_ce = float("inf")
     best_accuracy = float("-inf")
     best_f1 = float("-inf")
+    best_saved_f1 = float("-inf")
 
     if resume and ckpt_path.exists():
         blob = torch.load(ckpt_path, map_location=device, weights_only=False)
@@ -205,11 +220,17 @@ def train_paper_loop(
         best_ce = float(blob["best_ce"])
         best_accuracy = float(blob["best_accuracy"])
         best_f1 = float(blob["best_f1"])
+        if scheduler is not None and blob.get("scheduler") is not None:
+            scheduler.load_state_dict(blob["scheduler"])
+        if load_best and best_path.exists():
+            best_saved_f1 = best_f1
         log(f"{run_name}: resumed loop at epoch {start_epoch}")
 
+    recipe = "labeltok" if (accum > 1 or cosine or load_best) else "paper_loop"
     log(
-        f"{run_name}: paper loop  device={describe()}  lr={lr}  "
-        f"batch={batch_size}  epochs≤{max_epochs}"
+        f"{run_name}: {recipe}  device={describe()}  lr={lr}  "
+        f"batch={batch_size}  accum={accum}  cosine={cosine}  "
+        f"load_best={load_best}  epochs≤{max_epochs}"
     )
     t0 = time.perf_counter()
     stopped_epoch = start_epoch
@@ -222,18 +243,28 @@ def train_paper_loop(
             if phase == "train":
                 model.train()
                 early_stopping_count += 1
+                optimizer.zero_grad(set_to_none=True)
+                n_since = 0
                 for input_ids, attention_masks, labels in loaders["train"]:
                     input_ids = input_ids.to(device)
                     attention_masks = attention_masks.to(device)
                     labels = labels.to(device)
-                    optimizer.zero_grad()
                     outputs = model(
                         input_ids=input_ids,
                         attention_mask=attention_masks,
                         labels=labels,
                     )
-                    outputs.loss.backward()
+                    (outputs.loss / accum).backward()
+                    n_since += 1
+                    if n_since == accum:
+                        optimizer.step()
+                        optimizer.zero_grad(set_to_none=True)
+                        n_since = 0
+                if n_since:
                     optimizer.step()
+                    optimizer.zero_grad(set_to_none=True)
+                if scheduler is not None:
+                    scheduler.step()
             else:
                 curr_ce, curr_accuracy, curr_f1, _, _ = _run_eval(
                     model, loaders["val"], device, len(val_set)
@@ -247,6 +278,9 @@ def train_paper_loop(
                 if curr_f1 >= best_f1 + EPS:
                     best_f1 = curr_f1
                     early_stopping_count = 0
+                if load_best and curr_f1 > best_saved_f1:
+                    best_saved_f1 = curr_f1
+                    torch.save(model.state_dict(), best_path)
                 log(
                     f"{run_name}: epoch {epoch + 1}  "
                     f"val_ce={curr_ce:.4f}  val_acc={curr_accuracy:.4f}  "
@@ -262,34 +296,45 @@ def train_paper_loop(
                     early_stopping_count=early_stopping_count,
                 )
 
-        torch.save(
-            {
-                "epoch": epoch,
-                "model": model.state_dict(),
-                "optimizer": optimizer.state_dict(),
-                "early_stopping_count": early_stopping_count,
-                "best_ce": best_ce,
-                "best_accuracy": best_accuracy,
-                "best_f1": best_f1,
-            },
-            ckpt_path,
-        )
+        payload = {
+            "epoch": epoch,
+            "model": model.state_dict(),
+            "optimizer": optimizer.state_dict(),
+            "early_stopping_count": early_stopping_count,
+            "best_ce": best_ce,
+            "best_accuracy": best_accuracy,
+            "best_f1": best_f1,
+        }
+        if scheduler is not None:
+            payload["scheduler"] = scheduler.state_dict()
+        torch.save(payload, ckpt_path)
 
-    # Test the last weights — they do not reload a best checkpoint.
+    notes = "last checkpoint after early stop; no load_best"
+    if load_best and best_path.exists():
+        model.load_state_dict(torch.load(best_path, map_location=device, weights_only=False))
+        notes = "reloaded best val-F1 weights before test"
+
     test_texts, test_y = _texts_labels(test_df)
     test_ds = _tensor_dataset(tokenizer, test_texts, test_y, max_length=max_length)
     test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=True)
     _, _, _, actual, pred = _run_eval(model, test_loader, device, len(test_ds))
     test_metrics = metrics_from_preds(actual, pred)
 
-    final_dir.mkdir(parents=True, exist_ok=True)
-    if not _is_quantized(model):
-        model.to("cpu")
-    if hasattr(model, "save_pretrained"):
-        model.save_pretrained(final_dir)
-    else:
-        torch.save(model.state_dict(), final_dir / "pytorch_model.bin")
-    tokenizer.save_pretrained(final_dir)
+    try:
+        final_dir.mkdir(parents=True, exist_ok=True)
+        if not _is_quantized(model):
+            model.to("cpu")
+        if hasattr(model, "save_pretrained"):
+            model.save_pretrained(final_dir)
+        else:
+            torch.save(model.state_dict(), final_dir / "pytorch_model.bin")
+        tokenizer.save_pretrained(final_dir)
+    except Exception as exc:
+        log(
+            f"{run_name}: save_pretrained failed ({type(exc).__name__}: {exc}). "
+            f"Test metrics still returned; last weights are in {ckpt_path}"
+        )
+        notes = f"{notes}; save_pretrained failed: {type(exc).__name__}"
 
     empty_cache()
     wall = time.perf_counter() - t0
@@ -308,8 +353,9 @@ def train_paper_loop(
         "device": describe(),
         "lr": lr,
         "batch_size": batch_size,
-        "recipe": "paper_loop",
+        "grad_accum": accum,
+        "recipe": recipe,
         "trainable_params": trainable,
         "total_params": total,
-        "notes": "last checkpoint after early stop; no load_best",
+        "notes": notes,
     }

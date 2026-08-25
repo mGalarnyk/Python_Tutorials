@@ -29,9 +29,8 @@ PAPER_FULL_HPARAMS = {
     "roberta-large": {"lr": 1e-5, "batch_size": 16},
 }
 
-# LoRA / QLoRA reuse the paper loop and the same LR/batch so the only
-# change is adapters (or 4-bit). Do not bump LoRA LR unless that is the
-# variation you are measuring.
+# RoBERTa LoRA / QLoRA reuse the paper loop and the same LR/batch so the only
+# change is adapters (or 4-bit). Nemotron uses NEMOTRON_RECIPE ("labeltok").
 LORA_R = 16
 LORA_ALPHA = 32
 LORA_DROPOUT = 0.1
@@ -47,8 +46,13 @@ NEMOTRON_LORA_TARGET_MODULES = [
     "down_proj",
     "in_proj",
 ]
+NEMOTRON_LORA_R = 64
+NEMOTRON_LORA_ALPHA = 128
+NEMOTRON_GRAD_ACCUM = 16
 NEMOTRON_MAX_LENGTH = 256
 CAUSAL_KEYS = frozenset({"nemotron-nano-4b"})
+# Separate from RECIPE="paper" so the first Nemotron grid is not overwritten.
+NEMOTRON_RECIPE = "labeltok"
 
 MODELS = {
     "roberta-base": "roberta-base",
@@ -79,7 +83,7 @@ NEMOTRON_JOBS = (
     ("nemotron-nano-4b", "qlora"),
 )
 
-# Results table: RoBERTa grid + Nemotron rows (pending until those cells finish).
+# Results table: RoBERTa grid + Nemotron rows.
 TABLE_JOBS = ALL_JOBS + NEMOTRON_JOBS
 
 # Table 5 of the paper: mean weighted F1 over three seeds. Full fine-tune only.
@@ -105,17 +109,36 @@ RELEASED_CODE_URL = "https://github.com/gtfintechlab/fomc-hawkish-dovish"
 RECIPE = "paper"  # faithful Shah et al. loop, not Hugging Face Trainer
 
 
-def paper_hparams(model_key: str) -> dict:
+def recipe_for(model_key: str) -> str:
+    if is_causal(model_key):
+        return NEMOTRON_RECIPE
+    return RECIPE
+
+
+def is_tracked_run_dir(name: str) -> bool:
+    return name.endswith(f"__{RECIPE}") or name.endswith(f"__{NEMOTRON_RECIPE}")
+
+
+def paper_hparams(model_key: str, method: str = "full") -> dict:
     if model_key == "nemotron-nano-4b":
-        # Naive Mamba torch_forward is O(seq^2). batch 1 / 256 tokens fits one 96 GB card.
-        return {"lr": 1e-5, "batch_size": 1}
+        # batch 1 (naive Mamba). LoRA/QLoRA: higher LR + accum 16. Full: paper LR.
+        lr = 1e-4 if method in {"lora", "qlora"} else 1e-5
+        return {
+            "lr": lr,
+            "batch_size": 1,
+            "grad_accum": NEMOTRON_GRAD_ACCUM,
+            "cosine": True,
+            "load_best": True,
+        }
     if model_key not in PAPER_FULL_HPARAMS:
         raise KeyError(f"No paper hparams for {model_key}")
-    return dict(PAPER_FULL_HPARAMS[model_key])
+    hyps = dict(PAPER_FULL_HPARAMS[model_key])
+    hyps.update({"grad_accum": 1, "cosine": False, "load_best": False})
+    return hyps
 
 
 def run_id(model_key: str, method: str, seed: int, split: str = DEFAULT_SPLIT) -> str:
-    return f"{model_key}__{method}__{split}__seed{seed}__{RECIPE}"
+    return f"{model_key}__{method}__{split}__seed{seed}__{recipe_for(model_key)}"
 
 
 def run_dir(model_key: str, method: str, seed: int, split: str = DEFAULT_SPLIT) -> Path:
@@ -140,6 +163,14 @@ def lora_target_modules(model_key: str):
     if is_causal(model_key):
         return NEMOTRON_LORA_TARGET_MODULES
     return list(LORA_TARGET_MODULES)
+
+
+def lora_r(model_key: str) -> int:
+    return NEMOTRON_LORA_R if is_causal(model_key) else LORA_R
+
+
+def lora_alpha(model_key: str) -> int:
+    return NEMOTRON_LORA_ALPHA if is_causal(model_key) else LORA_ALPHA
 
 
 def max_length_for(model_key: str) -> int:

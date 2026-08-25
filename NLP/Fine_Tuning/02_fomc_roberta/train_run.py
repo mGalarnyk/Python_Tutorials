@@ -261,7 +261,7 @@ def _load_model(
     _quiet_transformers()
     quantized = method == "qlora"
     if cfg.is_causal(model_key):
-        from causal_cls import LastTokenClassifier
+        from causal_cls import LabelTokenClassifier, resolve_label_tokens
         from peft import LoraConfig, TaskType, get_peft_model
 
         dtype = torch.bfloat16 if torch.cuda.is_available() else torch.float32
@@ -281,17 +281,19 @@ def _load_model(
             log(f"QLoRA: replaced {n} Linear layers with LinearNF4 (classifier kept)")
         if method in {"lora", "qlora"}:
             targets = list(cfg.lora_target_modules(model_key))
-            log(f"LoRA targets={targets}")
+            log(f"LoRA targets={targets}  r={cfg.lora_r(model_key)}  alpha={cfg.lora_alpha(model_key)}")
             lora = LoraConfig(
                 task_type=TaskType.CAUSAL_LM,
-                r=cfg.LORA_R,
-                lora_alpha=cfg.LORA_ALPHA,
+                r=cfg.lora_r(model_key),
+                lora_alpha=cfg.lora_alpha(model_key),
                 lora_dropout=cfg.LORA_DROPOUT,
                 target_modules=targets,
             )
             backbone = get_peft_model(backbone, lora)
             backbone.print_trainable_parameters()
-        model = LastTokenClassifier(backbone, num_labels=num_labels)
+        label_ids, label_strs = resolve_label_tokens(tokenizer)
+        log(f"Nemotron label tokens={list(zip(label_strs, label_ids))}")
+        model = LabelTokenClassifier(backbone, label_token_ids=label_ids)
         if quantized:
             _quantize_on_cuda(model)
         return model
@@ -314,8 +316,8 @@ def _load_model(
 
         lora = LoraConfig(
             task_type=TaskType.SEQ_CLS,
-            r=cfg.LORA_R,
-            lora_alpha=cfg.LORA_ALPHA,
+            r=cfg.lora_r(model_key),
+            lora_alpha=cfg.lora_alpha(model_key),
             lora_dropout=cfg.LORA_DROPOUT,
             target_modules=cfg.lora_target_modules(model_key),
             modules_to_save=list(cfg.LORA_MODULES_TO_SAVE),
@@ -361,7 +363,6 @@ def load_trained(
     causal_marker = src / "causal_cls.json"
     if causal_marker.exists() or (src / "backbone").exists():
         import torch
-        from causal_cls import LastTokenClassifier
         from transformers import AutoModelForCausalLM
 
         meta = {"num_labels": 3}
@@ -384,10 +385,21 @@ def load_trained(
             backbone = AutoModelForCausalLM.from_pretrained(
                 load_from, trust_remote_code=True, **from_pretrained_kwargs(model_dtype())
             )
-        model = LastTokenClassifier(backbone, num_labels=int(meta.get("num_labels", 3)))
-        clf_path = src / "classifier.pt"
-        if clf_path.exists():
-            model.classifier.load_state_dict(torch.load(clf_path, map_location="cpu", weights_only=True))
+        if meta.get("mode") == "labeltok" or meta.get("label_token_ids"):
+            from causal_cls import LabelTokenClassifier
+
+            model = LabelTokenClassifier(
+                backbone, label_token_ids=[int(x) for x in meta["label_token_ids"]]
+            )
+        else:
+            from causal_cls import LastTokenClassifier
+
+            model = LastTokenClassifier(backbone, num_labels=int(meta.get("num_labels", 3)))
+            clf_path = src / "classifier.pt"
+            if clf_path.exists():
+                model.classifier.load_state_dict(
+                    torch.load(clf_path, map_location="cpu", weights_only=True)
+                )
         return place_model(model), tokenizer
 
     if adapter_cfg.exists():
@@ -518,17 +530,21 @@ def run_one(
     if method == "qlora":
         require_qlora()
 
-    hyps = cfg.paper_hparams(model_key)
+    hyps = cfg.paper_hparams(model_key, method)
     max_epochs = cfg.MAX_EPOCHS if max_epochs is None else max_epochs
     batch_size = hyps["batch_size"] if batch_size is None else batch_size
     lr = hyps["lr"] if lr is None else lr
+    grad_accum = int(hyps.get("grad_accum") or 1)
+    cosine = bool(hyps.get("cosine"))
+    load_best = bool(hyps.get("load_best"))
 
     log("=" * 64)
     log(f"START {model_key} {method} seed={seed}")
     log(f"run={run_name}")
     log(
-        f"recipe=paper_loop  device={describe()}  method={method}  "
-        f"lr={lr}  batch={batch_size}  epochs≤{max_epochs}"
+        f"recipe={cfg.recipe_for(model_key)}  device={describe()}  method={method}  "
+        f"lr={lr}  batch={batch_size}  accum={grad_accum}  cosine={cosine}  "
+        f"load_best={load_best}  epochs≤{max_epochs}"
     )
     log(f"checkpoints={out_dir}")
     log("=" * 64)
@@ -554,6 +570,9 @@ def run_one(
         max_epochs=max_epochs,
         resume=resume and not force,
         max_length=cfg.max_length_for(model_key),
+        grad_accum=grad_accum,
+        cosine=cosine,
+        load_best=load_best,
     )
 
     trainable = loop_out["trainable_params"]
@@ -572,9 +591,10 @@ def run_one(
         "seed": int(seed),
         "split": split,
         "device": loop_out["device"],
-        "recipe": "paper_loop",
+        "recipe": loop_out.get("recipe") or cfg.recipe_for(model_key),
         "lr": lr,
         "batch_size": batch_size,
+        "grad_accum": loop_out.get("grad_accum", grad_accum),
         "max_epochs": max_epochs,
         "epochs_trained": loop_out["epochs_trained"],
         "best_val_weighted_f1": loop_out["best_val_weighted_f1"],

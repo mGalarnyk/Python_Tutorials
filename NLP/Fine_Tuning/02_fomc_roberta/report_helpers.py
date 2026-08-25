@@ -126,7 +126,7 @@ def load_completed_runs() -> list[dict]:
     runs: list[dict] = []
     if cfg.CHECKPOINTS_DIR.exists():
         for path in sorted(cfg.CHECKPOINTS_DIR.glob("*/metrics.json")):
-            if not path.parent.name.endswith("__paper"):
+            if not cfg.is_tracked_run_dir(path.parent.name):
                 continue
             data = json.loads(path.read_text())
             if data.get("status") != "complete":
@@ -249,7 +249,7 @@ def load_talk_reads(reads: list[dict] | None = None) -> tuple[list[dict], str]:
     best: tuple[float, dict] | None = None
     if cfg.CHECKPOINTS_DIR.exists():
         for path in cfg.CHECKPOINTS_DIR.glob("*/talk_reads.json"):
-            if not path.parent.name.endswith("__paper"):
+            if not cfg.is_tracked_run_dir(path.parent.name):
                 continue
             metrics = path.parent / "metrics.json"
             f1 = -1.0

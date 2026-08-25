@@ -4,7 +4,8 @@
 #   bash run_fomc.sh              # 18-cell CUDA grid (base+large × full/LoRA/QLoRA × 3 seeds)
 #   bash run_fomc.sh qlora        # QLoRA only (6 cells). Leaves finished full/LoRA alone.
 #   bash run_fomc.sh jobs         # 1 GPU/job: unfinished RoBERTa cells, one process per card
-#   bash run_fomc.sh nemotron     # 1 GPU/job: Nemotron-3-Nano-4B full/LoRA/QLoRA × 3 seeds
+#   bash run_fomc.sh nemotron     # 1 GPU/job: Nemotron-3-Nano-4B full/LoRA/QLoRA × 3 seeds (labeltok)
+#   bash run_fomc.sh nemotron-lora # one seed: label-token LoRA r=64, accum 16, cosine, best ckpt
 #   bash run_fomc.sh pipeline     # one cell: roberta-base LoRA seed 5768
 #
 # Must be a GPU node. Login nodes are rejected.
@@ -69,11 +70,28 @@ case "$JOB" in
     echo "[fomc] mamba-ssm ok"
     python run_parallel.py --models nemotron-nano-4b --methods full,lora,qlora
     ;;
+  nemotron-lora)
+    if ! python -c "from mamba_ssm.ops.triton.layernorm_gated import rmsnorm_fn" >/dev/null 2>&1; then
+      echo "[fomc] installing mamba-ssm (Nemotron hybrid import)"
+      MAMBA_SKIP_CUDA_BUILD=TRUE uv pip install --no-build-isolation mamba-ssm einops
+      python patch_mamba_ssm.py
+    fi
+    if ! python -c "from mamba_ssm.ops.triton.layernorm_gated import rmsnorm_fn"; then
+      echo "[fomc] mamba-ssm still missing after install." >&2
+      echo "  source .venv/bin/activate" >&2
+      echo "  MAMBA_SKIP_CUDA_BUILD=TRUE uv pip install --no-build-isolation mamba-ssm einops" >&2
+      echo "  python patch_mamba_ssm.py" >&2
+      exit 1
+    fi
+    echo "[fomc] mamba-ssm ok"
+    echo "[fomc] labeltok LoRA probe: r=64  lr=1e-4  accum=16  cosine  best val-F1  seed=5768"
+    python train_run.py --model nemotron-nano-4b --method lora --seed 5768
+    ;;
   grid|grid-jobs)
     python run_grid.py --no-flyte --include-qlora
     ;;
   *)
-    echo "usage: bash run_fomc.sh [pipeline|grid|qlora|jobs|nemotron]" >&2
+    echo "usage: bash run_fomc.sh [pipeline|grid|qlora|jobs|nemotron|nemotron-lora]" >&2
     exit 2
     ;;
 esac
