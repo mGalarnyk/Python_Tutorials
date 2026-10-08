@@ -277,8 +277,8 @@ def _load_model(
             log("Nemotron: gradient checkpointing on")
         if quantized:
             require_qlora()
-            n = _replace_linears_with_nf4(backbone, skip=("lm_head", "classifier"))
-            log(f"QLoRA: replaced {n} Linear layers with LinearNF4 (classifier kept)")
+            n = _replace_linears_with_nf4(backbone, skip=cfg.NEMOTRON_NF4_SKIP)
+            log(f"QLoRA: replaced {n} Linear layers with LinearNF4 (kept BF16: {', '.join(cfg.NEMOTRON_NF4_SKIP)})")
         if method in {"lora", "qlora"}:
             targets = list(cfg.lora_target_modules(model_key))
             log(f"LoRA targets={targets}  r={cfg.lora_r(model_key)}  alpha={cfg.lora_alpha(model_key)}")
@@ -426,6 +426,7 @@ def predict_texts(model, tokenizer, texts: list[str]) -> list[dict[str, Any]]:
     import torch
 
     _ensure_pad_token(tokenizer)
+    sentences = list(texts)
     if getattr(model, "backbone", None) is not None:
         from fomc_prompt import encode_classify
 
@@ -445,7 +446,7 @@ def predict_texts(model, tokenizer, texts: list[str]) -> list[dict[str, Any]]:
         pred_ids = logits.argmax(dim=-1).tolist()
         probs = torch.softmax(logits, dim=-1).cpu().tolist()
     out = []
-    for text, pred, prob in zip(texts, pred_ids, probs):
+    for text, pred, prob in zip(sentences, pred_ids, probs):
         out.append(
             {
                 "text": text,

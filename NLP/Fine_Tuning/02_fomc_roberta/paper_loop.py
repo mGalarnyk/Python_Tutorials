@@ -94,6 +94,24 @@ def _emit(progress_path: Path, event: str, **payload: Any) -> None:
         fh.write(json.dumps(rec) + "\n")
 
 
+def _trainable_state(model) -> dict:
+    """Only the weights training changes (all of them for full FT, adapters for LoRA).
+
+    A full state_dict under QLoRA carries bitsandbytes quant-state keys that do
+    not load back into an already-quantized model, and is GBs of frozen base.
+    """
+    return {k: p.detach().clone() for k, p in model.named_parameters() if p.requires_grad}
+
+
+def _load_trainable(model, state: dict) -> None:
+    """Restore trainable weights from a trainable-only or a full state_dict."""
+    trainable = {k for k, p in model.named_parameters() if p.requires_grad}
+    missing = trainable - state.keys()
+    if missing:
+        raise RuntimeError(f"checkpoint lacks {len(missing)} trainable tensors, e.g. {sorted(missing)[:3]}")
+    model.load_state_dict({k: state[k] for k in trainable}, strict=False)
+
+
 def _texts_labels(df):
     sentences = df["text"].tolist()
     labels = df["label"].to_numpy()
@@ -213,7 +231,7 @@ def train_paper_loop(
 
     if resume and ckpt_path.exists():
         blob = torch.load(ckpt_path, map_location=device, weights_only=False)
-        model.load_state_dict(blob["model"])
+        _load_trainable(model, blob["model"])
         optimizer.load_state_dict(blob["optimizer"])
         start_epoch = int(blob["epoch"]) + 1
         early_stopping_count = int(blob["early_stopping_count"])
@@ -280,7 +298,7 @@ def train_paper_loop(
                     early_stopping_count = 0
                 if load_best and curr_f1 > best_saved_f1:
                     best_saved_f1 = curr_f1
-                    torch.save(model.state_dict(), best_path)
+                    torch.save(_trainable_state(model), best_path)
                 log(
                     f"{run_name}: epoch {epoch + 1}  "
                     f"val_ce={curr_ce:.4f}  val_acc={curr_accuracy:.4f}  "
@@ -298,7 +316,7 @@ def train_paper_loop(
 
         payload = {
             "epoch": epoch,
-            "model": model.state_dict(),
+            "model": _trainable_state(model),
             "optimizer": optimizer.state_dict(),
             "early_stopping_count": early_stopping_count,
             "best_ce": best_ce,
@@ -311,7 +329,7 @@ def train_paper_loop(
 
     notes = "last checkpoint after early stop; no load_best"
     if load_best and best_path.exists():
-        model.load_state_dict(torch.load(best_path, map_location=device, weights_only=False))
+        _load_trainable(model, torch.load(best_path, map_location=device, weights_only=False))
         notes = "reloaded best val-F1 weights before test"
 
     test_texts, test_y = _texts_labels(test_df)

@@ -30,6 +30,7 @@ runs/
 wandb/
 mlruns/
 lightning_logs/
+logs/
 checkpoint-*/
 
 # Model weights and adapters (regenerate from training)

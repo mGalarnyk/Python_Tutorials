@@ -164,7 +164,8 @@ class LabelTokenClassifier(nn.Module):
         if weight is not None:
             pooled = pooled.to(weight.dtype)
         vocab_logits = head(pooled)
-        logits = vocab_logits.index_select(-1, self.label_token_ids)
+        # The buffer stays on CPU when load_trained uses device_map placement.
+        logits = vocab_logits.index_select(-1, self.label_token_ids.to(vocab_logits.device))
         loss = None
         if labels is not None:
             loss = F.cross_entropy(logits.float(), labels)

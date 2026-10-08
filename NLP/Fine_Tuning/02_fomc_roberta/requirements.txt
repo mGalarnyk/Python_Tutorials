@@ -1,4 +1,5 @@
 flyte[tui]>=2.0
+flyteplugins-vllm  # VLLMAppEnvironment (serving). Does not install vLLM itself.
 torch>=2.1.0
 transformers>=4.45.0
 peft>=0.13.0
@@ -14,6 +15,8 @@ python-dotenv
 # QLoRA / 4-bit — NVIDIA path. Skip on macOS; use LoRA or full there.
 bitsandbytes>=0.44.0; sys_platform != "darwin"
 # Nemotron-3-Nano is a Mamba-2 hybrid. The HF remote code imports mamba_ssm
-# at load time. CUDA only — skip on macOS.
+# at load time. CUDA only — skip on macOS. mamba-ssm needs torch installed
+# first, so `bash run_fomc.sh nemotron` installs it after this file:
+#   MAMBA_SKIP_CUDA_BUILD=TRUE uv pip install --no-build-isolation mamba-ssm
+#   python patch_mamba_ssm.py
 einops>=0.8.0; sys_platform != "darwin"
-mamba-ssm>=2.2.0; sys_platform != "darwin"

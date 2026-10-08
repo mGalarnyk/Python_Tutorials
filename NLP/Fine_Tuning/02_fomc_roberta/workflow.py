@@ -11,6 +11,9 @@ Usage:
     flyte run --local --tui workflow.py pipeline --model_key roberta-base --method lora --seed 5768
     flyte run --local --tui workflow.py grid
     flyte start tui                                         # browse persisted local runs
+    # Serve a fine-tuned Nemotron with vLLM (OpenAI-compatible API):
+    flyte run workflow.py merge_adapter --method qlora --seed 5768
+    flyte deploy workflow.py vllm_app
     FLYTE_GPUS=1 flyte run workflow.py grid                 # one GPU, cells in series
     FLYTE_GPUS=1 flyte run workflow.py grid --parallel jobs # 1 GPU/job on a 4-GPU node
     # 4 GPUs/model (DDP) is a Results placeholder; the loop is still single-device.
@@ -35,9 +38,15 @@ os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
 import flyte
 import flyte.report  # required — `import flyte` does not load this submodule
+import flyte.report._report
+
+# flyte 2.11 bug: under IPython, Report.get_final_report() returns an IPython HTML
+# object, and flush() (ours and the task runner's) asserts str, so every
+# report=True task fails in a notebook. Always render the report as a string.
+flyte.report._report.ipython_check = lambda: False
 
 import config as cfg
-from flyte_env import cpu_env, gpu_env, ui_env
+from flyte_env import cpu_env, gpu_env, ui_env, vllm_app  # noqa: F401 (vllm_app: flyte deploy)
 from report_helpers import (
     TALK_SENTENCES,
     fomc_talk_report,
@@ -199,7 +208,10 @@ async def prepare_data(split: str = cfg.DEFAULT_SPLIT) -> int:
     return len(paths)
 
 
-@gpu_env.task(report=True)
+# retries: a preempted node, a driver hiccup, or an OOM reruns the task. The paper
+# loop checkpoints every epoch (loop_checkpoint.pt), so a retry resumes there
+# instead of starting over (unless force=True, which always starts clean).
+@gpu_env.task(report=True, retries=2)
 async def train_one(
     model_key: str = "roberta-base",
     method: str = "lora",
@@ -233,6 +245,22 @@ async def train_one(
         highlight=highlight,
     )
     return _cell_out(result, reads)
+
+
+@gpu_env.task(retries=2)
+async def merge_adapter(
+    method: str = "qlora",
+    seed: int = cfg.DEFAULT_SEED,
+    split: str = cfg.DEFAULT_SPLIT,
+) -> flyte.io.Dir:
+    """Fold a trained Nemotron LoRA / QLoRA adapter into the BF16 base for vLLM.
+
+    The returned directory is what `vllm_app` (flyte_env.py) serves.
+    """
+    from serve_vllm import merge_adapter as merge
+
+    out = merge(method=method, seed=int(seed), split=split)
+    return await flyte.io.Dir.from_local(out)
 
 
 @cpu_env.task(report=True)

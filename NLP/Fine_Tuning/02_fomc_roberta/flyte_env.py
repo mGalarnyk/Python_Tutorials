@@ -6,6 +6,8 @@ import os
 import shutil
 
 import flyte
+import flyte.app
+from flyteplugins.vllm import VLLMAppEnvironment
 
 # Flyte resource GPU count is NVIDIA. On this MacBook Pro, request 0 so
 # --local still runs; PyTorch uses MPS inside the task. Devbox: `flyte start
@@ -31,7 +33,7 @@ gpu_env = flyte.TaskEnvironment(
         memory="24Gi",
         gpu=requested_gpus(),
     ),
-    description="Combined-S (RoBERTa + Nemotron). Same env locally (gpu=0, MPS) and on PACE CUDA.",
+    description="Combined-S (RoBERTa + Nemotron). Same env locally (gpu=0, MPS) and on an NVIDIA CUDA GPU.",
 )
 
 # Unused. Nemotron-3-Nano-4B is another --model_key on gpu_env, not a second env.
@@ -63,4 +65,18 @@ cpu_env = flyte.TaskEnvironment(
     ),
     resources=flyte.Resources(cpu=2, memory="4Gi"),
     depends_on=[gpu_env, ui_env],
+)
+
+# Serving: vLLM behind an OpenAI-compatible API, as a Flyte App. The weights
+# are whatever `merge_adapter` (workflow.py) last returned: the LoRA / QLoRA
+# adapter folded into the BF16 Nemotron base. Deploy after a merge run:
+#   flyte deploy workflow.py vllm_app
+vllm_app = VLLMAppEnvironment(
+    name="fomc-nemotron-vllm",
+    model_path=flyte.app.RunOutput(type="directory", task_name="fomc-roberta-gpu.merge_adapter"),
+    model_id="fomc-nemotron",
+    resources=flyte.Resources(cpu=4, memory="24Gi", gpu=1),
+    extra_args=["--max-model-len", "512", "--trust-remote-code"],
+    scaling=flyte.app.Scaling(replicas=(0, 1), scaledown_after=600),
+    requires_auth=True,
 )

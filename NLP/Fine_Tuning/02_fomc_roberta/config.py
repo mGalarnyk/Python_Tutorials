@@ -46,6 +46,10 @@ NEMOTRON_LORA_TARGET_MODULES = [
     "down_proj",
     "in_proj",
 ]
+# QLoRA leaves these in BF16. The fused Mamba-2 training kernel
+# (mamba_split_conv1d_scan_combined) reads out_proj.weight directly, so an
+# NF4-packed weight would break it. lm_head scores the label tokens.
+NEMOTRON_NF4_SKIP = ("lm_head", "classifier", "out_proj")
 NEMOTRON_LORA_R = 64
 NEMOTRON_LORA_ALPHA = 128
 NEMOTRON_GRAD_ACCUM = 16

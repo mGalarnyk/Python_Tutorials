@@ -2,7 +2,7 @@
 
 The Federal Open Market Committee sets the federal funds rate. That rate shows up in mortgages, car loans, credit cards, and savings yields. **Hawkish** language leans toward tighter policy (higher rates, cooler inflation, more expensive borrowing). **Dovish** language leans toward easier policy (lower rates, cheaper loans, more growth). [Shah et al. (2023)](https://aclanthology.org/2023.acl-long.368/) label FOMC sentences so you can measure that lean in text.
 
-Full, LoRA, and QLoRA on Combined-S, same three seeds, weighted F1 vs their Table 5. **Nemotron-3-Nano-4B** is three more rows on that table (CUDA), not a second notebook. Flyte 2 is the orchestrator: one `workflow.py` on this MacBook Pro (`flyte run --local`), then the same tasks on a PACE GPU job. A training script is enough for one box; Flyte is what keeps CPU data tasks and GPU training as one DAG.
+Full, LoRA, and QLoRA on Combined-S, same three seeds, weighted F1 vs their Table 5. **Nemotron-3-Nano-4B** is three more rows on that table (CUDA), not a second notebook. Flyte 2 is the orchestrator: one `workflow.py` on this MacBook Pro (`flyte run --local`), then the same tasks on an NVIDIA GPU. A training script is enough for one box; Flyte is what keeps CPU data tasks and GPU training as one DAG.
 
 Labels:
 
@@ -30,6 +30,7 @@ The labeled set is only ~2,400 sentences, so this is not a huge training job eve
 |---------|-------|-------------|
 | This laptop | 16-inch **MacBook Pro**, Apple **M4 Max**, **128 GB** unified memory, 16-core CPU (12P + 4E), 40-core GPU, PyTorch MPS | `roberta-base` and `roberta-large`, full + LoRA |
 | Remote server | **1× or 4× NVIDIA RTX PRO 6000 Blackwell**, **96 GB** GDDR7 ECC each, one node (16-core, 256 GB host), CUDA | RoBERTa 2×3, then Nemotron-3-Nano-4B full / LoRA / QLoRA on the same table |
+| GPU laptop | **Dell Pro Max 16 Plus**, **NVIDIA RTX PRO 5000 Blackwell** laptop GPU (**24 GB**), WSL2, CUDA | RoBERTa 2×3, Nemotron-3-Nano-4B **QLoRA** (~5.4 GB peak, ~1 h/seed with fused Mamba kernels), vLLM serving |
 | Paper | RTX A6000 | Their original full fine-tunes (no LoRA/QLoRA) |
 
 QLoRA needs **NVIDIA CUDA** because it uses [bitsandbytes](https://github.com/bitsandbytes-foundation/bitsandbytes) 4-bit (NF4) quantization. That library does not provide a supported 4-bit training path on Apple MPS or CPU. `requirements.txt` therefore installs `bitsandbytes` only when `sys_platform != "darwin"`. On this Mac, `recommend_jobs()` omits QLoRA and `method="qlora"` raises a clear error — use `full` or `lora`. On the remote **RTX PRO 6000 Blackwell (96 GB)** run the **full 2×3**: RoBERTa-base and RoBERTa-large, each with full, LoRA, and QLoRA — not QLoRA-only.
@@ -42,7 +43,7 @@ Same data (Combined-S, seeds `5768`, `78516`, `944601`), same metric: **weighted
 |-------|--------|------|------|-------|
 | `roberta-base` | ~125M | Mac follow-along; again on CUDA | Mac follow-along; again on CUDA | RTX PRO 6000 Blackwell only |
 | `roberta-large` | ~355M | Mac follow-along; again on CUDA | Mac follow-along; again on CUDA | RTX PRO 6000 Blackwell only |
-| `nemotron-nano-4b` | ~4B | PACE CUDA (same Combined-S table) | PACE CUDA | PACE CUDA |
+| `nemotron-nano-4b` | ~4B | CUDA (same Combined-S table) | CUDA | CUDA |
 
 LoRA targets for RoBERTa are `query`, `key`, `value`, `dense` — not LLaMA `q_proj` names. The classification head is fully trained (`modules_to_save=["classifier"]`).
 
@@ -150,6 +151,35 @@ FLYTE_GPUS=1 flyte run workflow.py grid --parallel jobs  # 1 GPU/job on a 4-GPU 
 `bash run_fomc.sh jobs` is **1 GPU/job**: unfinished cells in parallel, one card each. F1 matches the 1-GPU row. Do not put one RoBERTa cell on four cards — the paper loop is single-device and the model already fits.
 
 `python run_grid.py` launches those Flyte local runs per unfinished cell. `--no-flyte` is the in-process loop only.
+
+## Serving with vLLM
+
+QLoRA saves memory in training. Serving is a different stack: fold the adapter into the BF16 Nemotron base and serve it with [vLLM](https://github.com/vllm-project/vllm). The classifier scores three label tokens at the last prompt token, so vLLM generates one token restricted to those ids (`allowed_token_ids`). Same prompt, same argmax, same prediction.
+
+vLLM pins its own torch, so it gets its own venv:
+
+```bash
+# --managed-python: vLLM compiles small C helpers and needs Python.h.
+# flashinfer-jit-cache: prebuilt sampling kernels, so nothing needs nvcc at startup.
+uv venv .venv-vllm --python 3.12 --managed-python
+VIRTUAL_ENV=.venv-vllm uv pip install vllm peft pandas openpyxl scikit-learn
+VIRTUAL_ENV=.venv-vllm uv pip install "flashinfer-jit-cache==$(.venv-vllm/bin/python -c 'import flashinfer; print(flashinfer.__version__)')" \
+  --extra-index-url https://flashinfer.ai/whl/cu130
+
+.venv/bin/python serve_vllm.py merge --method qlora --seed 5768          # -> checkpoints/<run>/merged
+.venv-vllm/bin/python serve_vllm.py eval --method qlora --seed 5768      # test F1 + sentences/s
+.venv-vllm/bin/python serve_vllm.py eval --method qlora --seed 5768 --lora   # unmerged adapter, hot-swappable
+.venv-vllm/bin/vllm serve checkpoints/<run>/merged --served-model-name fomc-nemotron --max-model-len 512
+```
+
+`eval` writes `vllm_metrics.json` next to `metrics.json`, with the PyTorch F1 beside the vLLM F1.
+
+On Flyte, `merge_adapter` (`workflow.py`) is a GPU task and `vllm_app` (`flyte_env.py`) is a [`VLLMAppEnvironment`](https://www.union.ai/docs/v2/flyte/user-guide/apps/native-app-integrations/vllm-app/) that serves that task's output behind an OpenAI-compatible API:
+
+```bash
+flyte run workflow.py merge_adapter --method qlora --seed 5768
+flyte deploy workflow.py vllm_app
+```
 
 ## CLI
 

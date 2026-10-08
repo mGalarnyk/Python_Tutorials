@@ -1,7 +1,133 @@
 # Auto-written by refresh_report_snapshot(). Do not edit by hand.
 SNAPSHOT = {
-  "updated": "2026-08-24 04:22 UTC",
+  "updated": "2026-10-08 04:31 UTC",
   "runs": [
+    {
+      "model": "nemotron-nano-4b",
+      "method": "qlora",
+      "seed": 5768,
+      "split": "lab-manual-split-combine",
+      "device": "cuda (NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU)",
+      "status": "complete",
+      "weighted_f1": 0.7002646803332998,
+      "epochs_trained": 10,
+      "trainable_pct": 2.508,
+      "wall_seconds": 4289.2,
+      "delta_vs_paper": -0.011,
+      "paper_weighted_f1": 0.7113
+    },
+    {
+      "model": "nemotron-nano-4b",
+      "method": "qlora",
+      "seed": 78516,
+      "split": "lab-manual-split-combine",
+      "device": "cuda (NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU)",
+      "status": "complete",
+      "weighted_f1": 0.7289003611865162,
+      "epochs_trained": 10.0,
+      "trainable_pct": 2.508,
+      "wall_seconds": 3631.1,
+      "delta_vs_paper": 0.0176,
+      "paper_weighted_f1": 0.7113
+    },
+    {
+      "model": "nemotron-nano-4b",
+      "method": "qlora",
+      "seed": 944601,
+      "split": "lab-manual-split-combine",
+      "device": "cuda (NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU)",
+      "status": "complete",
+      "weighted_f1": 0.7188866605102614,
+      "epochs_trained": 9.0,
+      "trainable_pct": 2.508,
+      "wall_seconds": 3318.6,
+      "delta_vs_paper": 0.0076,
+      "paper_weighted_f1": 0.7113
+    },
+    {
+      "model": "roberta-base",
+      "method": "full",
+      "seed": 5768,
+      "split": "lab-manual-split-combine",
+      "device": "cuda (NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU)",
+      "status": "complete",
+      "weighted_f1": 0.6736594481826264,
+      "epochs_trained": 11.0,
+      "trainable_pct": 100.0,
+      "wall_seconds": 249.8,
+      "delta_vs_paper": -0.0244,
+      "paper_weighted_f1": 0.6981
+    },
+    {
+      "model": "roberta-base",
+      "method": "lora",
+      "seed": 5768,
+      "split": "lab-manual-split-combine",
+      "device": "cuda (NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU)",
+      "status": "complete",
+      "weighted_f1": 0.6679411784013302,
+      "epochs_trained": 17.0,
+      "trainable_pct": 2.539,
+      "wall_seconds": 295.9,
+      "delta_vs_paper": -0.0302,
+      "paper_weighted_f1": 0.6981
+    },
+    {
+      "model": "roberta-base",
+      "method": "qlora",
+      "seed": 5768,
+      "split": "lab-manual-split-combine",
+      "device": "cuda (NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU)",
+      "status": "complete",
+      "weighted_f1": 0.6890281134059688,
+      "epochs_trained": 23.0,
+      "trainable_pct": 3.801,
+      "wall_seconds": 408.7,
+      "delta_vs_paper": -0.0091,
+      "paper_weighted_f1": 0.6981
+    },
+    {
+      "model": "roberta-large",
+      "method": "full",
+      "seed": 5768,
+      "split": "lab-manual-split-combine",
+      "device": "cuda (NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU)",
+      "status": "complete",
+      "weighted_f1": 0.7026632644071161,
+      "epochs_trained": 13.0,
+      "trainable_pct": 100.0,
+      "wall_seconds": 796.6,
+      "delta_vs_paper": -0.0086,
+      "paper_weighted_f1": 0.7113
+    },
+    {
+      "model": "roberta-large",
+      "method": "lora",
+      "seed": 5768,
+      "split": "lab-manual-split-combine",
+      "device": "cuda (NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU)",
+      "status": "complete",
+      "weighted_f1": 0.7093852533861836,
+      "epochs_trained": 21.0,
+      "trainable_pct": 2.237,
+      "wall_seconds": 1053.7,
+      "delta_vs_paper": -0.0019,
+      "paper_weighted_f1": 0.7113
+    },
+    {
+      "model": "roberta-large",
+      "method": "qlora",
+      "seed": 5768,
+      "split": "lab-manual-split-combine",
+      "device": "cuda (NVIDIA RTX PRO 5000 Blackwell Generation Laptop GPU)",
+      "status": "complete",
+      "weighted_f1": 0.6940311729657564,
+      "epochs_trained": 21.0,
+      "trainable_pct": 3.826,
+      "wall_seconds": 1076.2,
+      "delta_vs_paper": -0.0173,
+      "paper_weighted_f1": 0.7113
+    },
     {
       "model": "roberta-base",
       "method": "full",
@@ -277,5 +403,5 @@ SNAPSHOT = {
       "for_you": "Rates likely go up. A new mortgage or a refinance gets more expensive."
     }
   ],
-  "talk_source": "roberta-large lora, seed 944601"
+  "talk_source": "roberta-large lora, seed 5768"
 }

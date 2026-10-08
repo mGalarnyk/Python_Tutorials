@@ -8,7 +8,7 @@
 #   bash run_fomc.sh nemotron-lora # one seed: label-token LoRA r=64, accum 16, cosine, best ckpt
 #   bash run_fomc.sh pipeline     # one cell: roberta-base LoRA seed 5768
 #
-# Must be a GPU node. Login nodes are rejected.
+# Needs an NVIDIA CUDA GPU; exits otherwise.
 
 set -euo pipefail
 
@@ -40,9 +40,29 @@ fi
 echo "[fomc] host=$(hostname)"
 echo "[fomc] python=$(command -v python)"
 if ! python -c "import torch,sys; print('[fomc] cuda', torch.cuda.is_available(), torch.cuda.device_count(), torch.cuda.get_device_name(0) if torch.cuda.is_available() else ''); sys.exit(0 if torch.cuda.is_available() else 1)"; then
-  echo "[fomc] no GPU. Open a terminal on the GPU job (atl1-…), not a login node." >&2
+  echo "[fomc] no CUDA GPU found. Run this on a machine with an NVIDIA GPU." >&2
   exit 1
 fi
+
+ensure_causal_conv1d() {
+  # Mamba fast path. Without causal-conv1d, Nemotron's Mamba layers fall back to
+  # a naive PyTorch loop (~30 min/epoch). Builds against pip's CUDA nvcc, so no
+  # system CUDA toolkit or sudo is needed.
+  if python -c "import causal_conv1d" >/dev/null 2>&1; then
+    return
+  fi
+  echo "[fomc] building causal-conv1d (Mamba fast path, ~6 min)"
+  local cuda_major
+  cuda_major="$(python -c 'import torch; print(torch.version.cuda.split(".")[0] + "." + torch.version.cuda.split(".")[1])')"
+  uv pip install "nvidia-cuda-nvcc==${cuda_major}.*" "nvidia-cuda-cccl==${cuda_major}.*" \
+    "nvidia-cuda-crt==${cuda_major}.*" "nvidia-nvvm==${cuda_major}.*"
+  local cuda_home
+  cuda_home="$(python -c 'import nvidia, pathlib, torch; print(pathlib.Path(list(nvidia.__path__)[0]) / ("cu" + torch.version.cuda.split(".")[0]))')"
+  ln -sfn lib "${cuda_home}/lib64"
+  ln -sf libcudart.so."$(python -c 'import torch; print(torch.version.cuda.split(".")[0])')" "${cuda_home}/lib/libcudart.so"
+  CUDA_HOME="${cuda_home}" PATH="${cuda_home}/bin:${PATH}" CAUSAL_CONV1D_FORCE_BUILD=TRUE MAX_JOBS=8 \
+    uv pip install --no-build-isolation --no-cache causal-conv1d
+}
 
 case "$JOB" in
   pipeline)
@@ -68,6 +88,7 @@ case "$JOB" in
       exit 1
     fi
     echo "[fomc] mamba-ssm ok"
+    ensure_causal_conv1d
     python run_parallel.py --models nemotron-nano-4b --methods full,lora,qlora
     ;;
   nemotron-lora)
@@ -84,6 +105,7 @@ case "$JOB" in
       exit 1
     fi
     echo "[fomc] mamba-ssm ok"
+    ensure_causal_conv1d
     echo "[fomc] labeltok LoRA probe: r=64  lr=1e-4  accum=16  cosine  best val-F1  seed=5768"
     python train_run.py --model nemotron-nano-4b --method lora --seed 5768
     ;;

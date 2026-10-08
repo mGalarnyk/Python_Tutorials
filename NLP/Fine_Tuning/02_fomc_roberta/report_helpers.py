@@ -270,19 +270,41 @@ def load_talk_reads(reads: list[dict] | None = None) -> tuple[list[dict], str]:
     return _class_only(snap.get("talk_reads")), str(snap.get("talk_source") or "")
 
 
+def _previous_snapshot_runs() -> list[dict]:
+    """Runs recorded in report_snapshot.py (read as text: the module may be stale in sys.modules)."""
+    if not SNAPSHOT_PY.exists():
+        return []
+    text = SNAPSHOT_PY.read_text()
+    marker = "SNAPSHOT = "
+    if marker not in text:
+        return []
+    return list(json.loads(text.split(marker, 1)[1]).get("runs", []))
+
+
 def refresh_report_snapshot(
     runs: list[dict] | None = None,
     reads: list[dict] | None = None,
     talk_source: str | None = None,
 ) -> dict:
-    """Rewrite snapshot files so the slim devbox image has last-known cells + labels."""
+    """Rewrite snapshot files so the slim devbox image has last-known cells + labels.
+
+    Local checkpoints win; runs from other machines already in the snapshot are
+    kept, so refreshing on a laptop does not drop the GPU server's cells.
+    """
     grid = summarize_grid(runs)
     prev_reads, prev_src = load_talk_reads()
     talk_reads = _class_only(reads) if reads else prev_reads
     source = talk_source or prev_src
+
+    def _key(rec: dict) -> tuple:
+        return (rec.get("model"), rec.get("method"), rec.get("seed"), rec.get("split"), rec.get("device"))
+
+    merged_runs = list(grid["runs"])
+    local = {_key(r) for r in merged_runs}
+    merged_runs += [r for r in _previous_snapshot_runs() if _key(r) not in local]
     payload = {
         "updated": grid["updated"],
-        "runs": grid["runs"],
+        "runs": merged_runs,
         "talk_reads": talk_reads,
         "talk_source": source,
     }
@@ -329,6 +351,8 @@ def machine_row_color(machine: str) -> str:
         return "#fde8e6"
     if "gpus/model" in m:
         return "#ede9fe"
+    if "rtx pro 5000" in m:
+        return "#dcfce7"
     if "h200" in m or "blackwell" in m or "cuda" in m:
         return "#fef3c7"
     return "#ffffff"
@@ -339,6 +363,7 @@ def machine_color_legend_html() -> str:
         ("#eef0f3", "Shah et al. · RTX A6000"),
         ("#dbeafe", "This Mac · M4 Max, MPS"),
         ("#fef3c7", "1× RTX PRO 6000 Blackwell"),
+        ("#dcfce7", "RTX PRO 5000 Blackwell laptop, 24 GB"),
     )
     bits = "".join(
         f'<span style="display:inline-block;margin:0 10px 6px 0;padding:2px 8px;'

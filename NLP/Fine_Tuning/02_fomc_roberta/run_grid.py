@@ -80,13 +80,14 @@ def flyte_pipeline_argv(
         str(int(seed)),
         "--split",
         split,
-        "--include_market_stub",
-        "true" if include_market_stub else "false",
     ])
+    # Plain `bool` task inputs are on/off flags in the flyte CLI (no value).
+    if include_market_stub:
+        cmd.append("--include_market_stub")
     if max_epochs is not None:
         cmd.extend(["--max_epochs", str(max_epochs)])
     if force:
-        cmd.extend(["--force", "true"])
+        cmd.append("--force")
     return cmd
 
 
@@ -106,12 +107,11 @@ def flyte_grid_argv(
         "--split",
         split,
         "--include_market_stub",
-        "true",
     ]
     if max_epochs is not None:
         cmd.extend(["--max_epochs", str(max_epochs)])
     if force:
-        cmd.extend(["--force", "true"])
+        cmd.append("--force")
     if include_qlora is True:
         cmd.extend(["--include_qlora", "true"])
     elif include_qlora is False:
@@ -236,6 +236,8 @@ def machine_label(device: str | None = None, who: str = "") -> str:
     if "shah" in who_l and "released" not in who_l:
         return "RTX A6000"
     d = (device or "").lower()
+    if "rtx pro 5000" in d:
+        return "RTX PRO 5000 Blackwell laptop, 24 GB, CUDA"
     if d == "cuda" or "rtx" in d or "nvidia" in d or "h200" in d:
         return "RTX PRO 6000 Blackwell, 96 GB, CUDA"
     if d == "mps" or "mps" in d:

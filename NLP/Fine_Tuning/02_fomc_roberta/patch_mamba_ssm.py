@@ -19,9 +19,13 @@ PATCH = (
 
 
 def patch() -> Path | None:
-    import mamba_ssm
+    # Locate without importing: `import mamba_ssm` is what fails before the patch.
+    import importlib.util
 
-    path = Path(mamba_ssm.__file__).resolve().parent / "ops" / "selective_scan_interface.py"
+    spec = importlib.util.find_spec("mamba_ssm")
+    if spec is None or spec.origin is None:
+        raise RuntimeError("mamba_ssm is not installed")
+    path = Path(spec.origin).resolve().parent / "ops" / "selective_scan_interface.py"
     text = path.read_text()
     if "selective_scan_cuda = None" in text:
         return path
