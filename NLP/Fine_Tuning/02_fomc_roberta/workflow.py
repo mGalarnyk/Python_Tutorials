@@ -28,9 +28,12 @@ Usage:
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
+from datetime import timedelta
+from pathlib import Path
 from dataclasses import dataclass
 
 os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
@@ -128,6 +131,68 @@ def _cell_out(result: dict, reads: list[dict] | None) -> CellOut:
         labels=_label_csv(reads),
     )
 
+def _line_svg(xs: list[int], ys: list[float], title: str, color: str, best: int | None) -> str:
+    """Small inline SVG line chart, no plotting deps (works in the slim report image)."""
+    w, h, pad = 420, 220, 40
+    lo, hi = min(ys), max(ys)
+    span = (hi - lo) or 1.0
+    x_max = max(max(xs), 2)
+
+    def px(x: int) -> float:
+        return pad + (x - 1) / (x_max - 1) * (w - 2 * pad)
+
+    def py(y: float) -> float:
+        return h - pad - (y - lo) / span * (h - 2 * pad)
+
+    pts = " ".join(f"{px(x):.1f},{py(y):.1f}" for x, y in zip(xs, ys))
+    dots = "".join(f'<circle cx="{px(x):.1f}" cy="{py(y):.1f}" r="3" fill="{color}"/>' for x, y in zip(xs, ys))
+    mark = ""
+    if best is not None:
+        bx, by = px(xs[best]), py(ys[best])
+        mark = (
+            f'<circle cx="{bx:.1f}" cy="{by:.1f}" r="7" fill="none" stroke="#111" stroke-width="2"/>'
+            f'<text x="{bx + 9:.1f}" y="{by - 9:.1f}" font-size="12">best {ys[best]:.3f} (epoch {xs[best]})</text>'
+        )
+    return (
+        f'<svg width="{w}" height="{h}" viewBox="0 0 {w} {h}" style="font-family:sans-serif;margin:4px 12px 4px 0">'
+        f'<text x="{pad}" y="20" font-size="14" font-weight="600">{title}</text>'
+        f'<line x1="{pad}" y1="{h - pad}" x2="{w - pad}" y2="{h - pad}" stroke="#999"/>'
+        f'<line x1="{pad}" y1="{pad}" x2="{pad}" y2="{h - pad}" stroke="#999"/>'
+        f'<text x="{pad - 6}" y="{py(hi) + 4:.1f}" font-size="11" text-anchor="end">{hi:.2f}</text>'
+        f'<text x="{pad - 6}" y="{py(lo) + 4:.1f}" font-size="11" text-anchor="end">{lo:.2f}</text>'
+        f'<text x="{w / 2:.0f}" y="{h - 8}" font-size="11" text-anchor="middle">epoch</text>'
+        f'<polyline points="{pts}" fill="none" stroke="{color}" stroke-width="2"/>{dots}{mark}</svg>'
+    )
+
+
+def _training_curve_html(evals: list[dict], model_key: str, method: str, seed: int) -> str:
+    xs = [int(e["epoch"]) for e in evals]
+    f1 = [float(e["val_f1"]) for e in evals]
+    ce = [float(e["val_ce"]) for e in evals]
+    best = max(range(len(f1)), key=f1.__getitem__)
+    last = evals[-1]
+    return (
+        f"<h3>{cfg.display_name(model_key)} · {method} · seed {seed}</h3>"
+        f"<p>Epoch {last['epoch']}: val F1 {float(last['val_f1']):.3f}, val loss {float(last['val_ce']):.3f}, "
+        f"early-stop counter {last.get('early_stopping_count', 0)}/7. "
+        "Test scores come from the best-F1 epoch, not the last one.</p>"
+        + _line_svg(xs, f1, "Validation weighted F1", "#2563eb", best)
+        + _line_svg(xs, ce, "Validation loss (cross-entropy)", "#dc2626", None)
+    )
+
+
+async def _publish_training_curve(progress: Path, model_key: str, method: str, seed: int, shown: int) -> int:
+    """Redraw the Training curve tab when progress.jsonl has new epochs. shown=-1 forces a redraw."""
+    if not progress.exists():
+        return shown
+    evals = [r for r in map(json.loads, progress.read_text().splitlines()) if r.get("event") == "eval"]
+    if not evals or (shown >= 0 and len(evals) == shown):
+        return shown
+    flyte.report.get_tab("Training curve").replace(_training_curve_html(evals, model_key, method, seed))
+    await flyte.report.flush.aio()
+    return len(evals)
+
+
 async def _flush_talk_report(
     html: str,
     reads: list[dict] | None = None,
@@ -220,18 +285,32 @@ async def train_one(
     max_epochs: int | None = None,
     force: bool = False,
 ) -> CellOut:
-    """One paper-loop cell. Skips a finished metrics.json unless force=True."""
+    """One paper-loop cell. Skips a finished metrics.json unless force=True.
+
+    Training runs in a worker thread so this task can redraw the "Training curve"
+    report tab after every epoch (read from the loop's progress.jsonl).
+    """
     from train_run import run_one
 
-    result = run_one(
-        model_key=model_key,
-        method=method,
-        seed=int(seed),
-        split=split,
-        max_epochs=max_epochs,
-        resume=not force,
-        force=force,
+    progress = cfg.run_dir(model_key, method, int(seed), split) / "progress.jsonl"
+    training = asyncio.create_task(
+        asyncio.to_thread(
+            run_one,
+            model_key=model_key,
+            method=method,
+            seed=int(seed),
+            split=split,
+            max_epochs=max_epochs,
+            resume=not force,
+            force=force,
+        )
     )
+    shown = 0
+    while not training.done():
+        await asyncio.wait({training}, timeout=15)
+        shown = await _publish_training_curve(progress, model_key, method, int(seed), shown)
+    result = training.result()
+    await _publish_training_curve(progress, model_key, method, int(seed), -1)
     reads = _talk_reads_for_checkpoint(result)
     if reads:
         result["talk_reads"] = reads
@@ -252,15 +331,96 @@ async def merge_adapter(
     method: str = "qlora",
     seed: int = cfg.DEFAULT_SEED,
     split: str = cfg.DEFAULT_SPLIT,
+    force: bool = False,
 ) -> flyte.io.Dir:
     """Fold a trained Nemotron LoRA / QLoRA adapter into the BF16 base for vLLM.
 
-    The returned directory is what `vllm_app` (flyte_env.py) serves.
+    The returned directory is what `vllm_app` (flyte_env.py) serves. An existing
+    merge is reused unless force=True.
     """
     from serve_vllm import merge_adapter as merge
+    from serve_vllm import merged_dir
 
-    out = merge(method=method, seed=int(seed), split=split)
+    out = merged_dir(method, int(seed), split)
+    if force or not (out / "model.safetensors").exists():
+        out = merge(method=method, seed=int(seed), split=split)
     return await flyte.io.Dir.from_local(out)
+
+
+@dataclass
+class ReleaseOut:
+    """Named Summary -> Output for the release gate."""
+
+    approved: bool
+    model: str
+    method: str
+    test_f1_mean: float
+    seeds: int
+    paper_f1: float
+    merged_dir: str
+
+
+def _release_report(rows: list[dict], model_key: str, method: str, mean: float, paper: float, status: str) -> str:
+    body = "".join(
+        f"<tr><td>{r['seed']}</td><td>{float(r['weighted_f1']):.3f}</td><td>{int(float(r.get('epochs_trained') or 0))}</td></tr>"
+        for r in rows
+    )
+    return (
+        f"<h3>Release gate: {cfg.display_name(model_key)} · {method}</h3>"
+        f"<p>Test weighted F1 <b>{mean:.3f}</b> over {len(rows)} seed(s) vs Shah et al. RoBERTa-large "
+        f"<b>{paper:.3f}</b> (full fine-tune, Table 5).</p>"
+        f"<table><tr><th>seed</th><th>test F1</th><th>epochs</th></tr>{body}</table>"
+        f"<p><b>{status}</b></p>"
+    )
+
+
+@cpu_env.task(report=True)
+async def release(
+    model_key: str = "nemotron-nano-4b",
+    method: str = "qlora",
+    seed: int = cfg.DEFAULT_SEED,
+    split: str = cfg.DEFAULT_SPLIT,
+) -> ReleaseOut:
+    """Human approval before serving: show the held-out F1, wait for yes/no, then merge.
+
+    Locally the question is a [y/n] prompt in the terminal; on a cluster it is an
+    Approve button on the run in the Flyte UI. `seed` picks which adapter to ship.
+    """
+    rows = [
+        r for r in load_completed_runs()
+        if r.get("model") == model_key and r.get("method") == method and r.get("split") == split
+    ]
+    if not rows:
+        raise ValueError(f"No finished {model_key} {method} runs on {split}. Train first.")
+    mean = sum(float(r["weighted_f1"]) for r in rows) / len(rows)
+    paper = float(cfg.paper_f1("roberta-large", split) or 0.0)
+    await flyte.report.replace.aio(_release_report(rows, model_key, method, mean, paper, "Waiting for approval..."))
+    await flyte.report.flush.aio()
+
+    gate = await flyte.new_condition.aio(
+        "approve_release",
+        prompt=(
+            f"{cfg.display_name(model_key)} {method}: test F1 {mean:.3f} over {len(rows)} seed(s) "
+            f"vs RoBERTa-large {paper:.3f}. Merge seed {seed} and serve with vLLM?"
+        ),
+        data_type=bool,
+        timeout=timedelta(hours=24),
+    )
+    approved = bool(await gate.wait.aio())
+    merged = ""
+    if approved:
+        with flyte.group("serve"):
+            out = await merge_adapter(method=method, seed=int(seed), split=split)
+        merged = str(out.path)
+        status = f"Approved. Merged adapter ready for vLLM: {merged}. Deploy with `flyte deploy workflow.py vllm_app`."
+    else:
+        status = "Not approved. Nothing merged or deployed."
+    await flyte.report.replace.aio(_release_report(rows, model_key, method, mean, paper, status))
+    await flyte.report.flush.aio()
+    return ReleaseOut(
+        approved=approved, model=model_key, method=method, test_f1_mean=round(mean, 4),
+        seeds=len(rows), paper_f1=paper, merged_dir=merged,
+    )
 
 
 @cpu_env.task(report=True)
@@ -332,13 +492,16 @@ async def grid(
     include_qlora: bool | None = None,
     include_market_stub: bool = False,
     parallel: str = "serial",
+    seeds: list[int] | None = None,
+    include_nemotron: bool = False,
 ) -> GridOut:
     """Paper 3-seed grid. CUDA runs all six cells (base+large × full/LoRA/QLoRA).
 
     parallel=serial walks cells (safe on this Mac). parallel=jobs launches
     train_one concurrently so Flyte can place one GPU per unfinished cell.
+    Cells are grouped per model in the UI / TUI. include_nemotron adds
+    Nemotron-3-Nano-4B QLoRA (the method that fits a 24 GB card).
     """
-    import asyncio
     import shutil
 
     await prepare_data(split=split)
@@ -349,16 +512,19 @@ async def grid(
         if method == "qlora" and not include_qlora:
             continue
         jobs.append((model_key, method))
+    if include_nemotron:
+        jobs.append(("nemotron-nano-4b", "qlora"))
     mode = (parallel or "serial").strip().lower()
     if mode not in {"serial", "jobs"}:
         raise ValueError("parallel must be 'serial' or 'jobs'")
+    seed_list = [int(x) for x in (seeds or cfg.PAPER_SEEDS)]
     cells = [
-        (int(seed), model_key, method)
-        for seed in cfg.PAPER_SEEDS
+        (seed, model_key, method)
+        for seed in seed_list
         for model_key, method in jobs
     ]
     total = len(cells)
-    _say(f"START grid  {total} cells  jobs={jobs}  seeds={list(cfg.PAPER_SEEDS)}  parallel={mode}")
+    _say(f"START grid  {total} cells  jobs={jobs}  seeds={seed_list}  parallel={mode}")
 
     async def _run_cell(index: int, seed: int, model_key: str, method: str) -> CellOut:
         _say(f"START cell {index}/{total}: {model_key} {method} seed={seed}")
@@ -373,16 +539,23 @@ async def grid(
         _announce_cell(cell, index, total, split, jobs)
         return cell
 
+    numbered = list(enumerate(cells, 1))
+    models = list(dict.fromkeys(model_key for _, model_key, _ in cells))
+
+    async def _run_group(model_key: str) -> None:
+        mine = [(i, c) for i, c in numbered if c[1] == model_key]
+        with flyte.group(cfg.display_name(model_key)):
+            if mode == "jobs":
+                await asyncio.gather(*[_run_cell(i, *c) for i, c in mine])
+            else:
+                for i, c in mine:
+                    await _run_cell(i, *c)
+
     if mode == "jobs":
-        await asyncio.gather(
-            *[
-                _run_cell(i, seed, model_key, method)
-                for i, (seed, model_key, method) in enumerate(cells, 1)
-            ]
-        )
+        await asyncio.gather(*[_run_group(m) for m in models])
     else:
-        for i, (seed, model_key, method) in enumerate(cells, 1):
-            await _run_cell(i, seed, model_key, method)
+        for m in models:
+            await _run_group(m)
     _say(f"DONE grid  {total}/{total} cells")
     if include_market_stub:
         await fetch_market_data()
@@ -455,8 +628,6 @@ async def write_talk_report(summary: GridOut) -> GridOut:
 @ui_env.task(report=True)
 async def main() -> GridOut:
     """Driver: snapshot, one action per finished cell, then the talk Report on this run."""
-    import asyncio
-
     summary = await snapshot_grid()
     runs = load_completed_runs()
     if runs:

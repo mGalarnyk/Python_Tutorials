@@ -152,6 +152,20 @@ FLYTE_GPUS=1 flyte run workflow.py grid --parallel jobs  # 1 GPU/job on a 4-GPU 
 
 `python run_grid.py` launches those Flyte local runs per unfinished cell. `--no-flyte` is the in-process loop only.
 
+### Demo features (tested on the RTX PRO 5000 laptop)
+
+- **Live training curve.** `train_one` trains in a worker thread and redraws a **Training curve** report tab after every epoch (val F1 + val loss, best epoch circled), read from `progress.jsonl`. Cached cells redraw from their saved history.
+- **Grouped grid.** `grid` puts each model's cells in a `flyte.group` (RoBERTa-base, RoBERTa-large, Nemotron-3-Nano-4B). `--seeds` runs a subset; `--include_nemotron` adds the Nemotron QLoRA cell.
+- **Release gate.** `release` shows the held-out F1 vs Shah et al. and waits for a yes/no (`flyte.new_condition`) before merging the adapter for vLLM. Locally it is a `[y/n]` prompt in the terminal; on a cluster it is an Approve button in the UI.
+
+```bash
+flyte run --local workflow.py grid --seeds '[5768]' --include_qlora true --include_nemotron
+flyte run --local workflow.py train_one --model_key nemotron-nano-4b --method qlora --seed 5768
+flyte run --local workflow.py release            # y -> merge seed 5768 for vLLM, n -> stop
+```
+
+To browse local runs (groups, inputs/outputs, reports) in `flyte start tui`, record them: `flyte.init(local_persistence=True)` before `flyte.run(...)`, or a config with local persistence (`flyte create config --local-persistence`).
+
 ## Serving with vLLM
 
 QLoRA saves memory in training. Serving is a different stack: fold the adapter into the BF16 Nemotron base and serve it with [vLLM](https://github.com/vllm-project/vllm). The classifier scores three label tokens at the last prompt token, so vLLM generates one token restricted to those ids (`allowed_token_ids`). Same prompt, same argmax, same prediction.
