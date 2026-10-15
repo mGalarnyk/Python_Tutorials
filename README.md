@@ -42,7 +42,7 @@ How to Speed Up XGBoost Model Training | [Speed Up XGBoost Model Training](https
 ## Natural Language Processing
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
-Fine-Tuning with LoRA and QLoRA | [NLP/Fine_Tuning](https://opendatascience.com/lora-qlora-fine-tuning-flyte-vllm/) | Coming Soon
+LoRA and QLoRA with Flyte and vLLM  | [LoRA and QLoRA with Flyte and vLLM](https://opendatascience.com/lora-qlora-fine-tuning-flyte-vllm/) | Coming Soon
 
 ## Pandas
 Domain | Blog Post/IPython Notebook | Youtube Video
