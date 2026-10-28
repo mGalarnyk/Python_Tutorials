@@ -27,12 +27,12 @@ The running example is a financial markets task from [Trillion Dollar Words](htt
 <table>
   <tr>
     <td width="50%" valign="top">
-      <a href="./fomc_roberta_finetune.ipynb"><img src="./images/hawkish_dovish_task.png" width="420" alt="The task: label FOMC sentences dovish, hawkish, or neutral"></a><br>
+      <a href="./fomc_roberta_finetune.ipynb"><img src="./images/readme/worked_example.png" width="420" alt="Talk slide: worked example, classify Fed (FOMC) sentences as hawkish, dovish, or neutral with three models on one laptop GPU"></a><br>
       <b>1. <a href="./fomc_roberta_finetune.ipynb">The task and the notebook</a></b>
       <p>Load the paper's train and test splits, train the comparison grid, and classify new sentences with a finished checkpoint. Start here.</p>
     </td>
     <td width="50%" valign="top">
-      <a href="./train_run.py"><img src="./images/full_lora_qlora.png" width="420" alt="Full fine-tuning vs LoRA vs QLoRA"></a><br>
+      <a href="./train_run.py"><img src="./images/readme/full_lora_qlora_memory.png" width="420" alt="Talk slide: full fine-tuning vs LoRA vs QLoRA. On Nemotron 4B, LoRA pulls peak training memory from about 38 GB to 9 GB, and QLoRA to 5.4 GB"></a><br>
       <b>2. <a href="./train_run.py">Full fine-tuning vs LoRA vs QLoRA</a></b>
       <p>One training script for all three methods plus a no-fine-tuning baseline. Nemotron is scored as a classifier on the logits of three label words (<a href="./causal_cls.py">causal_cls.py</a>).</p>
     </td>
@@ -44,6 +44,7 @@ The running example is a financial markets task from [Trillion Dollar Words](htt
       <p>Data prep is cached, a GPU task that fails retries from its last epoch, and every stage writes its own report, from the label mix to live training curves. A release step waits for approval before merging the adapter.</p>
     </td>
     <td width="50%" valign="top">
+      <a href="./serve_vllm.py"><img src="./images/readme/vllm_serving.png" width="420" alt="Talk slide: serving the adapter with vLLM on the FP8 base, 0.725 F1, 5.2 GB, about 100 sentences per second"></a><br>
       <b>4. <a href="./serve_vllm.py">Serving with vLLM</a></b><br><sub><a href="#serving-with-vllm">How to run it</a></sub>
       <p>Merge the adapter into the base model and serve it behind an OpenAI-compatible API. The LoRA adapter trained on the laptop also works on NVIDIA's FP8 Nemotron: F1 0.725, 5.2 GB of weights, about 100 sentences per second (<a href="./bench_inference.py">bench_inference.py</a>).</p>
     </td>
@@ -224,7 +225,7 @@ report_snapshot.py            auto-generated: finished runs, bundled for Flyte
 serve_vllm.py                 merge adapter + score the test set with vLLM
 bench_inference.py            inference benchmark (F1, sentences/s, latency, memory)
 devbox/                       PodTemplate that gives the Flyte devbox the WSL GPU
-images/                       figures used by the notebook and this README
+images/                       figures used by the notebook; images/readme/ holds talk slides used in this README
 ```
 
 Not in git: `checkpoints/` (about 50 GB), `outputs/`, `logs/`, `data/`, `.flyte/`, and the two virtual environments. The commands above regenerate them.

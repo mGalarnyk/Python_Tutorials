@@ -10,3 +10,4 @@ The prompt used to generate these figures is in [../images/PROMPT.md](../images/
 | `ft_memory_budget.png` | Where GPU memory goes: parameters, grads, AdamW, activations on a 96 GB card | Unit-square memory budget used in LoRA / QLoRA talks. Not a copy of any vendor slide. |
 | `full_finetune_memory.png` | Memory to fully fine-tune Nemotron 3 Nano 4B in bf16 (~38 GB) vs a 24 GB GPU | Original diagram for the ODSC blog post. |
 | `flyte_report_why_finetune.png` | Flyte UI report: test F1 before fine-tuning and after QLoRA | Screenshot of this pipeline's `main` report. |
+| `readme/*.png` | Talk slides 15, 27, and 31, rendered from `slides/presentation_peft_talk.pdf` | Our ODSC AI West deck. Slide 15 diagram: [QLoRA](https://arxiv.org/abs/2305.14314). |
