@@ -8,3 +8,5 @@ The prompt used to generate these figures is in [../images/PROMPT.md](../images/
 | `hawkish_dovish_task.png` | Labels in paper id order: 0 Dovish, 1 Hawkish, 2 Neutral | [Shah et al. (2023)](https://aclanthology.org/2023.acl-long.368/). Example sentences are illustrative, not quoted from the paper. |
 | `full_lora_qlora.png` | Full FT vs LoRA vs QLoRA | LoRA: [Hu et al., 2021](https://arxiv.org/abs/2106.09685). QLoRA: [Dettmers et al., 2023](https://arxiv.org/abs/2305.14314). |
 | `ft_memory_budget.png` | Where GPU memory goes: parameters, grads, AdamW, activations on a 96 GB card | Unit-square memory budget used in LoRA / QLoRA talks. Not a copy of any vendor slide. |
+| `full_finetune_memory.png` | Memory to fully fine-tune Nemotron 3 Nano 4B in bf16 (~38 GB) vs a 24 GB GPU | Original diagram for the ODSC blog post. |
+| `flyte_report_why_finetune.png` | Flyte UI report: test F1 before fine-tuning and after QLoRA | Screenshot of this pipeline's `main` report. |

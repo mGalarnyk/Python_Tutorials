@@ -1,222 +1,249 @@
-# Part 2 — RoBERTa on FOMC hawkish–dovish
+# Parameter-Efficient LLM Fine-Tuning in Practice: LoRA, QLoRA, Flyte, and vLLM
 
-The Federal Open Market Committee sets the federal funds rate. That rate shows up in mortgages, car loans, credit cards, and savings yields. **Hawkish** language leans toward tighter policy (higher rates, cooler inflation, more expensive borrowing). **Dovish** language leans toward easier policy (lower rates, cheaper loans, more growth). [Shah et al. (2023)](https://aclanthology.org/2023.acl-long.368/) label FOMC sentences so you can measure that lean in text.
+This is the code and slides for an ODSC AI West session. The [ODSC blog post](https://opendatascience.com/lora-qlora-fine-tuning-flyte-vllm/) is a short preview of it.
 
-Full, LoRA, and QLoRA on Combined-S, same three seeds, weighted F1 vs their Table 5. **Nemotron-3-Nano-4B** is three more rows on that table (CUDA), not a second notebook. Flyte 2 is the orchestrator: one `workflow.py` on this MacBook Pro (`flyte run --local`), then the same tasks on an NVIDIA GPU. A training script is enough for one box; Flyte is what keeps CPU data tasks and GPU training as one DAG.
+**Slides:** [PowerPoint](slides/presentation_peft_talk.pptx) · [PDF](slides/presentation_peft_talk.pdf)
 
-Labels:
+## Abstract
 
-| Id | Stance | Meaning |
-|----|--------|---------|
-| 0 | Dovish | Easing / more accommodative policy |
-| 1 | Hawkish | Tightening / less accommodative policy |
-| 2 | Neutral | No clear stance |
+Full fine-tuning a modern LLM is a memory problem before it is a modeling problem. Even a small model like NVIDIA Nemotron 3 Nano 4B needs about 38 GB to fully fine-tune in bf16, which does not fit on a 24 GB laptop GPU. The weights themselves are only 7.5 GB; the gradients and optimizer state are what push training past 30 GB, before a single activation.
 
-## What the paper trained
+This session covers how parameter-efficient fine-tuning closes that gap. [LoRA](https://arxiv.org/abs/2106.09685) freezes the original weights and trains two small low-rank matrices instead. [QLoRA](https://arxiv.org/abs/2305.14314) goes further and stores the frozen weights in 4-bit NF4. On one laptop GPU, the Nemotron LoRA fine-tune peaked at 9.0 GB and the QLoRA fine-tune at 5.4 GB.
 
-They fine-tuned both **RoBERTa-base** (~125M) and **RoBERTa-large** (~355M) on NVIDIA RTX A6000 GPUs. Base was the best of their small models (combined-split weighted F1 **0.698**). Large was best overall (**0.717** combined, **0.711** combined-split) and is the released checkpoint [`gtfintechlab/FOMC-RoBERTa`](https://huggingface.co/gtfintechlab/FOMC-RoBERTa). Data and code: [gtfintechlab/fomc-hawkish-dovish](https://github.com/gtfintechlab/fomc-hawkish-dovish) (CC BY-NC 4.0).
+The running example is a financial markets task from [Trillion Dollar Words](https://aclanthology.org/2023.acl-long.368/): label sentences from the Federal Reserve's rate-setting committee (the FOMC) as hawkish (leaning toward raising rates), dovish (leaning toward cutting them), or neutral. No finance background is needed. We compare the paper's RoBERTa models with Nemotron 3 Nano 4B across full fine-tuning, LoRA, and QLoRA, run all 33 experiments as one [Flyte 2](https://github.com/flyteorg/flyte) pipeline, and serve the result with [vLLM](https://github.com/vllm-project/vllm).
 
-Their loop (see [`bert_fine_tune_lm_hawkish_dovish_train_test.py`](https://github.com/gtfintechlab/fomc-hawkish-dovish/blob/main/code_model/bert_fine_tune_lm_hawkish_dovish_train_test.py)): AdamW, max length 256, 20% of the official train file as validation, constant learning rate, early-stop patience 7 (reset if val CE **or** accuracy **or** F1 improves by 0.01), test the **last** weights. Combined-S grid winners: **RoBERTa-base lr 1e-5 batch 8**, **RoBERTa-large lr 1e-5 batch 16**.
+![Memory needed to fully fine-tune Nemotron 3 Nano 4B, one square per GB: 7.5 GB of parameters, 7.5 GB of gradients, 15 GB of Adam optimizer state, and 7.6 GB of activations, about 38 GB in total. Everything past the red 24 GB line does not fit.](images/full_finetune_memory.png)
 
-`method=full` is that script. LoRA / QLoRA use the **same loop, seeds, LR, and batch**; adapters (or 4-bit) are the variation.
+## Agenda
 
-The labeled set is only ~2,400 sentences, so this is not a huge training job even at large size.
+* **Why full fine-tuning doesn't fit:** where training memory goes (parameters, gradients, optimizer state, activations).
+* **LoRA:** freeze the model and train two small matrices, then merge them back so inference is just as fast.
+* **QLoRA:** keep the frozen base in 4-bit NF4 so a 4B model trains in 5.4 GB.
+* **Does the fine-tune actually help?** RoBERTa vs Nemotron on the FOMC task, with and without fine-tuning.
+* **In practice:** running 33 experiments as one Flyte pipeline, and serving the fine-tuned model with vLLM.
 
-**Fair comparison:** our `full` / `LoRA` 3-seed mean ± std vs the paper’s Table 5 (same three seeds). The released Hugging Face checkpoint is a single set of weights, not a matched 3-seed re-run, so it is not in the mean table.
+<p><b>0. <a href="#installation">Setup</a>:</b> install the packages, download the data, and (for Nemotron) build the fused Mamba kernels.</p>
 
-## Hardware: this MacBook Pro, then a remote NVIDIA RTX PRO 6000 Blackwell
-
-| Machine | Specs | What to run |
-|---------|-------|-------------|
-| This laptop | 16-inch **MacBook Pro**, Apple **M4 Max**, **128 GB** unified memory, 16-core CPU (12P + 4E), 40-core GPU, PyTorch MPS | `roberta-base` and `roberta-large`, full + LoRA |
-| Remote server | **1× or 4× NVIDIA RTX PRO 6000 Blackwell**, **96 GB** GDDR7 ECC each, one node (16-core, 256 GB host), CUDA | RoBERTa 2×3, then Nemotron-3-Nano-4B full / LoRA / QLoRA on the same table |
-| GPU laptop | **Dell Pro Max 16 Plus**, **NVIDIA RTX PRO 5000 Blackwell** laptop GPU (**24 GB**), WSL2, CUDA | RoBERTa 2×3, Nemotron-3-Nano-4B **QLoRA** (~5.4 GB peak, ~1 h/seed with fused Mamba kernels), vLLM serving |
-| Paper | RTX A6000 | Their original full fine-tunes (no LoRA/QLoRA) |
-
-QLoRA needs **NVIDIA CUDA** because it uses [bitsandbytes](https://github.com/bitsandbytes-foundation/bitsandbytes) 4-bit (NF4) quantization. That library does not provide a supported 4-bit training path on Apple MPS or CPU. `requirements.txt` therefore installs `bitsandbytes` only when `sys_platform != "darwin"`. On this Mac, `recommend_jobs()` omits QLoRA and `method="qlora"` raises a clear error — use `full` or `lora`. On the remote **RTX PRO 6000 Blackwell (96 GB)** run the **full 2×3**: RoBERTa-base and RoBERTa-large, each with full, LoRA, and QLoRA — not QLoRA-only.
-
-## Comparison grid
-
-Same data (Combined-S, seeds `5768`, `78516`, `944601`), same metric: **weighted F1**, reported as a **3-seed mean ± std** like Table 5.
-
-| Model | Params | Full | LoRA | QLoRA |
-|-------|--------|------|------|-------|
-| `roberta-base` | ~125M | Mac follow-along; again on CUDA | Mac follow-along; again on CUDA | RTX PRO 6000 Blackwell only |
-| `roberta-large` | ~355M | Mac follow-along; again on CUDA | Mac follow-along; again on CUDA | RTX PRO 6000 Blackwell only |
-| `nemotron-nano-4b` | ~4B | CUDA (same Combined-S table) | CUDA | CUDA |
-
-LoRA targets for RoBERTa are `query`, `key`, `value`, `dense` — not LLaMA `q_proj` names. The classification head is fully trained (`modules_to_save=["classifier"]`).
-
-`delta_vs_paper` is our 3-seed mean minus their published 3-seed mean for that size. LoRA rows still use that full-FT number as the quality target.
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <a href="./fomc_roberta_finetune.ipynb"><img src="./images/hawkish_dovish_task.png" width="420" alt="The task: label FOMC sentences dovish, hawkish, or neutral"></a><br>
+      <b>1. <a href="./fomc_roberta_finetune.ipynb">The task and the notebook</a></b>
+      <p>Load the paper's train and test splits, train the comparison grid, and classify new sentences with a finished checkpoint. Start here.</p>
+    </td>
+    <td width="50%" valign="top">
+      <a href="./train_run.py"><img src="./images/full_lora_qlora.png" width="420" alt="Full fine-tuning vs LoRA vs QLoRA"></a><br>
+      <b>2. <a href="./train_run.py">Full fine-tuning vs LoRA vs QLoRA</a></b>
+      <p>One training script for all three methods plus a no-fine-tuning baseline. Nemotron is scored as a classifier on the logits of three label words (<a href="./causal_cls.py">causal_cls.py</a>).</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <a href="./workflow.py"><img src="./images/flyte_report_why_finetune.png" width="420" alt="Flyte report: test F1 for each model before fine-tuning and after QLoRA"></a><br>
+      <b>3. <a href="./workflow.py">One Flyte pipeline for 33 runs</a></b><br><sub><a href="#running-the-flyte-pipeline">How to run it</a></sub>
+      <p>Data prep is cached, a GPU task that fails retries from its last epoch, and every stage writes its own report, from the label mix to live training curves. A release step waits for approval before merging the adapter.</p>
+    </td>
+    <td width="50%" valign="top">
+      <b>4. <a href="./serve_vllm.py">Serving with vLLM</a></b><br><sub><a href="#serving-with-vllm">How to run it</a></sub>
+      <p>Merge the adapter into the base model and serve it behind an OpenAI-compatible API. The LoRA adapter trained on the laptop also works on NVIDIA's FP8 Nemotron: F1 0.725, 5.2 GB of weights, about 100 sentences per second (<a href="./bench_inference.py">bench_inference.py</a>).</p>
+    </td>
+  </tr>
+</table>
 
 ## Results
 
-The comparison table lives in the [notebook](fomc_roberta_finetune.ipynb) (**Results**). MacBook Pro (M4 Max, MPS) numbers are filled; CUDA RoBERTa and Nemotron rows fill as `metrics.json` lands. CUDA F1 is the **1 GPU** (yellow) block. `bash run_fomc.sh jobs` is the same recipe on four cards at once — same F1, not a second table block. We do not split one RoBERTa run across four cards. Re-run the results cell anytime.
+Weighted F1 on the paper's Combined-S test split (0 to 1, higher is better), averaged over the paper's three seeds. Peak memory is during training. All runs were on a Dell Pro Max 16 Plus laptop (NVIDIA RTX PRO 5000 Blackwell, 24 GB, WSL2).
 
-Shah et al. Combined-S (Table 5, 3-seed mean ± std): RoBERTa-base **0.698 ± 0.010**, RoBERTa-large **0.711 ± 0.011**.
+| Model | No fine-tuning | Full | LoRA | QLoRA |
+|-------|----------------|------|------|-------|
+| RoBERTa-base (125M) | 0.188 | 0.667 | 0.684 | 0.685 |
+| RoBERTa-large (355M) | 0.173 | 0.716 | 0.720 | 0.705 |
+| Nemotron 3 Nano 4B | 0.622 | does not fit (~38 GB) | **0.727** (9.0 GB) | 0.716 (5.4 GB) |
 
-## Checkpoints and progress
+For reference, the paper's full fine-tunes scored 0.698 (RoBERTa-base) and 0.711 (RoBERTa-large). RoBERTa scores near zero without fine-tuning because its classification layer starts out untrained; Nemotron already scores 0.622 from a prompt alone.
 
-Each cell writes:
+## Installation
+
+Training needs an NVIDIA GPU with CUDA for QLoRA and for Nemotron. QLoRA uses [bitsandbytes](https://github.com/bitsandbytes-foundation/bitsandbytes) 4-bit quantization, and Nemotron's Mamba layers need CUDA kernels. On a Mac (Apple Silicon, MPS) you can still run RoBERTa full fine-tuning and LoRA.
+
+1. Get the repo and go into this folder. Every command below runs from here:
+
+   ```
+   git clone https://github.com/mGalarnyk/Python_Tutorials.git
+   cd Python_Tutorials/NLP/Fine_Tuning/fomc_peft
+   ```
+
+2. Install [uv](https://github.com/astral-sh/uv) if you don't have it (`curl -LsSf https://astral.sh/uv/install.sh | sh`), then create the environment:
+
+   ```
+   uv venv .venv --python 3.11
+   source .venv/bin/activate
+   uv pip install -r requirements.txt
+   uv pip install jupyterlab   # for the notebook
+   ```
+
+3. Download the paper's data splits into `data/` (gitignored):
+
+   ```
+   python load_data.py
+   ```
+
+4. Nemotron only: install mamba-ssm and build the fused Mamba kernels. Without them every Mamba block falls back to a slow PyTorch loop (about 30 vs 6.5 minutes per epoch on the laptop GPU). `run_fomc.sh nemotron-lora` does this once and then trains one Nemotron LoRA seed:
+
+   ```
+   bash run_fomc.sh nemotron-lora
+   ```
+
+   To build the kernels without training, run `CUDA_ARCHS="12.0" bash build_mamba_kernels.sh` (12.0 is Blackwell; use `"9.0;12.0"` to add Hopper).
+
+## Running the notebook
 
 ```
-checkpoints/<model>__<method>__<split>__seed5768/
-  checkpoint-*       # Hugging Face Trainer (resume here)
-  final/             # best weights / adapters after early stop
-  metrics.json       # test scores; presence means “done”
-  progress.jsonl     # one JSON object per step / eval / save
-outputs/grid_runs.csv      # one row per seed
-outputs/grid_summary.csv   # 3-seed mean ± std
+jupyter lab fomc_roberta_finetune.ipynb
 ```
 
-Re-running **resumes** an interrupted job and **skips** a finished `metrics.json`. Pass `--force` (or `FORCE = True` in the notebook) to start over.
+Training cells skip any run that already has a `metrics.json`, and an interrupted run resumes from its last checkpoint. Set `FORCE = True` to start over.
 
-```bash
-tail -f checkpoints/roberta-base__lora__lab-manual-split-combine__seed5768/progress.jsonl
+## Running from the command line
+
+```
+# One run (about an hour per Nemotron seed on the laptop GPU)
+python train_run.py --model nemotron-nano-4b --method qlora --seed 5768
+python train_run.py --model nemotron-nano-4b --method lora --seed 5768
+python train_run.py --model nemotron-nano-4b --method zeroshot --seed 5768
+
+# RoBERTa grid: base + large, full / LoRA / QLoRA, three seeds
+python run_grid.py --models roberta-base,roberta-large --methods full,lora,qlora \
+    --seeds 5768,78516,944601 --include-qlora --include-large-full
 ```
 
-Load a finished run:
+Each run writes `checkpoints/<model>__<method>__lab-manual-split-combine__seed<seed>__<recipe>/` with `metrics.json` (test scores and `peak_mem_gb`), `test_predictions.jsonl`, `progress.jsonl` (one line per step and eval), and the trained weights or adapter in `final/`. `outputs/grid_summary.csv` has the 3-seed mean and std for every cell.
+
+Load a finished run and classify new sentences:
 
 ```python
 from train_run import load_trained, predict_texts
 
-model, tokenizer = load_trained("checkpoints/roberta-base__lora__lab-manual-split-combine__seed5768")
+model, tokenizer = load_trained("checkpoints/roberta-base__lora__lab-manual-split-combine__seed5768__paper")
 predict_texts(model, tokenizer, ["The Committee decided to lower the target range."])
 ```
 
-## Data (downloaded, not committed)
+## Running the Flyte pipeline
 
-Default seed `5768`, Combined-S (`lab-manual-split-combine-*`):
+The same `workflow.py` runs in-process with `flyte run --local` or on a cluster with `flyte run`. The main tasks:
+
+| Task | What it does |
+|------|--------------|
+| `prepare_data` | Downloads the splits on CPU (cached) |
+| `train_one` | One model / method / seed on GPU, with a live training curve report |
+| `grid` | Runs many cells, grouped by model |
+| `main` | Builds the comparison report from finished runs (the "Why fine-tune?" charts) |
+| `release` | Shows held-out F1 vs the paper and waits for approval before `merge_adapter` |
 
 ```
-https://raw.githubusercontent.com/gtfintechlab/fomc-hawkish-dovish/main/training_data/test-and-training/training_data/lab-manual-split-combine-train-5768.xlsx
-https://raw.githubusercontent.com/gtfintechlab/fomc-hawkish-dovish/main/training_data/test-and-training/test_data/lab-manual-split-combine-test-5768.xlsx
-```
-
-`load_data.py` writes them under `data/`, which is gitignored. Use `split="lab-manual-combine"` if you want the non-split Combined numbers (paper large F1 0.717) instead.
-
-## Setup
-
-```bash
-cd NLP/Fine_Tuning/fomc_peft
-uv venv .venv --python 3.11
-source .venv/bin/activate
-uv pip install -r requirements.txt
-python load_data.py
-```
-
-Or just:
-
-```bash
-cd NLP/Fine_Tuning/fomc_peft
-cp env.example .env         # optional; fill in local HF cache paths
-bash run_fomc.sh            # in-process on this GPU node (`--local`, no Docker)
-bash run_fomc.sh grid
-bash run_fomc.sh grid-jobs
-```
-
-Notebook: [fomc_roberta_finetune.ipynb](fomc_roberta_finetune.ipynb).
-
-## Flyte 2
-
-Same **devbox** UI locally and on the remote GPU: **Sub actions** (child tasks), **Input** (typed args), **Output** (return values), plus Logs / Metrics / **Reports**. `prepare_data` is cached; a failed GPU cell retries without replaying the grid; the task image is `requirements.txt`.
-
-| File | Role |
-|------|------|
-| `flyte_env.py` | CPU vs GPU task environments (`gpu=0` on this Mac so `--local` uses MPS) |
-| `workflow.py` | Driver tasks (`main`, `pipeline`, `grid`) call leaf tasks (`prepare_data`, `train_one`, `snapshot_grid`, `write_talk_report`) |
-| `paper_loop.py` | Shah et al. training loop (imported inside the GPU task, not at workflow top) |
-| `config.yaml.example` | Dummy cluster config; copy to `.flyte/config.yaml` locally |
-
-```bash
-# This MacBook Pro (M4 Max) — CPU devbox. Do not pass --gpu (Apple Silicon unsupported).
-flyte start devbox
-flyte get devbox
-flyte -c .flyte/devbox.yaml run --name fomc-main workflow.py main
-# http://localhost:30080/v2  → run → Sub actions / Input / Output / Reports
-
-# --local --tui is the terminal only. Those runs never appear at :30080.
-flyte run --local --tui workflow.py pipeline --model_key roberta-base --method lora --seed 5768
-flyte start tui
-flyte run --local --tui workflow.py grid
-
-# Remote NVIDIA RTX PRO 6000 Blackwell (96 GB) — GPU devbox, then the same flyte run
-# (no --local). Full 2×3: (base + large) × (full + LoRA + QLoRA).
-flyte start devbox --gpu
-flyte get devbox
-FLYTE_GPUS=1 flyte run workflow.py grid                  # one GPU, cells in series
-FLYTE_GPUS=1 flyte run workflow.py grid --parallel jobs  # 1 GPU/job on a 4-GPU node
-```
-
-`bash run_fomc.sh jobs` is **1 GPU/job**: unfinished cells in parallel, one card each. F1 matches the 1-GPU row. Do not put one RoBERTa cell on four cards — the paper loop is single-device and the model already fits.
-
-`python run_grid.py` launches those Flyte local runs per unfinished cell. `--no-flyte` is the in-process loop only.
-
-### Demo features (tested on the RTX PRO 5000 laptop)
-
-- **Live training curve.** `train_one` trains in a worker thread and redraws a **Training curve** report tab after every epoch (val F1 + val loss, best epoch circled), read from `progress.jsonl`. Cached cells redraw from their saved history.
-- **Grouped grid.** `grid` puts each model's cells in a `flyte.group` (RoBERTa-base, RoBERTa-large, Nemotron-3-Nano-4B). `--seeds` runs a subset; `--include_nemotron` adds the Nemotron QLoRA cell.
-- **Release gate.** `release` shows the held-out F1 vs Shah et al. and waits for a yes/no (`flyte.new_condition`) before merging the adapter for vLLM. Locally it is a `[y/n]` prompt in the terminal; on a cluster it is an Approve button in the UI.
-
-```bash
-flyte run --local workflow.py grid --seeds '[5768]' --include_qlora true --include_nemotron
 flyte run --local workflow.py train_one --model_key nemotron-nano-4b --method qlora --seed 5768
-flyte run --local workflow.py release            # y -> merge seed 5768 for vLLM, n -> stop
+flyte run --local workflow.py grid --seeds '[5768]' --include_qlora true --include_nemotron
+flyte run --local workflow.py release    # y: merge seed 5768 for vLLM, n: stop
 ```
 
-To browse local runs (groups, inputs/outputs, reports) in `flyte start tui`, record them: `flyte.init(local_persistence=True)` before `flyte.run(...)`, or a config with local persistence (`flyte create config --local-persistence`).
+Locally, `release` asks `[y/n]` in the terminal; on a cluster it is an Approve button in the UI.
+
+To see the reports in the Flyte UI, run on a local devbox (needs Docker). On WSL2, Kubernetes cannot discover the GPU, so GPU tasks use a PodTemplate that mounts it directly:
+
+```
+flyte start devbox
+docker cp devbox/wsl-gpu-podtemplate.yaml flyte-devbox:/tmp/
+docker exec flyte-devbox kubectl apply -f /tmp/wsl-gpu-podtemplate.yaml
+mkdir -p .flyte && flyte create config --devbox -o .flyte/devbox.yaml
+
+python -c "from report_helpers import refresh_report_snapshot; refresh_report_snapshot()"
+FLYTE_WSL_GPU=1 flyte -c .flyte/devbox.yaml run --copy-style all workflow.py main
+```
+
+The UI is at http://localhost:30080/v2. Flyte bundles only git-tracked files, so `git add` new files before a devbox run. On Linux with a regular NVIDIA driver, use `flyte start devbox --gpu` and leave out the PodTemplate and `FLYTE_WSL_GPU`.
 
 ## Serving with vLLM
 
-QLoRA saves memory in training. Serving is a different stack: fold the adapter into the BF16 Nemotron base and serve it with [vLLM](https://github.com/vllm-project/vllm). The classifier scores three label tokens at the last prompt token, so vLLM generates one token restricted to those ids (`allowed_token_ids`). Same prompt, same argmax, same prediction.
+vLLM pins its own torch, so it gets its own environment:
 
-vLLM pins its own torch, so it gets its own venv:
-
-```bash
+```
 # --managed-python: vLLM compiles small C helpers and needs Python.h.
-# flashinfer-jit-cache: prebuilt sampling kernels, so nothing needs nvcc at startup.
 uv venv .venv-vllm --python 3.12 --managed-python
 VIRTUAL_ENV=.venv-vllm uv pip install vllm peft pandas openpyxl scikit-learn
 VIRTUAL_ENV=.venv-vllm uv pip install "flashinfer-jit-cache==$(.venv-vllm/bin/python -c 'import flashinfer; print(flashinfer.__version__)')" \
   --extra-index-url https://flashinfer.ai/whl/cu130
+```
 
-.venv/bin/python serve_vllm.py merge --method qlora --seed 5768          # -> checkpoints/<run>/merged
-.venv-vllm/bin/python serve_vllm.py eval --method qlora --seed 5768      # test F1 + sentences/s
-.venv-vllm/bin/python serve_vllm.py eval --method qlora --seed 5768 --lora   # unmerged adapter, hot-swappable
+Merge the adapter, check that vLLM gives the same F1 as PyTorch, then serve:
+
+```
+.venv/bin/python serve_vllm.py merge --method lora --seed 5768             # -> checkpoints/<run>/merged
+.venv-vllm/bin/python serve_vllm.py eval --method lora --seed 5768         # test F1 + sentences/s
 .venv-vllm/bin/vllm serve checkpoints/<run>/merged --served-model-name fomc-nemotron --max-model-len 512
 ```
 
-`eval` writes `vllm_metrics.json` next to `metrics.json`, with the PyTorch F1 beside the vLLM F1.
+The classifier scores three label tokens at the last prompt token, so vLLM generates one token restricted to those ids (`allowed_token_ids`): same prompt, same prediction.
 
-On Flyte, `merge_adapter` (`workflow.py`) is a GPU task and `vllm_app` (`flyte_env.py`) is a [`VLLMAppEnvironment`](https://www.union.ai/docs/v2/flyte/user-guide/apps/native-app-integrations/vllm-app/) that serves that task's output behind an OpenAI-compatible API:
+The FP8 numbers come from `bench_inference.py`:
 
-```bash
-flyte run workflow.py merge_adapter --method qlora --seed 5768
+```
+.venv-vllm/bin/python bench_inference.py nemotron --method lora --variant lora-fp8 --seed 5768
+```
+
+On Flyte, `merge_adapter` is a GPU task and `vllm_app` (in `flyte_env.py`) is a [`VLLMAppEnvironment`](https://www.union.ai/docs/v2/flyte/user-guide/apps/native-app-integrations/vllm-app/) that serves its output:
+
+```
+flyte run workflow.py merge_adapter --method lora --seed 5768
 flyte deploy workflow.py vllm_app
 ```
 
-## CLI
+## What's in this folder
 
-```bash
-# Recommended jobs × paper's 3 seeds (Flyte --local; skips finished metrics.json)
-python run_grid.py
-
-# One seed only
-python run_grid.py --seed 5768
-python train_run.py --model roberta-base --method lora --seed 78516
-
-# One cell, no orchestrator
-python train_run.py --model roberta-base --method lora
-python train_run.py --model roberta-base --method full
-
-# Remote RTX PRO 6000 Blackwell (96 GB): full 2×3 (base + large × full / LoRA / QLoRA)
-python run_grid.py --include-qlora
-flyte run workflow.py grid
+```
+fomc_roberta_finetune.ipynb   notebook (tutorial walkthrough)
+slides/                       talk deck (PowerPoint + PDF)
+workflow.py                   Flyte 2 pipeline (tasks, reports, release gate)
+flyte_env.py                  Flyte task environments: CPU, GPU, UI images, vLLM app
+train_run.py                  one run: full / LoRA / QLoRA / zero-shot
+paper_loop.py                 the paper's training loop, ported
+causal_cls.py                 Nemotron as a classifier (label-token logits)
+fomc_prompt.py                prompt that wraps a sentence for Nemotron
+load_data.py                  downloads the paper's train/test splits
+config.py                     models, seeds, hyperparameters, run paths
+device_utils.py               CUDA / MPS / CPU detection, memory helpers
+paper_baselines.py            the paper's published numbers
+run_grid.py                   runs many cells, writes outputs/grid_*.csv
+run_parallel.py               one process per GPU for unfinished cells (multi-GPU nodes)
+run_fomc.sh                   shell entry point (sets up Mamba kernels)
+build_mamba_kernels.sh        builds causal-conv1d (fast Nemotron training)
+patch_mamba_ssm.py            makes mamba-ssm importable without its CUDA build
+report_stages.py              HTML report for each pipeline stage
+report_viz.py                 inline-SVG charts used by the reports
+report_helpers.py             loads results, writes report_snapshot.py
+report_snapshot.py            auto-generated: finished runs, bundled for Flyte
+serve_vllm.py                 merge adapter + score the test set with vLLM
+bench_inference.py            inference benchmark (F1, sentences/s, latency, memory)
+devbox/                       PodTemplate that gives the Flyte devbox the WSL GPU
+images/                       figures used by the notebook and this README
 ```
 
-## License
+Not in git: `checkpoints/` (about 50 GB), `outputs/`, `logs/`, `data/`, `.flyte/`, and the two virtual environments. The commands above regenerate them.
 
-The FOMC annotations are CC BY-NC 4.0. Do not use them commercially. Cite the paper if you use the data or the released model:
+### Where each blog number comes from
+
+| Blog item | Produced by | Data |
+|---|---|---|
+| Results for all 33 runs | `train_run.py` (Nemotron), `run_grid.py` (RoBERTa) | `checkpoints/*/metrics.json` |
+| Nemotron QLoRA 0.716, LoRA 0.727, zero-shot 0.622 | same | `outputs/report_snapshot.json` |
+| Peak training memory (5.4 GB QLoRA, 9.0 GB LoRA) | `device_utils.peak_memory_gb` | `metrics.json` (`peak_mem_gb`) |
+| Flyte "Why fine-tune?" charts | `workflow.py: main` → `report_stages.grid_report` | devbox run |
+| FP8 serving: 0.725, ~100 sentences/s, 5.2 GB | `bench_inference.py nemotron --method lora --variant lora-fp8` | `outputs/inference_bench.jsonl` |
+
+In QLoRA, `lm_head` (which scores the labels) and the Mamba `out_proj` (read by the fused kernel) stay in bf16; see `train_run.py: _replace_linears_with_nf4`.
+
+## Data and license
+
+The data is from [gtfintechlab/fomc-hawkish-dovish](https://github.com/gtfintechlab/fomc-hawkish-dovish) and is licensed CC BY-NC 4.0, so do not use it commercially. The paper's training loop is ported from [their script](https://github.com/gtfintechlab/fomc-hawkish-dovish/blob/main/code_model/bert_fine_tune_lm_hawkish_dovish_train_test.py). Cite the paper if you use the data or the released model:
 
 ```
 @inproceedings{shah-etal-2023-trillion,
