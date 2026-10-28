@@ -22,30 +22,40 @@ The running example is a financial markets task from [Trillion Dollar Words](htt
 * **Does the fine-tune actually help?** RoBERTa vs Nemotron on the FOMC task, with and without fine-tuning.
 * **In practice:** running 33 experiments as one Flyte pipeline, and serving the fine-tuned model with vLLM.
 
-<p><b>0. <a href="#installation">Setup</a>:</b> install the packages, download the data, and (for Nemotron) build the fused Mamba kernels.</p>
-
 <table>
   <tr>
     <td width="50%" valign="top">
-      <a href="./fomc_roberta_finetune.ipynb"><img src="./images/readme/worked_example.png" width="420" alt="Talk slide: worked example, classify Fed (FOMC) sentences as hawkish, dovish, or neutral with three models on one laptop GPU"></a><br>
-      <b>1. <a href="./fomc_roberta_finetune.ipynb">The task and the notebook</a></b>
-      <p>Load the paper's train and test splits, train the comparison grid, and classify new sentences with a finished checkpoint. Start here.</p>
+      <a href="./slides/presentation_peft_talk.pdf"><img src="./images/slides/slide01_title.png" width="420" alt="Title slide: Parameter-Efficient Fine-Tuning (PEFT), ODSC AI West, October 29, 2026"></a><br>
+      <b>0. <a href="./slides/presentation_peft_talk.pdf">Slides</a></b><br><sub><a href="./slides/presentation_peft_talk.pdf">PDF</a> · <a href="./slides/presentation_peft_talk.pptx">PowerPoint</a></sub>
+      <p>The talk deck: why full fine-tuning runs out of memory, how LoRA and QLoRA fix it, and the results on one laptop GPU.</p>
     </td>
     <td width="50%" valign="top">
-      <a href="./train_run.py"><img src="./images/readme/full_lora_qlora_memory.png" width="420" alt="Talk slide: full fine-tuning vs LoRA vs QLoRA. On Nemotron 4B, LoRA pulls peak training memory from about 38 GB to 9 GB, and QLoRA to 5.4 GB"></a><br>
-      <b>2. <a href="./train_run.py">Full fine-tuning vs LoRA vs QLoRA</a></b>
+      <a href="#installation"><img src="./images/slides/slide26_code.png" width="420" alt="Talk slide: the Hugging Face PEFT and bitsandbytes code for the Nemotron QLoRA fine-tune"></a><br>
+      <b>1. <a href="#installation">Setup</a></b>
+      <p>Install the packages with uv, download the paper's data splits, and (for Nemotron) build the fused Mamba kernels.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <a href="./fomc_roberta_finetune.ipynb"><img src="./images/slides/slide27_worked_example.png" width="420" alt="Talk slide: worked example, classify Fed (FOMC) sentences as hawkish, dovish, or neutral with three models on one laptop GPU"></a><br>
+      <b>2. <a href="./fomc_roberta_finetune.ipynb">The task and the notebook</a></b>
+      <p>Load the paper's train and test splits, train the comparison grid, and classify new sentences with a finished checkpoint.</p>
+    </td>
+    <td width="50%" valign="top">
+      <a href="./train_run.py"><img src="./images/slides/slide15_full_lora_qlora.png" width="420" alt="Talk slide: full fine-tuning vs LoRA vs QLoRA. On Nemotron 4B, LoRA pulls peak training memory from about 38 GB to 9 GB, and QLoRA to 5.4 GB"></a><br>
+      <b>3. <a href="./train_run.py">Full fine-tuning vs LoRA vs QLoRA</a></b>
       <p>One training script for all three methods plus a no-fine-tuning baseline. Nemotron is scored as a classifier on the logits of three label words (<a href="./causal_cls.py">causal_cls.py</a>).</p>
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
-      <a href="./workflow.py"><img src="./images/flyte_report_why_finetune.png" width="420" alt="Flyte report: test F1 for each model before fine-tuning and after QLoRA"></a><br>
-      <b>3. <a href="./workflow.py">One Flyte pipeline for 33 runs</a></b><br><sub><a href="#running-the-flyte-pipeline">How to run it</a></sub>
+      <a href="./workflow.py"><img src="./images/slides/slide30_flyte.png" width="420" alt="Talk slide: Flyte, 33 runs as one pipeline, with the Flyte UI report comparing each model before and after QLoRA"></a><br>
+      <b>4. <a href="./workflow.py">One Flyte pipeline for 33 runs</a></b><br><sub><a href="#running-the-flyte-pipeline">How to run it</a></sub>
       <p>Data prep is cached, a GPU task that fails retries from its last epoch, and every stage writes its own report, from the label mix to live training curves. A release step waits for approval before merging the adapter.</p>
     </td>
     <td width="50%" valign="top">
-      <a href="./serve_vllm.py"><img src="./images/readme/vllm_serving.png" width="420" alt="Talk slide: serving the adapter with vLLM on the FP8 base, 0.725 F1, 5.2 GB, about 100 sentences per second"></a><br>
-      <b>4. <a href="./serve_vllm.py">Serving with vLLM</a></b><br><sub><a href="#serving-with-vllm">How to run it</a></sub>
+      <a href="./serve_vllm.py"><img src="./images/slides/slide31_vllm_serving.png" width="420" alt="Talk slide: serving the adapter with vLLM on the FP8 base, 0.725 F1, 5.2 GB, about 100 sentences per second"></a><br>
+      <b>5. <a href="./serve_vllm.py">Serving with vLLM</a></b><br><sub><a href="#serving-with-vllm">How to run it</a></sub>
       <p>Merge the adapter into the base model and serve it behind an OpenAI-compatible API. The LoRA adapter trained on the laptop also works on NVIDIA's FP8 Nemotron: F1 0.725, 5.2 GB of weights, about 100 sentences per second (<a href="./bench_inference.py">bench_inference.py</a>).</p>
     </td>
   </tr>
@@ -225,7 +235,7 @@ report_snapshot.py            auto-generated: finished runs, bundled for Flyte
 serve_vllm.py                 merge adapter + score the test set with vLLM
 bench_inference.py            inference benchmark (F1, sentences/s, latency, memory)
 devbox/                       PodTemplate that gives the Flyte devbox the WSL GPU
-images/                       figures used by the notebook; images/readme/ holds talk slides used in this README
+images/                       talk slides (images/slides/) and blog figures used by the notebook and this README
 ```
 
 Not in git: `checkpoints/` (about 50 GB), `outputs/`, `logs/`, `data/`, `.flyte/`, and the two virtual environments. The commands above regenerate them.

@@ -3,7 +3,7 @@ import json
 
 SNAPSHOT = json.loads(r"""
 {
-  "updated": "2026-10-09 05:01 UTC",
+  "updated": "2026-10-28 22:24 UTC",
   "runs": [
     {
       "model": "nemotron-nano-4b",
