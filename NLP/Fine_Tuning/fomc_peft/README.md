@@ -27,7 +27,7 @@ The running example is a financial markets task from [Trillion Dollar Words](htt
     <td width="50%" valign="top">
       <a href="./slides/presentation_peft_talk.pdf"><img src="./images/slides/slide01_title.png" width="420" alt="Title slide: Parameter-Efficient Fine-Tuning (PEFT), ODSC AI West, October 29, 2026"></a><br>
       <b>0. <a href="./slides/presentation_peft_talk.pdf">Slides</a></b><br><sub><a href="./slides/presentation_peft_talk.pdf">PDF</a> · <a href="./slides/presentation_peft_talk.pptx">PowerPoint</a></sub>
-      <p>The talk deck: why full fine-tuning runs out of memory, how LoRA and QLoRA fix it, and the results on one laptop GPU.</p>
+      <p>The talk deck: why full fine-tuning runs out of memory, how LoRA and QLoRA fix it, and the results. Every run in the talk was trained on one laptop: a Dell Pro Max 16 Plus with an NVIDIA RTX PRO 5000 Blackwell laptop GPU (24 GB of VRAM), an Intel Core Ultra 9 285HX (24 cores), and 128 GB of RAM, running Linux under WSL2.</p>
     </td>
     <td width="50%" valign="top">
       <a href="#installation"><img src="./images/slides/slide26_code.png" width="420" alt="Talk slide: the Hugging Face PEFT and bitsandbytes code for the Nemotron QLoRA fine-tune"></a><br>
