@@ -244,15 +244,4 @@ In QLoRA, `lm_head` (which scores the labels) and the Mamba `out_proj` (read by 
 
 ## Data and license
 
-The data is from [gtfintechlab/fomc-hawkish-dovish](https://github.com/gtfintechlab/fomc-hawkish-dovish) and is licensed CC BY-NC 4.0, so do not use it commercially. The paper's training loop is ported from [their script](https://github.com/gtfintechlab/fomc-hawkish-dovish/blob/main/code_model/bert_fine_tune_lm_hawkish_dovish_train_test.py). Cite the paper if you use the data or the released model:
-
-```
-@inproceedings{shah-etal-2023-trillion,
-    title = "Trillion Dollar Words: A New Financial Dataset, Task {\&} Market Analysis",
-    author = "Shah, Agam and Paturi, Suvan and Chava, Sudheer",
-    booktitle = "Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
-    year = "2023",
-    pages = "6664--6679",
-    url = "https://aclanthology.org/2023.acl-long.368",
-}
-```
+The data is from [gtfintechlab/fomc-hawkish-dovish](https://github.com/gtfintechlab/fomc-hawkish-dovish) and is licensed CC BY-NC 4.0.
