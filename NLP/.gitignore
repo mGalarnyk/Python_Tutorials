@@ -49,7 +49,7 @@ trainer_state.json
 
 # FOMC Combined-S downloads (CC BY-NC; regenerate with load_data.py).
 # Tutorial sample CSVs and other small datasets stay in git.
-**/02_fomc_roberta/data/*.xlsx
+**/fomc_peft/data/*.xlsx
 
 # Virtualenvs created inside this folder
 .venv/

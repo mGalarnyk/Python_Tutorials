@@ -9,7 +9,7 @@ Everything ran on the Dell laptop GPU (RTX PRO 5000 Blackwell, 24 GB, WSL2).
 ## Folder layout
 
 ```
-02_fomc_roberta/
+fomc_peft/
 ├── fomc_roberta_finetune.ipynb   notebook (tutorial walkthrough)
 ├── workflow.py                   Flyte 2 pipeline (tasks, reports, release gate)
 ├── flyte_env.py                  Flyte task environments: CPU, GPU, UI images

@@ -98,7 +98,7 @@ https://raw.githubusercontent.com/gtfintechlab/fomc-hawkish-dovish/main/training
 ## Setup
 
 ```bash
-cd NLP/Fine_Tuning/02_fomc_roberta
+cd NLP/Fine_Tuning/fomc_peft
 uv venv .venv --python 3.11
 source .venv/bin/activate
 uv pip install -r requirements.txt
@@ -108,7 +108,7 @@ python load_data.py
 Or just:
 
 ```bash
-cd NLP/Fine_Tuning/02_fomc_roberta
+cd NLP/Fine_Tuning/fomc_peft
 cp env.example .env         # optional; fill in local HF cache paths
 bash run_fomc.sh            # in-process on this GPU node (`--local`, no Docker)
 bash run_fomc.sh grid

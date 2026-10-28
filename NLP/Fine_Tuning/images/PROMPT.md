@@ -16,7 +16,7 @@ Title at top in dark navy, centered. Subtitle in gray.
 Rounded cards, plenty of padding. CPU vs GPU as small badges, not giant labels.
 ```
 
-## `flyte_pipeline.png` (part 2 — FOMC)
+## `flyte_pipeline.png`
 
 Card washes must match the Results table: Mac `#dbeafe`, 1 GPU `#fef3c7`, 1 GPU/job `#fde8e6`. The right card is four independent jobs, not one job split across four GPUs.
 
@@ -40,32 +40,7 @@ A downward chevron, then a short three-step row labeled workflow.py:
 Do not name a university or cluster. Do not write DDP or 4 GPUs/model.
 ```
 
-## `flyte_pipeline.png` (part 1 — text-to-SQL)
-
-```
-Title at top in dark navy, centered: "One Flyte 2 pipeline. Two machines."
-Subtitle in gray: "Same workflow.py — flyte run --local here, flyte run on the GPU."
-
-Two equal machine cards under the title, rounded corners, plenty of padding:
-
-Left card, light blue wash, header "THIS MACBOOK PRO": Apple M4 Max, 128 GB, 16-core (12P+4E), MPS. Monospace pill: flyte run --local. Runs: SmolLM2-135M smoke, full + LoRA.
-
-Right card, light green wash, header "REMOTE RTX PRO 6000 BLACKWELL": 96 GB each, CUDA. One GPU or four on one node. 16-core / 256 GB host. Monospace pill: flyte run. Runs: Union-scale samples, including QLoRA.
-
-A downward chevron, then a horizontal four-step pipeline labeled "workflow.py":
-
-Step 1 box, small gray CPU badge: prepare_data. Text: "SQL dataset on CPU. GPU stays free."
-
-Arrow to Step 2 box, navy GPU badge: train. Text: "full / LoRA / QLoRA on SmolLM2."
-
-Arrow to Step 3 box, navy GPU badge: evaluate. Text: "Exact-match SQL vs the base model."
-
-Arrow to Step 4 box, dashed border, gray CPU badge: serve. Text: "Optional. Same run, not a new script."
-
-Footer in small gray: "Swap --method or --model_name. Do not rewrite the pipeline for the next GPU."
-```
-
-## `hawkish_dovish_task.png` (part 2)
+## `hawkish_dovish_task.png`
 
 Left to right must match the paper ids: **0 Dovish, 1 Hawkish, 2 Neutral**. Do not put Neutral in the middle.
 
@@ -86,7 +61,7 @@ Footer in small gray: "Labeled FOMC sentences, 1996–2022. Metric: weighted F1.
 Example sentences are illustrative, not quoted from the paper.
 ```
 
-## `ft_memory_budget.png` (part 2 — FOMC)
+## `ft_memory_budget.png`
 
 Unit-square GPU budget. Draw it in code (matplotlib) so LoRA yellow equals full yellow and purple is identical in all three columns. Do not copy a vendor LLaMA-65B / 780 GB slide.
 
