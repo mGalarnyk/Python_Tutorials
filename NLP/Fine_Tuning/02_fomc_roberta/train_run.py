@@ -458,6 +458,50 @@ def predict_texts(model, tokenizer, texts: list[str]) -> list[dict[str, Any]]:
     return out
 
 
+def _write_loop_predictions(run_directory: Path, seed: int, split: str, preds: dict | None) -> None:
+    """test_predictions.jsonl from the exact test pass that produced metrics.json."""
+    if not preds or not preds.get("pred"):
+        return
+    _, test = load_splits(seed=str(seed), split=split)
+    texts = [t for t in test["text"].tolist() if isinstance(t, str)]  # same filter as the loop
+    if len(texts) != len(preds["pred"]):
+        log(f"test predictions skipped: {len(texts)} sentences vs {len(preds['pred'])} predictions")
+        return
+    path = Path(run_directory) / "test_predictions.jsonl"
+    with path.open("w") as fh:
+        for text, y, p, pr in zip(texts, preds["label"], preds["pred"], preds["probs"]):
+            fh.write(json.dumps({"text": text, "label": LABEL_NAMES[int(y)], "pred": LABEL_NAMES[int(p)],
+                                 "probs": {LABEL_NAMES[i]: float(v) for i, v in enumerate(pr)},
+                                 "source": "test pass"}) + "\n")
+    log(f"wrote {path}")
+
+
+def write_test_predictions(run_directory: str | Path, seed: int, split: str = cfg.DEFAULT_SPLIT) -> Path:
+    """Backfill test_predictions.jsonl for runs trained before the loop saved them.
+
+    Reloads the finished checkpoint, so it can differ slightly from the training-
+    time test pass (QLoRA adapters load onto an unquantized base).
+    """
+    run_directory = Path(run_directory)
+    model, tokenizer = load_trained(run_directory)
+    _, test = load_splits(seed=str(seed), split=split)
+    texts, labels = test["text"].tolist(), test["label"].tolist()
+    rows: list[dict[str, Any]] = []
+    for i in range(0, len(texts), 16):
+        rows.extend(predict_texts(model, tokenizer, texts[i : i + 16]))
+    path = run_directory / "test_predictions.jsonl"
+    with path.open("w") as fh:
+        for row, y in zip(rows, labels):
+            fh.write(json.dumps({"text": row["text"], "label": LABEL_NAMES[int(y)],
+                                 "pred": row["pred_name"], "probs": row["probs"],
+                                 "source": "re-scored from checkpoint"}) + "\n")
+    del model
+    gc.collect()
+    empty_cache()
+    log(f"wrote {path} ({len(rows)} sentences)")
+    return path
+
+
 def evaluate_split(model, tokenizer, df) -> dict[str, Any]:
     import torch
     from torch.utils.data import DataLoader, TensorDataset
@@ -493,6 +537,116 @@ def evaluate_split(model, tokenizer, df) -> dict[str, Any]:
     return metrics_from_preds(all_labels, all_preds)
 
 
+def _zero_shot_causal(backbone, tokenizer, texts: list[str]) -> list[dict[str, Any]]:
+    """Zero-shot an LLM fairly: which full label word is the likeliest reply to the prompt?
+
+    The fine-tuned runs score the first token of DOVISH / HAWKISH / neutral, tokens
+    fine-tuning teaches; an untrained model would answer in plain lowercase words,
+    so score the whole word (summed token log-probs) as the reply instead.
+    """
+    import torch
+
+    from fomc_prompt import encode_classify
+
+    device = next(backbone.parameters()).device
+    backbone.eval()
+    words = [tokenizer.encode(w, add_special_tokens=False) for w in LABEL_NAMES.values()]
+    rows: list[dict[str, Any]] = []
+    with torch.no_grad():
+        for text in texts:
+            prompt = tokenizer(encode_classify(text, tokenizer), add_special_tokens=False)["input_ids"]
+            seqs = [prompt + w for w in words]
+            width = max(len(q) for q in seqs)
+            ids = torch.full((len(seqs), width), tokenizer.pad_token_id, dtype=torch.long)
+            mask = torch.zeros_like(ids)
+            for i, q in enumerate(seqs):
+                ids[i, : len(q)] = torch.tensor(q)
+                mask[i, : len(q)] = 1
+            logp = torch.log_softmax(backbone(input_ids=ids.to(device), attention_mask=mask.to(device)).logits.float(), -1)
+            scores = []
+            for i, w in enumerate(words):
+                pos = range(len(prompt) - 1, len(prompt) - 1 + len(w))
+                scores.append(sum(logp[i, p, tok].item() for p, tok in zip(pos, w)))
+            probs = torch.softmax(torch.tensor(scores), 0).tolist()
+            best = int(max(range(3), key=probs.__getitem__))
+            rows.append({"text": text, "pred_id": best, "pred_name": LABEL_NAMES[best],
+                         "probs": {LABEL_NAMES[i]: float(p) for i, p in enumerate(probs)}})
+    return rows
+
+
+def run_zero_shot(model_key: str, seed: int = cfg.DEFAULT_SEED, split: str = cfg.DEFAULT_SPLIT) -> dict[str, Any]:
+    """The pretrained model on the same test split, with no fine-tuning: why fine-tuning is needed.
+
+    Nemotron: same prompt and the same three label-token logits as the fine-tuned
+    runs, just without the adapter (a real zero-shot classifier). RoBERTa: an
+    encoder has no classifier until one is trained, so the head is freshly
+    initialized (seeded); expect roughly chance.
+    """
+    import time
+
+    import torch
+
+    out_dir = cfg.run_dir(model_key, "zeroshot", seed, split)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    metrics_path = out_dir / "metrics.json"
+    run_name = cfg.run_id(model_key, "zeroshot", seed, split)
+    log("=" * 64)
+    log(f"{run_name}: no fine-tuning (zero-shot) on the test split")
+    torch.manual_seed(int(seed))
+    reset_peak_memory()
+    t0 = time.perf_counter()
+    tokenizer = _load_tokenizer(cfg.MODELS[model_key], model_key)
+    from device_utils import detect_device
+
+    model = _load_model(cfg.MODELS[model_key], model_key, "full", tokenizer).to(detect_device())
+    _, test = load_splits(seed=str(seed), split=split)
+    texts = [t for t in test["text"].tolist() if isinstance(t, str)]
+    labels = [int(y) for t, y in zip(test["text"].tolist(), test["label"].tolist()) if isinstance(t, str)]
+    if cfg.is_causal(model_key):
+        rows = _zero_shot_causal(model.backbone, tokenizer, texts)
+    else:
+        rows = []
+        for i in range(0, len(texts), 16):
+            rows.extend(predict_texts(model, tokenizer, texts[i : i + 16]))
+    preds = [int(r["pred_id"]) for r in rows]
+    test_metrics = metrics_from_preds(labels, preds)
+    with (out_dir / "test_predictions.jsonl").open("w") as fh:
+        for text, y, r in zip(texts, labels, rows):
+            fh.write(json.dumps({"text": text, "label": LABEL_NAMES[y], "pred": r["pred_name"],
+                                 "probs": r["probs"], "source": "zero-shot"}) + "\n")
+    mem = peak_memory_gb()
+    paper = cfg.paper_f1(model_key, split)
+    result = {
+        "status": "complete",
+        "run_id": run_name,
+        "model": model_key,
+        "method": "zeroshot",
+        "seed": int(seed),
+        "split": split,
+        "device": describe(),
+        "recipe": "zeroshot",
+        "epochs_trained": 0,
+        "trainable_params": 0,
+        "trainable_pct": 0.0,
+        "peak_mem_gb": None if mem is None else round(mem, 3),
+        "wall_seconds": round(time.perf_counter() - t0, 1),
+        "test": test_metrics,
+        "paper_weighted_f1": paper,
+        "delta_vs_paper": None if paper is None else round(test_metrics["weighted_f1"] - paper, 4),
+        "checkpoint_dir": str(out_dir),
+        "notes": "pretrained weights, no fine-tuning; "
+        + ("same prompt, scored by the log-probability of answering 'dovish' / 'hawkish' / 'neutral'"
+           if cfg.is_causal(model_key) else "classifier head randomly initialized"),
+    }
+    metrics_path.write_text(json.dumps(result, indent=2))
+    del model
+    gc.collect()
+    empty_cache()
+    log(f"DONE {model_key} zeroshot seed={seed}  TEST weighted F1={test_metrics['weighted_f1']:.4f}  "
+        f"acc={test_metrics['accuracy']:.4f}")
+    return result
+
+
 def run_one(
     model_key: str = "roberta-base",
     method: str = "lora",
@@ -509,8 +663,8 @@ def run_one(
 
     if model_key not in cfg.MODELS:
         raise ValueError(f"Unknown model_key {model_key!r}. Choose from {list(cfg.MODELS)}")
-    if method not in {"full", "lora", "qlora"}:
-        raise ValueError("method must be full, lora, or qlora")
+    if method not in {"full", "lora", "qlora", "zeroshot"}:
+        raise ValueError("method must be full, lora, qlora, or zeroshot")
 
     model_id = cfg.MODELS[model_key]
     out_dir = cfg.run_dir(model_key, method, seed, split)
@@ -528,6 +682,8 @@ def run_one(
         )
         return cached
 
+    if method == "zeroshot":
+        return run_zero_shot(model_key, seed=int(seed), split=split)
     if method == "qlora":
         require_qlora()
 
@@ -616,6 +772,7 @@ def run_one(
         "notes": loop_out.get("notes"),
     }
     metrics_path.write_text(json.dumps(result, indent=2))
+    _write_loop_predictions(out_dir, seed=int(seed), split=split, preds=loop_out.get("test_predictions"))
     log(
         f"DONE {model_key} {method} seed={seed}  "
         f"TEST weighted F1={test_metrics['weighted_f1']:.4f}  "
@@ -631,7 +788,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Train one FOMC RoBERTa cell")
     parser.add_argument("--model", default="roberta-base", choices=list(cfg.MODELS))
-    parser.add_argument("--method", default="lora", choices=["full", "lora", "qlora"])
+    parser.add_argument("--method", default="lora", choices=["full", "lora", "qlora", "zeroshot"])
     parser.add_argument("--seed", type=int, default=cfg.DEFAULT_SEED)
     parser.add_argument("--split", default=cfg.DEFAULT_SPLIT)
     parser.add_argument("--max-epochs", type=int, default=None)

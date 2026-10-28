@@ -1,0 +1,34 @@
+# Flyte devbox on WSL2: give GPU task pods the WSL GPU without Kubernetes GPU
+# scheduling. The NVIDIA k8s device plugin cannot discover WSL GPUs (NVML "Not
+# Supported"), so mount /dev/dxg and the driver libraries the devbox node has.
+#   docker cp devbox/wsl-gpu-podtemplate.yaml flyte-devbox:/tmp/ &&
+#   docker exec flyte-devbox kubectl apply -f /tmp/wsl-gpu-podtemplate.yaml
+# Then submit with FLYTE_WSL_GPU=1 (flyte_env.py selects this template).
+apiVersion: v1
+kind: PodTemplate
+metadata:
+  name: wsl-gpu
+  namespace: flyte
+template:
+  spec:
+    containers:
+      - name: default
+        image: placeholder  # required by the API; Flyte sets the real task image
+        env:
+          - {name: LD_LIBRARY_PATH, value: /usr/lib/wsl/lib}
+          - {name: NVIDIA_VISIBLE_DEVICES, value: void}
+        securityContext: {privileged: true}
+        volumeMounts:
+          - {name: dxg, mountPath: /dev/dxg}
+          - {name: wsl-drivers, mountPath: /usr/lib/wsl/drivers, readOnly: true}
+          - {name: libcuda, mountPath: /usr/lib/wsl/lib/libcuda.so.1, readOnly: true}
+          - {name: libcuda-dev, mountPath: /usr/lib/wsl/lib/libcuda.so, readOnly: true}
+          - {name: libdxcore, mountPath: /usr/lib/wsl/lib/libdxcore.so, readOnly: true}
+          - {name: libnvml, mountPath: /usr/lib/wsl/lib/libnvidia-ml.so.1, readOnly: true}
+    volumes:
+      - {name: dxg, hostPath: {path: /dev/dxg, type: CharDevice}}
+      - {name: wsl-drivers, hostPath: {path: /usr/lib/wsl/drivers, type: Directory}}
+      - {name: libcuda, hostPath: {path: /usr/lib64/libcuda.so.1, type: File}}
+      - {name: libcuda-dev, hostPath: {path: /usr/lib64/libcuda.so, type: File}}
+      - {name: libdxcore, hostPath: {path: /usr/lib64/libdxcore.so, type: File}}
+      - {name: libnvml, hostPath: {path: /usr/lib64/libnvidia-ml.so.1, type: File}}

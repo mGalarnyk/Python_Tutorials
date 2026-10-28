@@ -1,0 +1,3 @@
+# Not needed inside task containers (flyte run --copy-style all).
+images/
+*.ipynb

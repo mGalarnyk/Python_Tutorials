@@ -45,23 +45,8 @@ if ! python -c "import torch,sys; print('[fomc] cuda', torch.cuda.is_available()
 fi
 
 ensure_causal_conv1d() {
-  # Mamba fast path. Without causal-conv1d, Nemotron's Mamba layers fall back to
-  # a naive PyTorch loop (~30 min/epoch). Builds against pip's CUDA nvcc, so no
-  # system CUDA toolkit or sudo is needed.
-  if python -c "import causal_conv1d" >/dev/null 2>&1; then
-    return
-  fi
-  echo "[fomc] building causal-conv1d (Mamba fast path, ~6 min)"
-  local cuda_major
-  cuda_major="$(python -c 'import torch; print(torch.version.cuda.split(".")[0] + "." + torch.version.cuda.split(".")[1])')"
-  uv pip install "nvidia-cuda-nvcc==${cuda_major}.*" "nvidia-cuda-cccl==${cuda_major}.*" \
-    "nvidia-cuda-crt==${cuda_major}.*" "nvidia-nvvm==${cuda_major}.*"
-  local cuda_home
-  cuda_home="$(python -c 'import nvidia, pathlib, torch; print(pathlib.Path(list(nvidia.__path__)[0]) / ("cu" + torch.version.cuda.split(".")[0]))')"
-  ln -sfn lib "${cuda_home}/lib64"
-  ln -sf libcudart.so."$(python -c 'import torch; print(torch.version.cuda.split(".")[0])')" "${cuda_home}/lib/libcudart.so"
-  CUDA_HOME="${cuda_home}" PATH="${cuda_home}/bin:${PATH}" CAUSAL_CONV1D_FORCE_BUILD=TRUE MAX_JOBS=8 \
-    uv pip install --no-build-isolation --no-cache causal-conv1d
+  # Mamba fast path (mamba-ssm + causal-conv1d). Same script the Flyte GPU image runs.
+  bash "${ROOT}/build_mamba_kernels.sh"
 }
 
 case "$JOB" in

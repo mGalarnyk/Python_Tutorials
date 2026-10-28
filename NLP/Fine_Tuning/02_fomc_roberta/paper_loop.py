@@ -138,7 +138,7 @@ def _tensor_dataset(tokenizer, texts, labels, max_length: int = MAX_LENGTH) -> T
     )
 
 
-def _run_eval(model, loader, device, n: int) -> tuple[float, float, float, list[int], list[int]]:
+def _run_eval(model, loader, device, n: int, probs_out: list | None = None) -> tuple[float, float, float, list[int], list[int]]:
     model.eval()
     ce = 0.0
     correct = 0
@@ -154,6 +154,8 @@ def _run_eval(model, loader, device, n: int) -> tuple[float, float, float, list[
             )
             ce += outputs.loss.item() * input_ids.size(0)
             preds = torch.max(outputs.logits, 1)[1]
+            if probs_out is not None:
+                probs_out.extend(torch.softmax(outputs.logits.float(), dim=-1).cpu().tolist())
             correct += torch.sum(preds == labels).item()
             actual.extend(labels.cpu().tolist())
             pred.extend(preds.cpu().tolist())
@@ -334,8 +336,11 @@ def train_paper_loop(
 
     test_texts, test_y = _texts_labels(test_df)
     test_ds = _tensor_dataset(tokenizer, test_texts, test_y, max_length=max_length)
-    test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=True)
-    _, _, _, actual, pred = _run_eval(model, test_loader, device, len(test_ds))
+    # In file order (the paper shuffled; order does not change the metrics) so each
+    # prediction lines up with its sentence for the report's error analysis.
+    test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False)
+    test_probs: list[list[float]] = []
+    _, _, _, actual, pred = _run_eval(model, test_loader, device, len(test_ds), probs_out=test_probs)
     test_metrics = metrics_from_preds(actual, pred)
 
     try:
@@ -363,6 +368,7 @@ def train_paper_loop(
     )
     return {
         "test": test_metrics,
+        "test_predictions": {"label": actual, "pred": pred, "probs": test_probs},
         "best_val_ce": best_ce,
         "best_val_accuracy": best_accuracy,
         "best_val_weighted_f1": best_f1,

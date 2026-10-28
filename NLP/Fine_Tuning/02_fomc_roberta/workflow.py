@@ -57,7 +57,6 @@ from report_helpers import (
     load_talk_reads,
     market_data_report,
     persist_talk_reads,
-    prepare_data_report,
     reads_from_predict,
     source_label,
     refresh_report_snapshot,
@@ -131,64 +130,28 @@ def _cell_out(result: dict, reads: list[dict] | None) -> CellOut:
         labels=_label_csv(reads),
     )
 
-def _line_svg(xs: list[int], ys: list[float], title: str, color: str, best: int | None) -> str:
-    """Small inline SVG line chart, no plotting deps (works in the slim report image)."""
-    w, h, pad = 420, 220, 40
-    lo, hi = min(ys), max(ys)
-    span = (hi - lo) or 1.0
-    x_max = max(max(xs), 2)
+async def _publish_training_curve(
+    progress: Path, model_key: str, method: str, seed: int, shown: int, result: dict | None = None
+) -> int:
+    """Redraw the Training tab when progress.jsonl has new epochs. shown=-1 forces a redraw.
 
-    def px(x: int) -> float:
-        return pad + (x - 1) / (x_max - 1) * (w - 2 * pad)
+    With the finished result it also adds the error analysis from test_predictions.jsonl.
+    """
+    from report_stages import load_predictions, training_report, zero_shot_report
 
-    def py(y: float) -> float:
-        return h - pad - (y - lo) / span * (h - 2 * pad)
-
-    pts = " ".join(f"{px(x):.1f},{py(y):.1f}" for x, y in zip(xs, ys))
-    dots = "".join(f'<circle cx="{px(x):.1f}" cy="{py(y):.1f}" r="3" fill="{color}"/>' for x, y in zip(xs, ys))
-    mark = ""
-    if best is not None:
-        bx, by = px(xs[best]), py(ys[best])
-        mark = (
-            f'<circle cx="{bx:.1f}" cy="{by:.1f}" r="7" fill="none" stroke="#111" stroke-width="2"/>'
-            f'<text x="{bx + 9:.1f}" y="{by - 9:.1f}" font-size="12">best {ys[best]:.3f} (epoch {xs[best]})</text>'
-        )
-    return (
-        f'<svg width="{w}" height="{h}" viewBox="0 0 {w} {h}" style="font-family:sans-serif;margin:4px 12px 4px 0">'
-        f'<text x="{pad}" y="20" font-size="14" font-weight="600">{title}</text>'
-        f'<line x1="{pad}" y1="{h - pad}" x2="{w - pad}" y2="{h - pad}" stroke="#999"/>'
-        f'<line x1="{pad}" y1="{pad}" x2="{pad}" y2="{h - pad}" stroke="#999"/>'
-        f'<text x="{pad - 6}" y="{py(hi) + 4:.1f}" font-size="11" text-anchor="end">{hi:.2f}</text>'
-        f'<text x="{pad - 6}" y="{py(lo) + 4:.1f}" font-size="11" text-anchor="end">{lo:.2f}</text>'
-        f'<text x="{w / 2:.0f}" y="{h - 8}" font-size="11" text-anchor="middle">epoch</text>'
-        f'<polyline points="{pts}" fill="none" stroke="{color}" stroke-width="2"/>{dots}{mark}</svg>'
-    )
-
-
-def _training_curve_html(evals: list[dict], model_key: str, method: str, seed: int) -> str:
-    xs = [int(e["epoch"]) for e in evals]
-    f1 = [float(e["val_f1"]) for e in evals]
-    ce = [float(e["val_ce"]) for e in evals]
-    best = max(range(len(f1)), key=f1.__getitem__)
-    last = evals[-1]
-    return (
-        f"<h3>{cfg.display_name(model_key)} · {method} · seed {seed}</h3>"
-        f"<p>Epoch {last['epoch']}: val F1 {float(last['val_f1']):.3f}, val loss {float(last['val_ce']):.3f}, "
-        f"early-stop counter {last.get('early_stopping_count', 0)}/7. "
-        "Test scores come from the best-F1 epoch, not the last one.</p>"
-        + _line_svg(xs, f1, "Validation weighted F1", "#2563eb", best)
-        + _line_svg(xs, ce, "Validation loss (cross-entropy)", "#dc2626", None)
-    )
-
-
-async def _publish_training_curve(progress: Path, model_key: str, method: str, seed: int, shown: int) -> int:
-    """Redraw the Training curve tab when progress.jsonl has new epochs. shown=-1 forces a redraw."""
+    if result and result.get("method") == "zeroshot":
+        html = zero_shot_report(model_key, seed, result, load_predictions(progress.parent))
+        flyte.report.get_tab("Training").replace(html)
+        await flyte.report.flush.aio()
+        return shown
     if not progress.exists():
         return shown
     evals = [r for r in map(json.loads, progress.read_text().splitlines()) if r.get("event") == "eval"]
     if not evals or (shown >= 0 and len(evals) == shown):
         return shown
-    flyte.report.get_tab("Training curve").replace(_training_curve_html(evals, model_key, method, seed))
+    preds = load_predictions(progress.parent) if result else None
+    html = training_report(evals, model_key, method, seed, metrics=result, preds=preds)
+    flyte.report.get_tab("Training").replace(html)
     await flyte.report.flush.aio()
     return len(evals)
 
@@ -264,11 +227,11 @@ async def prepare_data(split: str = cfg.DEFAULT_SPLIT) -> int:
     """Download Combined-S train/test xlsx for the paper's three seeds."""
     from load_data import download_paper_splits
 
+    from report_stages import data_report
+
     paths = download_paper_splits(split=split, seeds=cfg.PAPER_SEEDS)
     log.info("FOMC splits ready: %s files under data/", len(paths))
-    await flyte.report.replace.aio(
-        prepare_data_report(len(paths), split, list(cfg.PAPER_SEEDS))
-    )
+    await flyte.report.replace.aio(data_report(split=split, seed=cfg.DEFAULT_SEED))
     await flyte.report.flush.aio()
     return len(paths)
 
@@ -287,7 +250,7 @@ async def train_one(
 ) -> CellOut:
     """One paper-loop cell. Skips a finished metrics.json unless force=True.
 
-    Training runs in a worker thread so this task can redraw the "Training curve"
+    Training runs in a worker thread so this task can redraw the "Training"
     report tab after every epoch (read from the loop's progress.jsonl).
     """
     from train_run import run_one
@@ -310,7 +273,7 @@ async def train_one(
         await asyncio.wait({training}, timeout=15)
         shown = await _publish_training_curve(progress, model_key, method, int(seed), shown)
     result = training.result()
-    await _publish_training_curve(progress, model_key, method, int(seed), -1)
+    await _publish_training_curve(progress, model_key, method, int(seed), -1, result=result)
     reads = _talk_reads_for_checkpoint(result)
     if reads:
         result["talk_reads"] = reads
@@ -352,74 +315,94 @@ class ReleaseOut:
     """Named Summary -> Output for the release gate."""
 
     approved: bool
+    seed: int
     model: str
     method: str
+    test_f1: float
     test_f1_mean: float
-    seeds: int
     paper_f1: float
     merged_dir: str
 
 
-def _release_report(rows: list[dict], model_key: str, method: str, mean: float, paper: float, status: str) -> str:
-    body = "".join(
-        f"<tr><td>{r['seed']}</td><td>{float(r['weighted_f1']):.3f}</td><td>{int(float(r.get('epochs_trained') or 0))}</td></tr>"
-        for r in rows
-    )
-    return (
-        f"<h3>Release gate: {cfg.display_name(model_key)} · {method}</h3>"
-        f"<p>Test weighted F1 <b>{mean:.3f}</b> over {len(rows)} seed(s) vs Shah et al. RoBERTa-large "
-        f"<b>{paper:.3f}</b> (full fine-tune, Table 5).</p>"
-        f"<table><tr><th>seed</th><th>test F1</th><th>epochs</th></tr>{body}</table>"
-        f"<p><b>{status}</b></p>"
-    )
+def _release_html(rows: list[dict], model_key: str, method: str, mean: float, paper: float,
+                  status: str, seed: int, split: str) -> str:
+    from report_stages import load_predictions, release_report
+
+    preds = load_predictions(cfg.run_dir(model_key, method, int(seed), split))
+    return release_report(rows, model_key, method, mean, paper, status, preds=preds or None, shown_seed=int(seed))
 
 
 @cpu_env.task(report=True)
 async def release(
     model_key: str = "nemotron-nano-4b",
     method: str = "qlora",
-    seed: int = cfg.DEFAULT_SEED,
     split: str = cfg.DEFAULT_SPLIT,
 ) -> ReleaseOut:
-    """Human approval before serving: show the held-out F1, wait for yes/no, then merge.
+    """A person picks which seed's adapter to ship (or none), looking at the evidence.
 
-    Locally the question is a [y/n] prompt in the terminal; on a cluster it is an
-    Approve button on the run in the Flyte UI. `seed` picks which adapter to ship.
+    Locally the question is a prompt in the terminal; on a cluster it is an input
+    box on the paused run in the Flyte UI. The chosen adapter is then merged for vLLM.
     """
-    rows = [
-        r for r in load_completed_runs()
-        if r.get("model") == model_key and r.get("method") == method and r.get("split") == split
-    ]
+
+    def _mine(runs: list[dict]) -> list[dict]:
+        return [
+            r for r in runs
+            if r.get("model") == model_key and r.get("method") == method and r.get("split") == split
+        ]
+
+    # Checkpoints on this worker first; otherwise the results snapshot bundled with
+    # the code (a fresh devbox / cluster pod has no checkpoints/ directory).
+    rows = _mine(load_completed_runs())
+    if not rows:
+        from report_helpers import _previous_snapshot_runs
+
+        rows = _mine(_previous_snapshot_runs())
     if not rows:
         raise ValueError(f"No finished {model_key} {method} runs on {split}. Train first.")
+    rows = sorted(rows, key=lambda r: int(r["seed"]))
     mean = sum(float(r["weighted_f1"]) for r in rows) / len(rows)
     paper = float(cfg.paper_f1("roberta-large", split) or 0.0)
-    await flyte.report.replace.aio(_release_report(rows, model_key, method, mean, paper, "Waiting for approval..."))
+    by_seed = {int(r["seed"]): float(r["weighted_f1"]) for r in rows}
+    best = max(by_seed, key=by_seed.get)
+    await flyte.report.replace.aio(_release_html(rows, model_key, method, mean, paper, "Waiting for a decision...", best, split))
     await flyte.report.flush.aio()
 
+    choices = ", ".join(f"{s} (F1 {f:.3f})" for s, f in by_seed.items())
     gate = await flyte.new_condition.aio(
-        "approve_release",
+        "pick_seed_to_ship",
         prompt=(
-            f"{cfg.display_name(model_key)} {method}: test F1 {mean:.3f} over {len(rows)} seed(s) "
-            f"vs RoBERTa-large {paper:.3f}. Merge seed {seed} and serve with vLLM?"
+            f"{cfg.display_name(model_key)} {method}: mean test F1 {mean:.3f} vs RoBERTa-large {paper:.3f}. "
+            f"Which seed's adapter should ship? {choices}. Type a seed, or 'none'."
         ),
-        data_type=bool,
+        data_type=str,
         timeout=timedelta(hours=24),
     )
-    approved = bool(await gate.wait.aio())
+    answer = str(await gate.wait.aio()).strip().lower()
+    seed = int(answer) if answer.isdigit() and int(answer) in by_seed else -1
     merged = ""
-    if approved:
-        with flyte.group("serve"):
-            out = await merge_adapter(method=method, seed=int(seed), split=split)
-        merged = str(out.path)
-        status = f"Approved. Merged adapter ready for vLLM: {merged}. Deploy with `flyte deploy workflow.py vllm_app`."
+    if seed < 0:
+        status = "Not approved. Nothing merged or deployed." if answer in {"none", "no", "n", ""} else (
+            f"'{answer}' is not one of the seeds; nothing merged or deployed.")
+        shown = best
     else:
-        status = "Not approved. Nothing merged or deployed."
-    await flyte.report.replace.aio(_release_report(rows, model_key, method, mean, paper, status))
+        shown = seed
+        adapter = cfg.run_dir(model_key, method, seed, split) / "final" / "backbone" / "adapter_config.json"
+        if not adapter.exists():
+            status = (
+                f"Approved seed {seed}, but its adapter is not on this worker. Run "
+                f"`flyte run --local workflow.py merge_adapter --seed {seed}` where the checkpoint lives."
+            )
+        else:
+            with flyte.group("serve"):
+                out = await merge_adapter(method=method, seed=seed, split=split)
+            merged = str(out.path)
+            status = (f"Approved seed {seed}. Merged adapter ready for vLLM: {merged}. "
+                      "Deploy with `flyte deploy workflow.py vllm_app`.")
+    await flyte.report.replace.aio(_release_html(rows, model_key, method, mean, paper, status, shown, split))
     await flyte.report.flush.aio()
     return ReleaseOut(
-        approved=approved, model=model_key, method=method, test_f1_mean=round(mean, 4),
-        seeds=len(rows), paper_f1=paper, merged_dir=merged,
+        approved=seed >= 0, seed=seed, model=model_key, method=method,
+        test_f1=round(by_seed.get(seed, 0.0), 4), test_f1_mean=round(mean, 4), paper_f1=paper, merged_dir=merged,
     )
 
 
@@ -494,6 +477,7 @@ async def grid(
     parallel: str = "serial",
     seeds: list[int] | None = None,
     include_nemotron: bool = False,
+    include_baselines: bool = False,
 ) -> GridOut:
     """Paper 3-seed grid. CUDA runs all six cells (base+large × full/LoRA/QLoRA).
 
@@ -514,6 +498,8 @@ async def grid(
         jobs.append((model_key, method))
     if include_nemotron:
         jobs.append(("nemotron-nano-4b", "qlora"))
+    if include_baselines:  # the pretrained model with no fine-tuning, per model in the grid
+        jobs = [(m, "zeroshot") for m in dict.fromkeys(m for m, _ in jobs)] + jobs
     mode = (parallel or "serial").strip().lower()
     if mode not in {"serial", "jobs"}:
         raise ValueError("parallel must be 'serial' or 'jobs'")
@@ -604,10 +590,14 @@ async def cell_summary(model: str, method: str, seed: int) -> CellOut:
     )
 
 
-@ui_env.task
+@ui_env.task(report=True)
 async def snapshot_grid() -> GridOut:
     """Load finished cells + sentence labels (metrics.json or bundled snapshot)."""
+    from report_stages import grid_report
+
     grid = refresh_report_snapshot()
+    await flyte.report.replace.aio(grid_report(grid["runs"]))
+    await flyte.report.flush.aio()
     talks, _src = load_talk_reads()
     return _grid_out(grid, talks)
 

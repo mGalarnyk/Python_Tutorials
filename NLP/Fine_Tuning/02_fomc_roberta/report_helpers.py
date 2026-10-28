@@ -96,6 +96,8 @@ def _machine(device: str | None, who: str = "") -> str:
     if "shah" in (who or "").lower():
         return "RTX A6000"
     d = (device or "").lower()
+    if "rtx pro 5000" in d:
+        return "RTX PRO 5000 Blackwell laptop, 24 GB, CUDA"
     if d == "cuda" or "rtx" in d or "nvidia" in d or "h200" in d:
         return "RTX PRO 6000 Blackwell, 96 GB, CUDA"
     if d == "mps" or "mps" in d:
@@ -118,6 +120,7 @@ def _slim_run(data: dict) -> dict:
         "wall_seconds": data.get("wall_seconds"),
         "delta_vs_paper": data.get("delta_vs_paper"),
         "paper_weighted_f1": data.get("paper_weighted_f1"),
+        "peak_mem_gb": data.get("peak_mem_gb"),
     }
 
 
@@ -278,7 +281,8 @@ def _previous_snapshot_runs() -> list[dict]:
     marker = "SNAPSHOT = "
     if marker not in text:
         return []
-    return list(json.loads(text.split(marker, 1)[1]).get("runs", []))
+    body = text.split(marker, 1)[1]
+    return list(json.loads(body[body.index("{") : body.rindex("}") + 1]).get("runs", []))
 
 
 def refresh_report_snapshot(
@@ -310,9 +314,11 @@ def refresh_report_snapshot(
     }
     cfg.OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
     SNAPSHOT_JSON.write_text(json.dumps(payload, indent=2))
+    # JSON inside the module (null, true) so any metric value round-trips.
     SNAPSHOT_PY.write_text(
         "# Auto-written by refresh_report_snapshot(). Do not edit by hand.\n"
-        f"SNAPSHOT = {json.dumps(payload, indent=2)}\n"
+        "import json\n\n"
+        f'SNAPSHOT = json.loads(r"""\n{json.dumps(payload, indent=2)}\n""")\n'
     )
     grid["talk_reads"] = talk_reads
     grid["talk_source"] = source
@@ -362,7 +368,6 @@ def machine_color_legend_html() -> str:
     chips = (
         ("#eef0f3", "Shah et al. · RTX A6000"),
         ("#dbeafe", "This Mac · M4 Max, MPS"),
-        ("#fef3c7", "1× RTX PRO 6000 Blackwell"),
         ("#dcfce7", "RTX PRO 5000 Blackwell laptop, 24 GB"),
     )
     bits = "".join(
@@ -395,19 +400,6 @@ def _results_table_html(grid: dict, highlight: tuple[str, str] | None = None) ->
             f"<td>{_delta_cell(row)}</td><td>{row['n_seeds']}</td>"
             f"<td>{row['status']}</td><td>{row['machine']}</td></tr>"
         )
-    pending = [
-        job
-        for job in cfg.TABLE_JOBS
-        if not any(r["model"] == job[0] and r["method"] == job[1] and r["who"] == "ours" for r in grid["rows"])
-    ]
-    for model, method in pending:
-        machine = "RTX PRO 6000 Blackwell, 96 GB (not run)"
-        bg = machine_row_color(machine)
-        body.append(
-            f'<tr style="background:{bg}"><td>ours</td><td>{_short_model(model)}</td>'
-            f"<td>{method}</td><td>—</td><td>—</td><td>0</td><td>pending</td>"
-            f"<td>{machine}</td></tr>"
-        )
     return head + "".join(body) + "</table>"
 
 
@@ -434,23 +426,16 @@ def _seed_table_html(runs: list[dict]) -> str:
 
 
 def _status_board(grid: dict) -> str:
-    n = grid["n_complete"]
-    mac = grid["n_mac"]
-    expect = grid["n_mac_expected"]
-    cuda = grid["n_cuda"]
-    return (
-        f"<div class='grid3'>"
-        f"<div class='card'><div style='font-weight:700'>Finished cells</div>"
-        f"<p style='margin:6px 0 0;font-size:1.4em'><b>{n}</b></p>"
-        f"<p class='credit'>from metrics.json / snapshot · {grid['updated']}</p></div>"
-        f"<div class='card'><div style='font-weight:700'>This Mac (MPS)</div>"
-        f"<p style='margin:6px 0 0;font-size:1.4em'><b>{mac} / {expect}</b></p>"
-        f"<p class='credit'>base+large × full+LoRA × 3 seeds</p></div>"
-        f"<div class='card'><div style='font-weight:700'>CUDA (not started)</div>"
-        f"<p style='margin:6px 0 0;font-size:1.4em'><b>{cuda} / 18</b></p>"
-        f"<p class='credit'>RTX PRO 6000 Blackwell · QLoRA lives here</p></div>"
-        f"</div>"
-    )
+    """Finished cells per machine (whatever has run, not a fixed plan)."""
+    import report_viz as rv
+
+    per = {}
+    for r in grid["runs"]:
+        m = _machine(str(r.get("device") or ""), "ours")
+        per[m] = per.get(m, 0) + 1
+    items = [("Finished runs", str(grid["n_complete"]), f"updated {grid['updated']}")]
+    items += [(m.split(",")[0], str(n), m.split(",", 1)[1].strip() if "," in m else "") for m, n in sorted(per.items())]
+    return rv.tiles(items)
 
 
 def _badge(name: str) -> str:
@@ -517,19 +502,26 @@ def reads_tab_html(reads: tuple | list | None = None, src: str | None = None) ->
     )
 
 
+def _grid_chart(grid: dict) -> str:
+    import report_stages
+
+    return report_stages.grid_section(grid["runs"])
+
+
 def table5_tab_html(grid: dict | None = None, highlight: tuple[str, str] | None = None) -> str:
+    import report_viz as rv
+
     grid = grid or summarize_grid()
     return (
-        f"{REPORT_CSS}<div class='fomc'><h2>Did we match Table 5?</h2>"
+        f"{rv.VIZ_CSS}{REPORT_CSS}<div class='fomc rv'><h2>Did we match Table 5?</h2>"
         f"{_status_board(grid)}"
-        f"{_f1_bar_chart(grid)}"
+        f"{_grid_chart(grid)}"
         f"{_results_table_html(grid, highlight=highlight)}"
         f"{machine_color_legend_html()}"
         "<h3>Per seed (updates when a cell writes metrics.json)</h3>"
         f"{_seed_table_html(grid['runs'])}"
-        "<p class='credit'>3-seed mean ± std, Combined-S, weighted F1. "
-        "Same files as the notebook Results cell. Pending rows appear when that "
-        "(model, method) has no finished run yet.</p></div>"
+        "<p class='credit'>Mean ± std over finished seeds, Combined-S, weighted F1. "
+        "Same files as the notebook Results cell.</p></div>"
     )
 
 
@@ -690,9 +682,11 @@ def fomc_talk_report(
             "<p class='note'>No sentence labels yet. Finish a <code>train_one</code> "
             "cell (or classify a checkpoint) and this block fills in.</p>"
         )
+    import report_viz as rv
+
     return f"""
-    {REPORT_CSS}
-    <div class="fomc">
+    {rv.VIZ_CSS}{REPORT_CSS}
+    <div class="fomc rv">
       <h2>FOMC hawkish–dovish</h2>
       <p class="lede">Three labels. Households meet them as a mortgage, a car loan,
       or a savings yield. The table below is the live grid.</p>
@@ -702,7 +696,7 @@ def fomc_talk_report(
       {labels_block}
       <h3>Live grid</h3>
       {_status_board(grid)}
-      {_f1_bar_chart(grid)}
+      {_grid_chart(grid)}
       {_results_table_html(grid, highlight=highlight)}
       {machine_color_legend_html()}
     </div>
