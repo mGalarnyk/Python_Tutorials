@@ -1,29 +1,27 @@
 """
-FOMC hawkish–dovish Flyte 2 pipeline.
+FOMC hawkish-dovish Flyte 2 pipeline.
 
-Same paper loop as run_grid.py / paper_loop.py. Flyte is the orchestration:
-the same tasks run on this MacBook Pro (`flyte run --local`, MPS) and on a
-remote NVIDIA RTX PRO 6000 Blackwell (`flyte run`, CUDA). CPU tasks fetch
-data; GPU tasks train. Later CPU tasks can pull market series and replicate
-Shah et al.'s QQQ returns chart (Figure 2).
+Each function below with an @<env>.task decorator is a Flyte task. When one task
+calls another (pipeline -> prepare_data -> train_one), Flyte records each call
+as its own step ("action") with its inputs, outputs, logs, and report, so a run
+in the UI shows the whole tree. The environments (container image, CPU / GPU)
+are defined in flyte_env.py.
+
+The training itself is the same paper loop as run_grid.py / train_run.py;
+Flyte adds caching, retries, per-step reports, parallel runs, and an approval
+gate on top.
 
 Usage:
-    flyte run --local --tui workflow.py pipeline --model_key roberta-base --method lora --seed 5768
-    flyte run --local --tui workflow.py grid
-    flyte start tui                                         # browse persisted local runs
-    # Serve a fine-tuned Nemotron with vLLM (OpenAI-compatible API):
-    flyte run workflow.py merge_adapter --method qlora --seed 5768
+    # In this Python process, no Docker:
+    flyte run --local workflow.py train_one --model_key nemotron-nano-4b --method qlora --seed 5768
+    flyte run --local workflow.py grid --seeds '[5768]' --include_qlora true --include_nemotron
+    flyte run --local workflow.py release              # y: merge the adapter for vLLM
+    # On a local Flyte devbox, with the UI at http://localhost:30080/v2:
+    flyte start devbox
+    FLYTE_WSL_GPU=1 flyte -c .flyte/devbox.yaml run --copy-style all workflow.py main
+    # Serve the fine-tuned Nemotron with vLLM (OpenAI-compatible API):
+    flyte run workflow.py merge_adapter --method lora --seed 5768
     flyte deploy workflow.py vllm_app
-    FLYTE_GPUS=1 flyte run workflow.py grid                 # one GPU, cells in series
-    FLYTE_GPUS=1 flyte run workflow.py grid --parallel jobs # 1 GPU/job on a 4-GPU node
-    # 4 GPUs/model (DDP) is a Results placeholder; the loop is still single-device.
-    # Same Flyte 2 UI locally and on the GPU: Sub actions, Input, Output, Reports.
-    #   Mac (CPU):  flyte start devbox
-    #   Remote NVIDIA RTX PRO 6000 Blackwell:  flyte start devbox --gpu
-    #   then (no --local):  flyte -c .flyte/devbox.yaml run workflow.py pipeline ...
-    #   open http://localhost:30080/v2
-    # Reports: report=True + import flyte.report (required).
-    #   flyte -c .flyte/devbox.yaml run --name fomc-main workflow.py main
 """
 
 from __future__ import annotations
@@ -71,6 +69,8 @@ log.setLevel(logging.INFO)
 # Do not import train_run / torch at module top (fork + MPS).
 
 
+# Task outputs are typed. A dataclass return value shows up field by field in
+# the Output tab of the Flyte UI, and other tasks can take it as an input.
 @dataclass
 class CellOut:
     """Named Summary → Output for one paper-loop cell."""
@@ -139,6 +139,9 @@ async def _publish_training_curve(
     """
     from report_stages import load_predictions, training_report, zero_shot_report
 
+    # Flyte reports: a task with report=True gets an HTML report in the UI.
+    # get_tab("Training") adds a named tab; replace() sets its HTML; flush()
+    # sends it to the UI now, so the chart updates while the task is still running.
     if result and result.get("method") == "zeroshot":
         html = zero_shot_report(model_key, seed, result, load_predictions(progress.parent))
         flyte.report.get_tab("Training").replace(html)
@@ -222,6 +225,10 @@ def _talk_reads_for_checkpoint(result: dict) -> list[dict]:
         return []
 
 
+# @cpu_env.task: run this function as a Flyte task in the CPU environment.
+#   cache="auto": if this task already ran with the same inputs and the same code,
+#                 Flyte reuses the earlier output instead of running it again.
+#   report=True:  the task gets an HTML report tab in the UI (here: the label mix).
 @cpu_env.task(cache="auto", report=True)
 async def prepare_data(split: str = cfg.DEFAULT_SPLIT) -> int:
     """Download Combined-S train/test xlsx for the paper's three seeds."""
@@ -236,9 +243,14 @@ async def prepare_data(split: str = cfg.DEFAULT_SPLIT) -> int:
     return len(paths)
 
 
-# retries: a preempted node, a driver hiccup, or an OOM reruns the task. The paper
-# loop checkpoints every epoch (loop_checkpoint.pt), so a retry resumes there
-# instead of starting over (unless force=True, which always starts clean).
+# @gpu_env.task: run this function as a Flyte task in the GPU environment.
+#   report=True: the task gets a report in the UI. Here it has a "Training" tab
+#                with the live validation curve, redrawn after every epoch.
+#   retries=2:   if the task fails (a preempted node, a driver hiccup, an OOM),
+#                Flyte runs it again, up to 2 more times. The paper loop saves a
+#                checkpoint every epoch (loop_checkpoint.pt), so a retry resumes
+#                from the last epoch instead of starting over (force=True always
+#                starts clean).
 @gpu_env.task(report=True, retries=2)
 async def train_one(
     model_key: str = "roberta-base",
@@ -255,6 +267,8 @@ async def train_one(
     """
     from train_run import run_one
 
+    # Train in a background thread; meanwhile, every 15 s, redraw the Training
+    # tab from the epochs the loop has logged to progress.jsonl.
     progress = cfg.run_dir(model_key, method, int(seed), split) / "progress.jsonl"
     training = asyncio.create_task(
         asyncio.to_thread(
@@ -289,6 +303,9 @@ async def train_one(
     return _cell_out(result, reads)
 
 
+# GPU task with retries, no report. It returns a flyte.io.Dir: Flyte uploads the
+# merged model folder and passes a reference to it, which vllm_app (flyte_env.py)
+# then serves.
 @gpu_env.task(retries=2)
 async def merge_adapter(
     method: str = "qlora",
@@ -332,6 +349,8 @@ def _release_html(rows: list[dict], model_key: str, method: str, mean: float, pa
     return release_report(rows, model_key, method, mean, paper, status, preds=preds or None, shown_seed=int(seed))
 
 
+# The release gate: a CPU task that shows the evidence in its report, then pauses
+# for a person to decide (flyte.new_condition below) before merging an adapter.
 @cpu_env.task(report=True)
 async def release(
     model_key: str = "nemotron-nano-4b",
@@ -367,6 +386,9 @@ async def release(
     await flyte.report.replace.aio(_release_html(rows, model_key, method, mean, paper, "Waiting for a decision...", best, split))
     await flyte.report.flush.aio()
 
+    # flyte.new_condition pauses the run until someone answers. With --local it
+    # asks in the terminal; on a devbox or cluster the paused run shows an input
+    # box in the UI. If nobody answers within 24 hours, the task times out.
     choices = ", ".join(f"{s} (F1 {f:.3f})" for s, f in by_seed.items())
     gate = await flyte.new_condition.aio(
         "pick_seed_to_ship",
@@ -393,6 +415,8 @@ async def release(
                 f"`flyte run --local workflow.py merge_adapter --seed {seed}` where the checkpoint lives."
             )
         else:
+            # flyte.group only affects the UI: the steps inside are shown together
+            # under a "serve" heading. Calling a task from a task runs it as a child step.
             with flyte.group("serve"):
                 out = await merge_adapter(method=method, seed=seed, split=split)
             merged = str(out.path)
@@ -406,6 +430,7 @@ async def release(
     )
 
 
+# Not part of the talk: a placeholder for the market-returns half of the paper.
 @cpu_env.task(report=True)
 async def fetch_market_data() -> str:
     """
@@ -434,6 +459,9 @@ async def fetch_market_data() -> str:
     return str(path)
 
 
+# A driver task: it does no heavy work itself, it calls other tasks. Each
+# `await some_task(...)` below becomes a child step in the UI, running in that
+# task's own environment (prepare_data on CPU, train_one on GPU).
 @cpu_env.task(report=True)
 async def pipeline(
     model_key: str = "roberta-base",
@@ -445,12 +473,7 @@ async def pipeline(
     include_market_stub: bool = False,
 ) -> CellOut:
     """Prepare Combined-S data, train one cell, optionally register the market stub."""
-    log.info(
-        "FOMC pipeline: %s %s seed=%s  (local MPS or remote RTX PRO 6000 Blackwell)",
-        model_key,
-        method,
-        seed,
-    )
+    log.info("FOMC pipeline: %s %s seed=%s", model_key, method, seed)
     await prepare_data(split=split)
     cell = await train_one(
         model_key=model_key,
@@ -467,6 +490,8 @@ async def pipeline(
     return cell
 
 
+# The 3-seed grid as one driver task: one train_one child step per
+# (model, method, seed). Steps are grouped by model in the UI.
 @cpu_env.task(report=True)
 async def grid(
     split: str = cfg.DEFAULT_SPLIT,
@@ -481,10 +506,10 @@ async def grid(
 ) -> GridOut:
     """Paper 3-seed grid. CUDA runs all six cells (base+large × full/LoRA/QLoRA).
 
-    parallel=serial walks cells (safe on this Mac). parallel=jobs launches
-    train_one concurrently so Flyte can place one GPU per unfinished cell.
-    Cells are grouped per model in the UI / TUI. include_nemotron adds
-    Nemotron-3-Nano-4B QLoRA (the method that fits a 24 GB card).
+    parallel=serial trains one cell at a time (what a single GPU needs).
+    parallel=jobs starts every train_one at once, so a cluster with several
+    GPUs can give each its own GPU. include_nemotron adds Nemotron 3 Nano 4B
+    QLoRA; include_baselines adds the no-fine-tuning row per model.
     """
     import shutil
 
@@ -530,6 +555,8 @@ async def grid(
 
     async def _run_group(model_key: str) -> None:
         mine = [(i, c) for i, c in numbered if c[1] == model_key]
+        # flyte.group: show this model's cells together under one heading in the UI.
+        # asyncio.gather starts the child tasks at the same time; Flyte runs them in parallel.
         with flyte.group(cfg.display_name(model_key)):
             if mode == "jobs":
                 await asyncio.gather(*[_run_cell(i, *c) for i, c in mine])
@@ -549,6 +576,8 @@ async def grid(
     return await write_talk_report(summary)
 
 
+# Report-side tasks below run in the slim ui_env (no torch, no GPU). They read
+# finished results; they do not train.
 @ui_env.task
 async def cell_summary(model: str, method: str, seed: int) -> CellOut:
     """One finished paper-loop cell — Input/Output on Summary, no training."""
@@ -615,6 +644,8 @@ async def write_talk_report(summary: GridOut) -> GridOut:
     return summary
 
 
+# The run shown in the talk: builds the comparison report ("Why fine-tune?")
+# from finished results, with one child step per finished run.
 @ui_env.task(report=True)
 async def main() -> GridOut:
     """Driver: snapshot, one action per finished cell, then the talk Report on this run."""
@@ -646,6 +677,7 @@ async def publish_talk_report() -> GridOut:
     return await main()
 
 
+# `python workflow.py`: connect using the Flyte config file and run `main`.
 if __name__ == "__main__":
     flyte.init_from_config()
     r = flyte.run(main)
