@@ -12,7 +12,7 @@ This is the code and slides for an ODSC AI West session. The [ODSC blog post](ht
 > cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
 > source .venv/bin/activate
 > flyte start devbox
-> docker exec flyte-devbox kubectl -n flyte wait --for=condition=ready pod --all --timeout=300s
+> docker exec flyte-devbox kubectl -n flyte wait --for=condition=ready pod -l app.kubernetes.io/name=rustfs --timeout=300s
 > mkdir -p .flyte && flyte create config --devbox -o .flyte/devbox.yaml
 > flyte -c .flyte/devbox.yaml run --copy-style all workflow.py main
 > ```
@@ -198,7 +198,7 @@ source .venv/bin/activate
 flyte start devbox
 
 # 2. Wait until the devbox is really ready (it says "ready" a little early).
-docker exec flyte-devbox kubectl -n flyte wait --for=condition=ready pod --all --timeout=300s
+docker exec flyte-devbox kubectl -n flyte wait --for=condition=ready pod -l app.kubernetes.io/name=rustfs --timeout=300s
 
 # 3. Point the flyte CLI at the devbox (writes .flyte/devbox.yaml; only needed once).
 mkdir -p .flyte && flyte create config --devbox -o .flyte/devbox.yaml
