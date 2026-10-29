@@ -92,11 +92,12 @@ For reference, the paper's full fine-tunes scored 0.698 (RoBERTa-base) and 0.711
 
 Training needs an NVIDIA GPU with CUDA for QLoRA and for Nemotron. QLoRA uses [bitsandbytes](https://github.com/bitsandbytes-foundation/bitsandbytes) 4-bit quantization, and Nemotron's Mamba layers need CUDA kernels. On a Mac (Apple Silicon, MPS) you can still run RoBERTa full fine-tuning and LoRA.
 
-1. Get the repo and go into this folder. Every command below runs from here:
+1. Get the repo into `~/projects` and go into this folder. On Windows, run this and every other command in the Ubuntu (WSL) terminal. Every command in this README starts with `cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft`, so it works from any folder:
 
    ```
+   mkdir -p ~/projects && cd ~/projects
    git clone https://github.com/mGalarnyk/Python_Tutorials.git
-   cd Python_Tutorials/NLP/Fine_Tuning/fomc_peft
+   cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
    ```
 
 2. Install [uv](https://github.com/astral-sh/uv) if you don't have it (`curl -LsSf https://astral.sh/uv/install.sh | sh`), then create the environment:
@@ -173,7 +174,7 @@ There are two ways to run it. **Only the second one gives you the Flyte UI in a 
 `--local` runs every task in your Python process. Output goes to the terminal; nothing opens in a browser. This is the simplest way to train with the GPU.
 
 ```
-cd NLP/Fine_Tuning/fomc_peft
+cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
 source .venv/bin/activate
 flyte run --local workflow.py train_one --model_key roberta-base --method lora --seed 5768
 flyte run --local workflow.py release    # asks y/n in the terminal
@@ -191,7 +192,7 @@ A devbox is a small Flyte cluster running in Docker on your laptop. You send run
 **Every time.** Run these in the WSL terminal (not PowerShell), from this folder:
 
 ```
-cd NLP/Fine_Tuning/fomc_peft
+cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
 source .venv/bin/activate
 
 # 1. Start the devbox. The first time it downloads the Flyte image (a few minutes).
