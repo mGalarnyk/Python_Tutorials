@@ -4,6 +4,21 @@ This is the code and slides for an ODSC AI West session. The [ODSC blog post](ht
 
 **Slides:** [PowerPoint](slides/presentation_peft_talk.pptx) · [PDF](slides/presentation_peft_talk.pdf)
 
+> [!WARNING]
+> **Windows + NVIDIA GPU: run this to show the Flyte reports.**
+> Open Docker Desktop first. Then paste these into the **Ubuntu (WSL) terminal**, not PowerShell, after doing the [Installation](#installation) steps once:
+>
+> ```
+> cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
+> source .venv/bin/activate
+> flyte start devbox
+> docker exec flyte-devbox kubectl -n flyte wait --for=condition=ready pod --all --timeout=300s
+> mkdir -p .flyte && flyte create config --devbox -o .flyte/devbox.yaml
+> flyte -c .flyte/devbox.yaml run --copy-style all workflow.py main
+> ```
+>
+> The last command prints a link. Open it in your browser and click the **Reports** tab: those are the "Why fine-tune?" charts from the talk. The run takes about a minute and does not train anything, so it does not need the GPU. To watch training on the GPU instead, run Step 2 of the [notebook](fomc_roberta_finetune.ipynb). When you are done: `flyte stop devbox`.
+
 ## Abstract
 
 Full fine-tuning a modern LLM is a memory problem before it is a modeling problem. Even a small model like NVIDIA Nemotron 3 Nano 4B needs about 38 GB to fully fine-tune in bf16, which does not fit on a 24 GB laptop GPU. The weights themselves are only 7.5 GB; the gradients and optimizer state are what push training past 30 GB, before a single activation.
@@ -182,14 +197,17 @@ source .venv/bin/activate
 # 1. Start the devbox. The first time it downloads the Flyte image (a few minutes).
 flyte start devbox
 
-# 2. Point the flyte CLI at the devbox (writes .flyte/devbox.yaml; only needed once).
+# 2. Wait until the devbox is really ready (it says "ready" a little early).
+docker exec flyte-devbox kubectl -n flyte wait --for=condition=ready pod --all --timeout=300s
+
+# 3. Point the flyte CLI at the devbox (writes .flyte/devbox.yaml; only needed once).
 mkdir -p .flyte && flyte create config --devbox -o .flyte/devbox.yaml
 
-# 3. Send the comparison report to the devbox. No GPU, no training.
+# 4. Send the comparison report to the devbox. No GPU, no training.
 flyte -c .flyte/devbox.yaml run --copy-style all workflow.py main
 ```
 
-**What you will see:** step 3 prints a link to the run. Open it in your Windows browser, or go to http://localhost:30080/v2 and click the newest run. The first time, Flyte builds a small container image for the task, which takes a few minutes; later runs take about a minute. When the run finishes, open its **Reports** tab for the "Why fine-tune?" charts. The tree of steps on the left shows one step per finished run, each with its inputs and outputs. `main` reads the results bundled with the repo (`report_snapshot.py`), so it works without any checkpoints.
+**What you will see:** step 4 prints a link to the run. Open it in your Windows browser, or go to http://localhost:30080/v2 and click the newest run. The run takes about a minute. When the run finishes, open its **Reports** tab for the "Why fine-tune?" charts. The tree of steps on the left shows one step per finished run, each with its inputs and outputs. `main` reads the results bundled with the repo (`report_snapshot.py`), so it works without any checkpoints.
 
 **Training on the GPU inside the devbox** is the advanced path. Kubernetes in the devbox cannot see a WSL GPU, so GPU tasks use a PodTemplate that mounts it. The first GPU run also builds the full training image (PyTorch plus the Mamba kernels), which takes a long time.
 
