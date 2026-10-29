@@ -103,6 +103,7 @@ Training needs an NVIDIA GPU with CUDA for QLoRA and for Nemotron. QLoRA uses [b
 2. Install [uv](https://github.com/astral-sh/uv) if you don't have it (`curl -LsSf https://astral.sh/uv/install.sh | sh`), then create the environment:
 
    ```
+   cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
    uv venv .venv --python 3.11
    source .venv/bin/activate
    uv pip install -r requirements.txt
@@ -112,12 +113,16 @@ Training needs an NVIDIA GPU with CUDA for QLoRA and for Nemotron. QLoRA uses [b
 3. Download the paper's data splits into `data/` (gitignored):
 
    ```
+   cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
+   source .venv/bin/activate
    python load_data.py
    ```
 
 4. Nemotron only: install mamba-ssm and build the fused Mamba kernels. Without them every Mamba block falls back to a slow PyTorch loop (about 30 vs 6.5 minutes per epoch on the laptop GPU). `run_fomc.sh nemotron-lora` does this once and then trains one Nemotron LoRA seed:
 
    ```
+   cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
+   source .venv/bin/activate
    bash run_fomc.sh nemotron-lora
    ```
 
@@ -126,6 +131,8 @@ Training needs an NVIDIA GPU with CUDA for QLoRA and for Nemotron. QLoRA uses [b
 ## Running the notebook
 
 ```
+cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
+source .venv/bin/activate
 jupyter lab fomc_roberta_finetune.ipynb
 ```
 
@@ -134,6 +141,9 @@ Training cells skip any run that already has a `metrics.json`, and an interrupte
 ## Running from the command line
 
 ```
+cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
+source .venv/bin/activate
+
 # One run (about an hour per Nemotron seed on the laptop GPU)
 python train_run.py --model nemotron-nano-4b --method qlora --seed 5768
 python train_run.py --model nemotron-nano-4b --method lora --seed 5768
@@ -149,6 +159,7 @@ Each run writes `checkpoints/<model>__<method>__lab-manual-split-combine__seed<s
 Load a finished run and classify new sentences:
 
 ```python
+# Start Python from ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft with .venv active.
 from train_run import load_trained, predict_texts
 
 model, tokenizer = load_trained("checkpoints/roberta-base__lora__lab-manual-split-combine__seed5768__paper")
@@ -213,6 +224,8 @@ flyte -c .flyte/devbox.yaml run --copy-style all workflow.py main
 **Training on the GPU inside the devbox** is the advanced path. Kubernetes in the devbox cannot see a WSL GPU, so GPU tasks use a PodTemplate that mounts it. The first GPU run also builds the full training image (PyTorch plus the Mamba kernels), which takes a long time.
 
 ```
+cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
+source .venv/bin/activate
 flyte start devbox --gpu      # instead of step 1 above
 docker cp devbox/wsl-gpu-podtemplate.yaml flyte-devbox:/tmp/
 docker exec flyte-devbox kubectl apply -f /tmp/wsl-gpu-podtemplate.yaml
@@ -229,6 +242,7 @@ The run's **Training** report tab redraws the validation curve after every epoch
 vLLM pins its own torch, so it gets its own environment:
 
 ```
+cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
 # --managed-python: vLLM compiles small C helpers and needs Python.h.
 uv venv .venv-vllm --python 3.12 --managed-python
 VIRTUAL_ENV=.venv-vllm uv pip install vllm peft pandas openpyxl scikit-learn
@@ -239,6 +253,7 @@ VIRTUAL_ENV=.venv-vllm uv pip install "flashinfer-jit-cache==$(.venv-vllm/bin/py
 Merge the adapter, check that vLLM gives the same F1 as PyTorch, then serve:
 
 ```
+cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
 .venv/bin/python serve_vllm.py merge --method lora --seed 5768             # -> checkpoints/<run>/merged
 .venv-vllm/bin/python serve_vllm.py eval --method lora --seed 5768         # test F1 + sentences/s
 .venv-vllm/bin/vllm serve checkpoints/<run>/merged --served-model-name fomc-nemotron --max-model-len 512
@@ -249,12 +264,15 @@ The classifier scores three label tokens at the last prompt token, so vLLM gener
 The FP8 numbers come from `bench_inference.py`:
 
 ```
+cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
 .venv-vllm/bin/python bench_inference.py nemotron --method lora --variant lora-fp8 --seed 5768
 ```
 
 On Flyte, `merge_adapter` is a GPU task and `vllm_app` (in `flyte_env.py`) is a [`VLLMAppEnvironment`](https://www.union.ai/docs/v2/flyte/user-guide/apps/native-app-integrations/vllm-app/) that serves its output:
 
 ```
+cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
+source .venv/bin/activate
 flyte run workflow.py merge_adapter --method lora --seed 5768
 flyte deploy workflow.py vllm_app
 ```
