@@ -272,18 +272,6 @@ images/                       talk slides (images/slides/) and blog figures used
 
 Not in git: `checkpoints/` (about 50 GB), `outputs/`, `logs/`, `data/`, `.flyte/`, and the two virtual environments. The commands above regenerate them.
 
-### Where each blog number comes from
-
-| Blog item | Produced by | Data |
-|---|---|---|
-| Results for all 33 runs | `train_run.py` (Nemotron), `run_grid.py` (RoBERTa) | `checkpoints/*/metrics.json` |
-| Nemotron QLoRA 0.716, LoRA 0.727, zero-shot 0.622 | same | `outputs/report_snapshot.json` |
-| Peak training memory (5.4 GB QLoRA, 9.0 GB LoRA) | `device_utils.peak_memory_gb` | `metrics.json` (`peak_mem_gb`) |
-| Flyte "Why fine-tune?" charts | `workflow.py: main` → `report_stages.grid_report` | devbox run |
-| FP8 serving: 0.725, ~100 sentences/s, 5.2 GB | `bench_inference.py nemotron --method lora --variant lora-fp8` | `outputs/inference_bench.jsonl` |
-
-In QLoRA, `lm_head` (which scores the labels) and the Mamba `out_proj` (read by the fused kernel) stay in bf16; see `train_run.py: _replace_linears_with_nf4`.
-
 ## Data and license
 
 The data is from [gtfintechlab/fomc-hawkish-dovish](https://github.com/gtfintechlab/fomc-hawkish-dovish) and is licensed CC BY-NC 4.0.
