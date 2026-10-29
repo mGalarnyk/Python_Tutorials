@@ -43,14 +43,14 @@ The running example is a financial markets task from [Trillion Dollar Words](htt
     </td>
     <td width="50%" valign="top">
       <a href="./train_run.py"><img src="./images/slides/slide15_full_lora_qlora.png" width="420" alt="Talk slide: full fine-tuning vs LoRA vs QLoRA. On Nemotron 4B, LoRA pulls peak training memory from about 38 GB to 9 GB, and QLoRA to 5.4 GB"></a><br>
-      <b>3. <a href="./train_run.py">How each run was trained</a></b><br><sub><a href="#running-from-the-command-line">Commands</a></sub>
+      <b>3. <a href="./train_run.py">How each run was trained</a></b><br><sub><a href="#training-from-the-terminal">Commands</a></sub>
       <p>The training code behind the results. One script trains any of the three models with full fine-tuning, LoRA, or QLoRA, or scores it with no fine-tuning. Open this to see how LoRA and QLoRA are set up, or to rerun a single result.</p>
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
       <a href="./workflow.py"><img src="./images/slides/slide30_flyte.png" width="420" alt="Talk slide: Flyte, 33 runs as one pipeline, with the Flyte UI report comparing each model before and after QLoRA"></a><br>
-      <b>4. <a href="./workflow.py">Running all 33 with Flyte</a></b><br><sub><a href="#running-the-flyte-pipeline">How to run it</a></sub>
+      <b>4. <a href="./workflow.py">Running all 33 with Flyte</a></b><br><sub><a href="#the-flyte-reports-in-your-browser">How to run it</a></sub>
       <p>Why it is here: 33 training runs by hand turn into a pile of scripts. One Flyte pipeline runs them all, skips runs that already finished, retries a failed run from its last epoch, and gives each step a report in a web UI (the charts on the slide). Open this to rerun the whole experiment or to see how Flyte reports are made.</p>
     </td>
     <td width="50%" valign="top">
@@ -123,7 +123,15 @@ jupyter lab fomc_roberta_finetune.ipynb
 
 Training cells skip any run that already has a `metrics.json`, and an interrupted run resumes from its last checkpoint. Set `FORCE = True` to start over.
 
-## Running from the command line
+## Running the code
+
+There are three ways to run things. **Only the last one opens anything in a browser.**
+
+1. **[Training from the terminal](#training-from-the-terminal)**: plain Python scripts. Progress prints in the terminal. No Flyte, no browser.
+2. **[The Flyte pipeline in the terminal](#the-flyte-pipeline-in-the-terminal)**: the same training run as Flyte tasks, which adds caching and retries. Still terminal only, no browser.
+3. **[The Flyte reports in your browser](#the-flyte-reports-in-your-browser)**: sends the pipeline to a small Flyte server on your laptop, so you can see each step and its report at http://localhost:30080/v2. This is what the talk shows.
+
+### Training from the terminal
 
 ```
 cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
@@ -151,7 +159,7 @@ model, tokenizer = load_trained("checkpoints/roberta-base__lora__lab-manual-spli
 predict_texts(model, tokenizer, ["The Committee decided to lower the target range."])
 ```
 
-## Running the Flyte pipeline
+### The Flyte pipeline in the terminal
 
 `workflow.py` is the Flyte pipeline. Its main tasks:
 
@@ -163,11 +171,7 @@ predict_texts(model, tokenizer, ["The Committee decided to lower the target rang
 | `main` | Builds the comparison report (the "Why fine-tune?" charts) from finished runs | No, takes about a minute |
 | `release` | Shows test F1 vs the paper and waits for a person to approve before merging the adapter | No |
 
-There are two ways to run it. **Only the second one gives you the Flyte UI in a browser.**
-
-### Option A: in this terminal, no UI
-
-`--local` runs every task in your Python process. Output goes to the terminal; nothing opens in a browser. This is the simplest way to train with the GPU.
+`flyte run --local` runs these tasks in your terminal. Output prints there; nothing opens in a browser. The reports in the table only show up in the browser (next section).
 
 ```
 cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
@@ -176,7 +180,7 @@ flyte run --local workflow.py train_one --model_key roberta-base --method lora -
 flyte run --local workflow.py release    # asks y/n in the terminal
 ```
 
-### Option B: the Flyte UI on a local devbox (Windows + WSL2)
+### The Flyte reports in your browser
 
 A devbox is a small Flyte cluster running in Docker on your laptop. You send runs to it and watch them at http://localhost:30080/v2.
 
@@ -185,7 +189,7 @@ A devbox is a small Flyte cluster running in Docker on your laptop. You send run
 2. In Docker Desktop, open Settings > Resources > WSL integration and turn it on for your Linux distro (for example Ubuntu). Check it from the WSL terminal: `docker ps` should print a table, not "command not found".
 3. Do the [Installation](#installation) steps above, in WSL.
 
-**Every time.** Run these in the WSL terminal (not PowerShell), from this folder:
+**Every time.** On Windows, run these in the Ubuntu (WSL) terminal, not PowerShell:
 
 ```
 cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
