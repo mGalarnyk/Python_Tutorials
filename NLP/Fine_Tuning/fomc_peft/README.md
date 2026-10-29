@@ -4,20 +4,6 @@ This is the code and slides for an ODSC AI West session. The [ODSC blog post](ht
 
 **Slides:** [PowerPoint](slides/presentation_peft_talk.pptx) · [PDF](slides/presentation_peft_talk.pdf)
 
-**Windows + NVIDIA GPU: run this to show the Flyte reports.**
-Open Docker Desktop first. Then paste these into the **Ubuntu (WSL) terminal**, not PowerShell, after doing the [Installation](#installation) steps once:
-
-```
-cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
-source .venv/bin/activate
-flyte start devbox
-docker exec flyte-devbox kubectl -n flyte wait --for=condition=ready pod -l app.kubernetes.io/name=rustfs --timeout=300s
-mkdir -p .flyte && flyte create config --devbox -o .flyte/devbox.yaml
-flyte -c .flyte/devbox.yaml run --copy-style all workflow.py main
-```
-
-The last command prints a link. Open it in your browser and click the **Reports** tab: those are the "Why fine-tune?" charts from the talk. The run takes about a minute and does not train anything, so it does not need the GPU. To watch training on the GPU instead, run Step 2 of the [notebook](fomc_roberta_finetune.ipynb). When you are done: `flyte stop devbox`.
-
 ## Abstract
 
 Full fine-tuning a modern LLM is a memory problem before it is a modeling problem. Even a small model like NVIDIA Nemotron 3 Nano 4B needs about 38 GB to fully fine-tune in bf16, which does not fit on a 24 GB laptop GPU. The weights themselves are only 7.5 GB; the gradients and optimizer state are what push training past 30 GB, before a single activation.
