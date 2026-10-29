@@ -185,48 +185,38 @@ flyte run --local workflow.py release    # asks y/n in the terminal
 
 #### On a devbox, with the reports in your browser
 
-A devbox is a small Flyte server running in Docker on your laptop. You send tasks to it and watch them, with their reports, at http://localhost:30080/v2.
-
-**One-time setup:**
-1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) on Windows.
-2. In Docker Desktop, open Settings > Resources > WSL integration and turn it on for your Linux distro (for example Ubuntu).
-3. Do the [Installation](#installation) steps above, in WSL.
-
-**Start the devbox.** Open Docker Desktop, then run these in the Ubuntu (WSL) terminal, not PowerShell:
+Open Docker Desktop (with Settings > Resources > WSL integration turned on), then run these in order in the Ubuntu (WSL) terminal:
 
 ```
+# 1. Go to the folder
 cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
 source .venv/bin/activate
+
+# 2. Start the devbox and wait until it is ready
 flyte start devbox
-# The devbox says "ready" a little before its storage is; wait for it:
 docker exec flyte-devbox kubectl -n flyte wait --for=condition=ready pod -l app.kubernetes.io/name=rustfs --timeout=300s
-# Point the flyte command at the devbox (only needed once):
 mkdir -p .flyte && flyte create config --devbox -o .flyte/devbox.yaml
-```
 
-**Show the comparison report** (the charts from the talk). This does not train, so it takes about a minute and needs no GPU setup:
-
-```
+# 3. Run the comparison report (no training, about a minute)
 flyte -c .flyte/devbox.yaml run --copy-style all workflow.py main
 ```
 
-It prints a link. Open it and click the **Reports** tab. The steps on the left show one step per finished run, each with its inputs and outputs. `main` reads the results bundled with the repo (`report_snapshot.py`), so it works without any checkpoints.
+Open the link it prints and click **Reports**. When you are done: `flyte stop devbox`.
 
-**Train on the GPU and watch the training curve.** Kubernetes inside the devbox cannot see a WSL GPU on its own, so this needs the devbox started with `--gpu` and a PodTemplate that mounts the GPU. The first GPU run also builds the full training image (PyTorch plus the Mamba kernels), which takes a long time.
+To train on the GPU instead and watch the training curve, change step 2 and step 3 to this (not yet tested on the laptop; the first run builds a large image):
 
 ```
-cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
-source .venv/bin/activate
-flyte start devbox --gpu      # instead of plain `flyte start devbox`
+# 2. Start the devbox with the GPU
+flyte start devbox --gpu
+docker exec flyte-devbox kubectl -n flyte wait --for=condition=ready pod -l app.kubernetes.io/name=rustfs --timeout=300s
+mkdir -p .flyte && flyte create config --devbox -o .flyte/devbox.yaml
 docker cp devbox/wsl-gpu-podtemplate.yaml flyte-devbox:/tmp/
 docker exec flyte-devbox kubectl apply -f /tmp/wsl-gpu-podtemplate.yaml
+
+# 3. Train one model; its Training tab redraws after every epoch
 FLYTE_WSL_GPU=1 flyte -c .flyte/devbox.yaml run --copy-style all workflow.py train_one \
     --model_key roberta-base --method lora --seed 5768
 ```
-
-Open the printed link; the run's **Training** tab redraws the validation curve after every epoch. `FLYTE_WSL_GPU=1` tells `flyte_env.py` to use the PodTemplate. Flyte bundles only git-tracked files, so `git add` any new files before a devbox run.
-
-**When you are done:** `flyte stop devbox`.
 
 ## Serving with vLLM
 
