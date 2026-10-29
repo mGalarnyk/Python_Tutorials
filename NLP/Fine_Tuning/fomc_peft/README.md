@@ -141,37 +141,69 @@ predict_texts(model, tokenizer, ["The Committee decided to lower the target rang
 
 ## Running the Flyte pipeline
 
-The same `workflow.py` runs in-process with `flyte run --local` or on a cluster with `flyte run`. The main tasks:
+`workflow.py` is the Flyte pipeline. Its main tasks:
 
-| Task | What it does |
-|------|--------------|
-| `prepare_data` | Downloads the splits on CPU (cached) |
-| `train_one` | One model / method / seed on GPU, with a live training curve report |
-| `grid` | Runs many cells, grouped by model |
-| `main` | Builds the comparison report from finished runs (the "Why fine-tune?" charts) |
-| `release` | Shows held-out F1 vs the paper and waits for approval before `merge_adapter` |
+| Task | What it does | Trains? |
+|------|--------------|---------|
+| `prepare_data` | Downloads the data splits (cached after the first run) | No |
+| `train_one` | Trains one model / method / seed, with a live training-curve report | Yes, on the GPU |
+| `grid` | Runs `train_one` for many models, methods, and seeds, grouped by model | Yes |
+| `main` | Builds the comparison report (the "Why fine-tune?" charts) from finished runs | No, takes about a minute |
+| `release` | Shows test F1 vs the paper and waits for a person to approve before merging the adapter | No |
 
-```
-flyte run --local workflow.py train_one --model_key nemotron-nano-4b --method qlora --seed 5768
-flyte run --local workflow.py grid --seeds '[5768]' --include_qlora true --include_nemotron
-flyte run --local workflow.py release    # y: merge seed 5768 for vLLM, n: stop
-```
+There are two ways to run it. **Only the second one gives you the Flyte UI in a browser.**
 
-Locally, `release` asks `[y/n]` in the terminal; on a cluster it is an Approve button in the UI.
+### Option A: in this terminal, no UI
 
-To see the reports in the Flyte UI, run on a local devbox (needs Docker). On WSL2, Kubernetes cannot discover the GPU, so GPU tasks use a PodTemplate that mounts it directly:
+`--local` runs every task in your Python process. Output goes to the terminal; nothing opens in a browser. This is the simplest way to train with the GPU.
 
 ```
+cd NLP/Fine_Tuning/fomc_peft
+source .venv/bin/activate
+flyte run --local workflow.py train_one --model_key roberta-base --method lora --seed 5768
+flyte run --local workflow.py release    # asks y/n in the terminal
+```
+
+### Option B: the Flyte UI on a local devbox (Windows + WSL2)
+
+A devbox is a small Flyte cluster running in Docker on your laptop. You send runs to it and watch them at http://localhost:30080/v2.
+
+**Before you start (one time):**
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) on Windows and start it.
+2. In Docker Desktop, open Settings > Resources > WSL integration and turn it on for your Linux distro (for example Ubuntu). Check it from the WSL terminal: `docker ps` should print a table, not "command not found".
+3. Do the [Installation](#installation) steps above, in WSL.
+
+**Every time.** Run these in the WSL terminal (not PowerShell), from this folder:
+
+```
+cd NLP/Fine_Tuning/fomc_peft
+source .venv/bin/activate
+
+# 1. Start the devbox. The first time it downloads the Flyte image (a few minutes).
 flyte start devbox
-docker cp devbox/wsl-gpu-podtemplate.yaml flyte-devbox:/tmp/
-docker exec flyte-devbox kubectl apply -f /tmp/wsl-gpu-podtemplate.yaml
+
+# 2. Point the flyte CLI at the devbox (writes .flyte/devbox.yaml; only needed once).
 mkdir -p .flyte && flyte create config --devbox -o .flyte/devbox.yaml
 
-python -c "from report_helpers import refresh_report_snapshot; refresh_report_snapshot()"
-FLYTE_WSL_GPU=1 flyte -c .flyte/devbox.yaml run --copy-style all workflow.py main
+# 3. Send the comparison report to the devbox. No GPU, no training.
+flyte -c .flyte/devbox.yaml run --copy-style all workflow.py main
 ```
 
-The UI is at http://localhost:30080/v2. Flyte bundles only git-tracked files, so `git add` new files before a devbox run. On Linux with a regular NVIDIA driver, use `flyte start devbox --gpu` and leave out the PodTemplate and `FLYTE_WSL_GPU`.
+**What you will see:** step 3 prints a link to the run. Open it in your Windows browser, or go to http://localhost:30080/v2 and click the newest run. The first time, Flyte builds a small container image for the task, which takes a few minutes; later runs take about a minute. When the run finishes, open its **Reports** tab for the "Why fine-tune?" charts. The tree of steps on the left shows one step per finished run, each with its inputs and outputs. `main` reads the results bundled with the repo (`report_snapshot.py`), so it works without any checkpoints.
+
+**Training on the GPU inside the devbox** is the advanced path. Kubernetes in the devbox cannot see a WSL GPU, so GPU tasks use a PodTemplate that mounts it. The first GPU run also builds the full training image (PyTorch plus the Mamba kernels), which takes a long time.
+
+```
+flyte start devbox --gpu      # instead of step 1 above
+docker cp devbox/wsl-gpu-podtemplate.yaml flyte-devbox:/tmp/
+docker exec flyte-devbox kubectl apply -f /tmp/wsl-gpu-podtemplate.yaml
+FLYTE_WSL_GPU=1 flyte -c .flyte/devbox.yaml run --copy-style all workflow.py train_one \
+    --model_key roberta-base --method lora --seed 5768
+```
+
+The run's **Training** report tab redraws the validation curve after every epoch. `FLYTE_WSL_GPU=1` tells `flyte_env.py` to use the PodTemplate. Flyte bundles only git-tracked files, so `git add` any new files before a devbox run.
+
+**When you are done:** `flyte stop devbox`.
 
 ## Serving with vLLM
 
