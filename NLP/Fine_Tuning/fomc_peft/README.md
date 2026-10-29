@@ -43,14 +43,14 @@ The running example is a financial markets task from [Trillion Dollar Words](htt
     </td>
     <td width="50%" valign="top">
       <a href="./train_run.py"><img src="./images/slides/slide15_full_lora_qlora.png" width="420" alt="Talk slide: full fine-tuning vs LoRA vs QLoRA. On Nemotron 4B, LoRA pulls peak training memory from about 38 GB to 9 GB, and QLoRA to 5.4 GB"></a><br>
-      <b>3. <a href="./train_run.py">How each run was trained</a></b><br><sub><a href="#training-from-the-terminal">Commands</a></sub>
+      <b>3. <a href="./train_run.py">How each run was trained</a></b><br><sub><a href="#plain-python-scripts">Commands</a></sub>
       <p>The training code behind the results. One script trains any of the three models with full fine-tuning, LoRA, or QLoRA, or scores it with no fine-tuning. Open this to see how LoRA and QLoRA are set up, or to rerun a single result.</p>
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
       <a href="./workflow.py"><img src="./images/slides/slide30_flyte.png" width="420" alt="Talk slide: Flyte, 33 runs as one pipeline, with the Flyte UI report comparing each model before and after QLoRA"></a><br>
-      <b>4. <a href="./workflow.py">Running all 33 with Flyte</a></b><br><sub><a href="#the-flyte-reports-in-your-browser">How to run it</a></sub>
+      <b>4. <a href="./workflow.py">Running all 33 with Flyte</a></b><br><sub><a href="#the-flyte-pipeline">How to run it</a></sub>
       <p>Why it is here: 33 training runs by hand turn into a pile of scripts. One Flyte pipeline runs them all, skips runs that already finished, retries a failed run from its last epoch, and gives each step a report in a web UI (the charts on the slide). Open this to rerun the whole experiment or to see how Flyte reports are made.</p>
     </td>
     <td width="50%" valign="top">
@@ -125,13 +125,14 @@ Training cells skip any run that already has a `metrics.json`, and an interrupte
 
 ## Running the code
 
-There are three ways to run things. **Only the last one opens anything in a browser.**
+There are two ways to train. Both use the same training code on your GPU.
 
-1. **[Training from the terminal](#training-from-the-terminal)**: plain Python scripts. Progress prints in the terminal. No Flyte, no browser.
-2. **[The Flyte pipeline in the terminal](#the-flyte-pipeline-in-the-terminal)**: the same training run as Flyte tasks, which adds caching and retries. Still terminal only, no browser.
-3. **[The Flyte reports in your browser](#the-flyte-reports-in-your-browser)**: sends the pipeline to a small Flyte server on your laptop, so you can see each step and its report at http://localhost:30080/v2. This is what the talk shows.
+1. **[Plain Python scripts](#plain-python-scripts)**: no Flyte. Progress prints in the terminal.
+2. **[The Flyte pipeline](#the-flyte-pipeline)** (`workflow.py`): the same training, run as Flyte tasks. Flyte adds caching, retries, and a **report for every task**: a live training curve while a model trains, the comparison charts across all runs, and the release decision. You can run the pipeline two ways:
+   - **In your terminal** (`flyte run --local`): it trains, but you only see printed output, not the reports.
+   - **On a Flyte server on your laptop** (a devbox): it runs the same tasks, and you see every step and its report in your browser at http://localhost:30080/v2. This is what the talk shows.
 
-### Training from the terminal
+### Plain Python scripts
 
 ```
 cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
@@ -143,7 +144,7 @@ python train_run.py --model nemotron-nano-4b --method lora --seed 5768
 python train_run.py --model nemotron-nano-4b --method zeroshot --seed 5768
 
 # RoBERTa grid: base + large, full / LoRA / QLoRA, three seeds
-python run_grid.py --models roberta-base,roberta-large --methods full,lora,qlora \
+python run_grid.py --no-flyte --models roberta-base,roberta-large --methods full,lora,qlora \
     --seeds 5768,78516,944601 --include-qlora --include-large-full
 ```
 
@@ -159,19 +160,21 @@ model, tokenizer = load_trained("checkpoints/roberta-base__lora__lab-manual-spli
 predict_texts(model, tokenizer, ["The Committee decided to lower the target range."])
 ```
 
-### The Flyte pipeline in the terminal
+### The Flyte pipeline
 
-`workflow.py` is the Flyte pipeline. Its main tasks:
+The pipeline's main tasks, each with its own report:
 
-| Task | What it does | Trains? |
-|------|--------------|---------|
-| `prepare_data` | Downloads the data splits (cached after the first run) | No |
-| `train_one` | Trains one model / method / seed, with a live training-curve report | Yes, on the GPU |
-| `grid` | Runs `train_one` for many models, methods, and seeds, grouped by model | Yes |
-| `main` | Builds the comparison report (the "Why fine-tune?" charts) from finished runs | No, takes about a minute |
-| `release` | Shows test F1 vs the paper and waits for a person to approve before merging the adapter | No |
+| Task | What it does | Its report |
+|------|--------------|------------|
+| `prepare_data` | Downloads the data splits (cached after the first run) | The label mix |
+| `train_one` | Trains one model / method / seed on the GPU | A training curve, redrawn after every epoch |
+| `grid` | Runs `train_one` for many models, methods, and seeds | One report per training run, grouped by model |
+| `main` | Compares all finished runs. Does not train | The "Why fine-tune?" charts from the talk |
+| `release` | Waits for a person to approve, then merges the adapter for vLLM | The evidence for the decision |
 
-`flyte run --local` runs these tasks in your terminal. Output prints there; nothing opens in a browser. The reports in the table only show up in the browser (next section).
+#### In your terminal
+
+Trains on your GPU. You see printed output; the reports are written but there is nowhere to view them.
 
 ```
 cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
@@ -180,49 +183,48 @@ flyte run --local workflow.py train_one --model_key roberta-base --method lora -
 flyte run --local workflow.py release    # asks y/n in the terminal
 ```
 
-### The Flyte reports in your browser
+#### On a devbox, with the reports in your browser
 
-A devbox is a small Flyte cluster running in Docker on your laptop. You send runs to it and watch them at http://localhost:30080/v2.
+A devbox is a small Flyte server running in Docker on your laptop. You send tasks to it and watch them, with their reports, at http://localhost:30080/v2.
 
-**Before you start (one time):**
-1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) on Windows and start it.
-2. In Docker Desktop, open Settings > Resources > WSL integration and turn it on for your Linux distro (for example Ubuntu). Check it from the WSL terminal: `docker ps` should print a table, not "command not found".
+**One-time setup:**
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) on Windows.
+2. In Docker Desktop, open Settings > Resources > WSL integration and turn it on for your Linux distro (for example Ubuntu).
 3. Do the [Installation](#installation) steps above, in WSL.
 
-**Every time.** On Windows, run these in the Ubuntu (WSL) terminal, not PowerShell:
+**Start the devbox.** Open Docker Desktop, then run these in the Ubuntu (WSL) terminal, not PowerShell:
 
 ```
 cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
 source .venv/bin/activate
-
-# 1. Start the devbox. The first time it downloads the Flyte image (a few minutes).
 flyte start devbox
-
-# 2. Wait until the devbox is really ready (it says "ready" a little early).
+# The devbox says "ready" a little before its storage is; wait for it:
 docker exec flyte-devbox kubectl -n flyte wait --for=condition=ready pod -l app.kubernetes.io/name=rustfs --timeout=300s
-
-# 3. Point the flyte CLI at the devbox (writes .flyte/devbox.yaml; only needed once).
+# Point the flyte command at the devbox (only needed once):
 mkdir -p .flyte && flyte create config --devbox -o .flyte/devbox.yaml
+```
 
-# 4. Send the comparison report to the devbox. No GPU, no training.
+**Show the comparison report** (the charts from the talk). This does not train, so it takes about a minute and needs no GPU setup:
+
+```
 flyte -c .flyte/devbox.yaml run --copy-style all workflow.py main
 ```
 
-**What you will see:** step 4 prints a link to the run. Open it in your Windows browser, or go to http://localhost:30080/v2 and click the newest run. The run takes about a minute. When the run finishes, open its **Reports** tab for the "Why fine-tune?" charts. The tree of steps on the left shows one step per finished run, each with its inputs and outputs. `main` reads the results bundled with the repo (`report_snapshot.py`), so it works without any checkpoints.
+It prints a link. Open it and click the **Reports** tab. The steps on the left show one step per finished run, each with its inputs and outputs. `main` reads the results bundled with the repo (`report_snapshot.py`), so it works without any checkpoints.
 
-**Training on the GPU inside the devbox** is the advanced path. Kubernetes in the devbox cannot see a WSL GPU, so GPU tasks use a PodTemplate that mounts it. The first GPU run also builds the full training image (PyTorch plus the Mamba kernels), which takes a long time.
+**Train on the GPU and watch the training curve.** Kubernetes inside the devbox cannot see a WSL GPU on its own, so this needs the devbox started with `--gpu` and a PodTemplate that mounts the GPU. The first GPU run also builds the full training image (PyTorch plus the Mamba kernels), which takes a long time.
 
 ```
 cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
 source .venv/bin/activate
-flyte start devbox --gpu      # instead of step 1 above
+flyte start devbox --gpu      # instead of plain `flyte start devbox`
 docker cp devbox/wsl-gpu-podtemplate.yaml flyte-devbox:/tmp/
 docker exec flyte-devbox kubectl apply -f /tmp/wsl-gpu-podtemplate.yaml
 FLYTE_WSL_GPU=1 flyte -c .flyte/devbox.yaml run --copy-style all workflow.py train_one \
     --model_key roberta-base --method lora --seed 5768
 ```
 
-The run's **Training** report tab redraws the validation curve after every epoch. `FLYTE_WSL_GPU=1` tells `flyte_env.py` to use the PodTemplate. Flyte bundles only git-tracked files, so `git add` any new files before a devbox run.
+Open the printed link; the run's **Training** tab redraws the validation curve after every epoch. `FLYTE_WSL_GPU=1` tells `flyte_env.py` to use the PodTemplate. Flyte bundles only git-tracked files, so `git add` any new files before a devbox run.
 
 **When you are done:** `flyte stop devbox`.
 
