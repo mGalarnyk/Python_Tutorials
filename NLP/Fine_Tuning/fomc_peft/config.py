@@ -13,6 +13,10 @@ DEFAULT_SEED = 5768
 DEFAULT_SPLIT = "lab-manual-split-combine"
 PAPER_SEEDS = (5768, 78516, 944601)
 
+# The run whose labels the Flyte report shows for the example sentences: the
+# talk's best method (Nemotron 3 Nano 4B + LoRA, 0.727 3-seed mean), best seed.
+TALK_MODEL = ("nemotron-nano-4b", "lora")
+
 # Their training loop: max 100 epochs, stop after 7 epochs with no 1e-2 gain.
 MAX_EPOCHS = 100
 EARLY_STOPPING_PATIENCE = 7

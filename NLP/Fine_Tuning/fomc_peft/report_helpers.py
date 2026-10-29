@@ -28,7 +28,7 @@ HOUSEHOLD = {
 }
 
 # Fallback if a checkpoint is not on disk (e.g. a slim UI republish).
-# Seed 944601 RoBERTa-large LoRA on this Mac. Third line is the teaching beat:
+# From an earlier RoBERTa-large LoRA run. Third line is the teaching beat:
 # a bland activity sentence still comes out hawkish.
 EXAMPLE_READS = (
     {
@@ -246,24 +246,32 @@ def persist_talk_reads(result: dict, reads: list[dict]) -> None:
 
 
 def load_talk_reads(reads: list[dict] | None = None) -> tuple[list[dict], str]:
-    """Prefer this-run reads, then a checkpoint talk_reads.json, then the snapshot."""
+    """Prefer this-run reads, then a checkpoint talk_reads.json, then the snapshot.
+
+    Among checkpoints, the talk's model and method (cfg.TALK_MODEL) win; its
+    best seed by test F1 is used. Other runs are only a fallback.
+    """
     if reads:
         return _class_only(reads), ""
-    best: tuple[float, dict] | None = None
+    best: tuple[bool, float, dict] | None = None
     if cfg.CHECKPOINTS_DIR.exists():
         for path in cfg.CHECKPOINTS_DIR.glob("*/talk_reads.json"):
             if not cfg.is_tracked_run_dir(path.parent.name):
                 continue
             metrics = path.parent / "metrics.json"
             f1 = -1.0
+            is_talk_model = False
             if metrics.exists():
-                test = json.loads(metrics.read_text()).get("test") or {}
+                m = json.loads(metrics.read_text())
+                is_talk_model = (m.get("model"), m.get("method")) == cfg.TALK_MODEL
+                test = m.get("test") or {}
                 if test.get("weighted_f1") is not None:
                     f1 = float(test["weighted_f1"])
             payload = json.loads(path.read_text())
-            if best is None or f1 > best[0]:
-                best = (f1, payload)
+            if best is None or (is_talk_model, f1) > best[:2]:
+                best = (is_talk_model, f1, payload)
     if best:
+        best = (best[1], best[2])
         return _class_only(best[1].get("reads")), str(best[1].get("source") or "")
     snap = {}
     if SNAPSHOT_JSON.exists():
@@ -632,7 +640,7 @@ def reads_from_predict(rows: list[dict]) -> list[dict]:
 
 def source_label(result: dict | None) -> str:
     if not result:
-        return "RoBERTa-large LoRA, seed 944601"
+        return f"{cfg.TALK_MODEL[0]} {cfg.TALK_MODEL[1]}"
     return (
         f"{result.get('model', '?')} {result.get('method', '?')}, "
         f"seed {result.get('seed', '?')}"

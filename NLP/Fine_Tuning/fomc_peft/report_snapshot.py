@@ -3,7 +3,7 @@ import json
 
 SNAPSHOT = json.loads(r"""
 {
-  "updated": "2026-10-28 22:47 UTC",
+  "updated": "2026-10-29 00:32 UTC",
   "runs": [
     {
       "model": "nemotron-nano-4b",
@@ -523,6 +523,6 @@ SNAPSHOT = json.loads(r"""
       "for_you": "Rates likely go up. A new mortgage or a refinance gets more expensive."
     }
   ],
-  "talk_source": "roberta-large full, seed 944601"
+  "talk_source": "nemotron-nano-4b lora, seed 78516"
 }
 """)
