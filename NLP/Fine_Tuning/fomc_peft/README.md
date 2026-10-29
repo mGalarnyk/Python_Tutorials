@@ -38,25 +38,25 @@ The running example is a financial markets task from [Trillion Dollar Words](htt
   <tr>
     <td width="50%" valign="top">
       <a href="./fomc_roberta_finetune.ipynb"><img src="./images/slides/slide27_worked_example.png" width="420" alt="Talk slide: worked example, classify Fed (FOMC) sentences as hawkish, dovish, or neutral with three models on one laptop GPU"></a><br>
-      <b>2. <a href="./fomc_roberta_finetune.ipynb">The task and the notebook</a></b>
-      <p>Load the paper's train and test splits, train the comparison grid, and classify new sentences with a finished checkpoint.</p>
+      <b>2. <a href="./fomc_roberta_finetune.ipynb">The notebook: a tour of the results</a></b>
+      <p>Start here. It walks through the task and the results of all 33 runs, which are saved in the repo, so nothing long reruns. It also fine-tunes one small model live (about 1.5 minutes on a GPU) so you see training happen, and labels sentences you write.</p>
     </td>
     <td width="50%" valign="top">
       <a href="./train_run.py"><img src="./images/slides/slide15_full_lora_qlora.png" width="420" alt="Talk slide: full fine-tuning vs LoRA vs QLoRA. On Nemotron 4B, LoRA pulls peak training memory from about 38 GB to 9 GB, and QLoRA to 5.4 GB"></a><br>
-      <b>3. <a href="./train_run.py">Full fine-tuning vs LoRA vs QLoRA</a></b>
-      <p>One training script for all three methods plus a no-fine-tuning baseline. Nemotron is scored as a classifier on the logits of three label words (<a href="./causal_cls.py">causal_cls.py</a>).</p>
+      <b>3. <a href="./train_run.py">How each run was trained</a></b><br><sub><a href="#running-from-the-command-line">Commands</a></sub>
+      <p>The training code behind the results. One script trains any of the three models with full fine-tuning, LoRA, or QLoRA, or scores it with no fine-tuning. Open this to see how LoRA and QLoRA are set up, or to rerun a single result.</p>
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
       <a href="./workflow.py"><img src="./images/slides/slide30_flyte.png" width="420" alt="Talk slide: Flyte, 33 runs as one pipeline, with the Flyte UI report comparing each model before and after QLoRA"></a><br>
-      <b>4. <a href="./workflow.py">One Flyte pipeline for 33 runs</a></b><br><sub><a href="#running-the-flyte-pipeline">How to run it</a></sub>
-      <p>Data prep is cached, a GPU task that fails retries from its last epoch, and every stage writes its own report, from the label mix to live training curves. A release step waits for approval before merging the adapter.</p>
+      <b>4. <a href="./workflow.py">Running all 33 with Flyte</a></b><br><sub><a href="#running-the-flyte-pipeline">How to run it</a></sub>
+      <p>Why it is here: 33 training runs by hand turn into a pile of scripts. One Flyte pipeline runs them all, skips runs that already finished, retries a failed run from its last epoch, and gives each step a report in a web UI (the charts on the slide). Open this to rerun the whole experiment or to see how Flyte reports are made.</p>
     </td>
     <td width="50%" valign="top">
       <a href="./serve_vllm.py"><img src="./images/slides/slide31_vllm_serving.png" width="420" alt="Talk slide: serving the adapter with vLLM on the FP8 base, 0.725 F1, 5.2 GB, about 100 sentences per second"></a><br>
-      <b>5. <a href="./serve_vllm.py">Serving with vLLM</a></b><br><sub><a href="#serving-with-vllm">How to run it</a></sub>
-      <p>Merge the adapter into the base model and serve it behind an OpenAI-compatible API. The LoRA adapter trained on the laptop also works on NVIDIA's FP8 Nemotron: F1 0.725, 5.2 GB of weights, about 100 sentences per second (<a href="./bench_inference.py">bench_inference.py</a>).</p>
+      <b>5. <a href="./serve_vllm.py">Using the model in an app (vLLM)</a></b><br><sub><a href="#serving-with-vllm">How to run it</a></sub>
+      <p>Why it is here: after training, the model has to answer requests. vLLM serves it behind the same API as OpenAI, so existing code can call it. The adapter trained on the laptop also runs on NVIDIA's smaller FP8 version of Nemotron: F1 0.725, 5.2 GB of GPU memory, about 100 sentences per second.</p>
     </td>
   </tr>
 </table>
