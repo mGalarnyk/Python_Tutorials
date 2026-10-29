@@ -185,35 +185,25 @@ flyte run --local workflow.py release    # asks y/n in the terminal
 
 #### On a devbox, with the reports in your browser
 
-Open Docker Desktop (with Settings > Resources > WSL integration turned on), then run these in order in the Ubuntu (WSL) terminal:
+Open Docker Desktop (with Settings > Resources > WSL integration turned on), then run this in the Ubuntu (WSL) terminal:
 
 ```
-# 1. Go to the folder
+bash ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft/show_reports.sh
+```
+
+It starts a Flyte devbox (or reuses the one already running), waits until it is ready, and runs the comparison report. That takes about a minute, or about two the first time. Open the link it prints and click **Reports**. When you are done: `flyte stop devbox`.
+
+To train on the GPU on the devbox and watch the training curve instead (not yet tested on the laptop; the first run builds a large image), run these after `show_reports.sh` has started the devbox once:
+
+```
 cd ~/projects/Python_Tutorials/NLP/Fine_Tuning/fomc_peft
 source .venv/bin/activate
-
-# 2. Start the devbox and wait until it is ready
-flyte start devbox
-docker exec flyte-devbox kubectl -n flyte wait --for=condition=ready pod -l app.kubernetes.io/name=rustfs --timeout=300s
-mkdir -p .flyte && flyte create config --devbox -o .flyte/devbox.yaml
-
-# 3. Run the comparison report (no training, about a minute)
-flyte -c .flyte/devbox.yaml run --copy-style all workflow.py main
-```
-
-Open the link it prints and click **Reports**. When you are done: `flyte stop devbox`.
-
-To train on the GPU instead and watch the training curve, change step 2 and step 3 to this (not yet tested on the laptop; the first run builds a large image):
-
-```
-# 2. Start the devbox with the GPU
-flyte start devbox --gpu
-docker exec flyte-devbox kubectl -n flyte wait --for=condition=ready pod -l app.kubernetes.io/name=rustfs --timeout=300s
-mkdir -p .flyte && flyte create config --devbox -o .flyte/devbox.yaml
+# Restart the devbox with the GPU, and let GPU tasks use it
+flyte stop devbox && docker rm -f flyte-devbox && flyte start devbox --gpu
 docker cp devbox/wsl-gpu-podtemplate.yaml flyte-devbox:/tmp/
 docker exec flyte-devbox kubectl apply -f /tmp/wsl-gpu-podtemplate.yaml
 
-# 3. Train one model; its Training tab redraws after every epoch
+# Train one model; its Training tab redraws after every epoch
 FLYTE_WSL_GPU=1 flyte -c .flyte/devbox.yaml run --copy-style all workflow.py train_one \
     --model_key roberta-base --method lora --seed 5768
 ```
@@ -276,6 +266,7 @@ paper_baselines.py            the paper's published numbers
 run_grid.py                   runs many cells, writes outputs/grid_*.csv
 run_parallel.py               one process per GPU for unfinished cells (multi-GPU nodes)
 run_fomc.sh                   shell entry point (sets up Mamba kernels)
+show_reports.sh               starts a Flyte devbox and runs the comparison report
 build_mamba_kernels.sh        builds causal-conv1d (fast Nemotron training)
 patch_mamba_ssm.py            makes mamba-ssm importable without its CUDA build
 report_stages.py              HTML report for each pipeline stage
