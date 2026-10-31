@@ -5,8 +5,8 @@ Useful Python and Machine Learning Tutorials. Feel free to submit a pull request
 ## Apis
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
-Fitbit API Tutorial | [Blog Post](https://towardsdatascience.com/using-the-fitbit-web-api-with-python-f29f119621ea) | None
-Twitter API Tutorial | [Blog Post](https://towardsdatascience.com/how-to-access-data-from-the-twitter-api-using-tweepy-python-e2d9e4d54978) | None
+Fitbit API Tutorial | [Blog Post](https://medium.com/data-science/using-the-fitbit-web-api-with-python-f29f119621ea) | None
+Twitter API Tutorial | [Blog Post](https://medium.com/data-science/how-to-access-data-from-the-twitter-api-using-tweepy-python-e2d9e4d54978) | None
 
 ## Basics 
 What is it? | Blog Post/IPython Notebook | Youtube Video
@@ -23,7 +23,7 @@ What is it? | Blog Post/IPython Notebook | Youtube Video
 10: Dictionaries + Dictionary Manipulation | [10: Dictionaries + Dictionary Manipulation](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsDictionaries.ipynb) | [10: Dictionaries + Dictionary Manipulation](https://www.youtube.com/watch?v=LlIqrWJaBcQ)
 11: Word Count (PunctuationFilter out , Dictionary Manipulation, and Sorting Lists)  | [11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Python_Basics/Intro/PythonBasicsWordCount.ipynb) | [11: Word Count (Filter out Punctuation, Dictionary Manipulation, and Sorting Lists)](https://www.youtube.com/watch?v=l_dIleafLZ8)
 12: While Loops and Prime Numbers | None | [12: While Loops and Prime Numbers](https://youtu.be/apEjxRmIp0I)
-13: Python Sets and Set Theory | [Python Sets and Set Theory](https://towardsdatascience.com/python-sets-and-set-theory-2ace093d1607) | [Python Sets and Set Theory](https://youtu.be/hZPNPh5Zg3M)
+13: Python Sets and Set Theory | [Python Sets and Set Theory](https://medium.com/data-science/python-sets-and-set-theory-2ace093d1607) | [Python Sets and Set Theory](https://youtu.be/hZPNPh5Zg3M)
 Anagrams | [Using Python to Detect Anagrams](https://medium.com/@GalarnykMichael/using-python-to-detect-anagrams-a002ddedb4cb) | None
 Prime Numbers | [Prime Numbers](https://medium.com/@GalarnykMichael/prime-numbers-using-python-824ff4b3ea19) | None
 Solving System of Equations | [Solving System of Equations](https://medium.com/@GalarnykMichael/solving-system-of-linear-equations-using-python-645ad1904cec#.z6lw1zyw6) | [Solving System of Equations](https://www.youtube.com/watch?v=AqIrdW2-K6k&)
@@ -58,7 +58,7 @@ Time Series Part 2  | [Time Series Data Basics with Pandas Part 2](https://githu
 ## Parallel and Distributed Python
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
-Common options for Parallelizing Python Code | [Blog Post](https://towardsdatascience.com/parallelizing-python-code-3eb3c8e5f9cd) | None
+Common options for Parallelizing Python Code | [Blog Post](https://medium.com/data-science/parallelizing-python-code-3eb3c8e5f9cd) | None
 Writing your First Distributed Python Application with Ray | [Blog Post](https://medium.com/data-science/writing-your-first-distributed-python-application-with-ray-4248ebc07f41) | None
 
 ## PyTorch
@@ -71,7 +71,7 @@ Getting Started With Ray Lightning: Easy Multi-Node PyTorch Lightning Training |
 ## Reinforcement Learning
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
 --- | --- | ---
-An Introduction to Reinforcement Learning with OpenAI Gym, RLlib, and Google Colab | [Blog Post](https://towardsdatascience.com/an-introduction-to-reinforcement-learning-with-openai-gym-rllib-and-google-colab-48fc1ddfb889) | None
+An Introduction to Reinforcement Learning with OpenAI Gym, RLlib, and Google Colab | [Blog Post](https://medium.com/data-science/an-introduction-to-reinforcement-learning-with-openai-gym-rllib-and-google-colab-48fc1ddfb889) | None
 
 ## Scrapy
 What is it? | Blog Post | Youtube Video
@@ -81,7 +81,7 @@ Scraping Fundrazr (GoFundMe/Kickstarter like Website) | [Step by Step Instructio
 ## Sklearn (Scikit-Learn)
 What is it? | Blog Post/IPython Notebook | Youtube Video
 --- | --- | ---
-Decision Trees (Classification) | [Decision Trees (Classification)](https://towardsdatascience.com/understanding-decision-trees-for-classification-python-9663d683c952) | [Understanding Decision Trees using Python (scikit-learn)](https://youtu.be/yi7KsXtaOCo)
+Decision Trees (Classification) | [Decision Trees (Classification)](https://medium.com/data-science/understanding-decision-trees-for-classification-python-9663d683c952)| [Understanding Decision Trees using Python (scikit-learn)](https://youtu.be/yi7KsXtaOCo)
 K-Means Clustering | [Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/KMeans/KMeans.ipynb) | [Video](https://youtu.be/VfC6xta9PFk?si=DGUGuaRTKoEkCoSC)
 Hierarchical clustering  | [Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/HierarchicalClustering/HierarchicalClustering.ipynb) | [Video](https://youtu.be/PLahk7WczWc?si=OkPjwgY6zmhuVRRJ)
 How to Speed up Scikit-Learn Model Training | [Blog](https://medium.com/distributed-computing-with-ray/how-to-speed-up-scikit-learn-model-training-aaf17e2d1e1) | [Video](https://youtu.be/gj4ekRfOB20?si=KaUpt6ufXwVkuPBq)
@@ -92,7 +92,7 @@ Logistic Regression | [Digits](https://github.com/mGalarnyk/Python_Tutorials/blo
 Principal Component Analysis | [PCA Using Python: A Tutorial](https://builtin.com/machine-learning/pca-in-python) | [PCA using Python](https://www.youtube.com/watch?v=kApPBm1YsqU)
 Random Forest | [Blog](https://towardsdatascience.com/understanding-random-forest-using-python-scikit-learn/) / [Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/CART/Random_Forest/RandomForestUsingPython.ipynb) | [Understanding Random Forests using Python (scikit-learn)](https://youtu.be/R9tJeEgHyeo?si=PJVymdZ55WAoxIhG)
 Train Test Split (Scikit-Learn + Python) | [Understanding Train Test Split (Scikit-Learn + Python)](https://builtin.com/data-science/train-test-split) / [Train Test Split using Python (Scikit-Learn)](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Sklearn/Train_Test_Split/02_04_Train_Test_Split.ipynb)| [Train Test Split using Python (Scikit-Learn)](https://youtu.be/rCevxk3jeKs)
-Visualizing Decision Trees with Python (Scikit-learn, Graphviz, Matplotlib) | [Visualizing Decision Trees](https://towardsdatascience.com/visualizing-decision-trees-with-python-scikit-learn-graphviz-matplotlib-1c50b4aa68dc) | None
+Visualizing Decision Trees with Python (Scikit-learn, Graphviz, Matplotlib) | [Visualizing Decision Trees](https://medium.com/data-science/visualizing-decision-trees-with-python-scikit-learn-graphviz-matplotlib-1c50b4aa68dc) | None
 
 ## Spark (Python)
 Tutorial | IPython Notebook | Youtube Video
@@ -105,7 +105,7 @@ What is it? | Blog Post/Jupyter Notebook | Youtube Video
 68-95-99.7 rule for a Normal Distribution | [Blog Post](https://builtin.com/data-science/empirical-rule)/[Jupyter Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Statistics/normal_Distribution_Area_Under_Curve.ipynb) | None
 Confidence Intervals | Coming Soon | Coming Soon
 Understanding Boxplots | [Blog Post](https://builtin.com/data-science/boxplot) | None
-Understanding Sampling With and Without Replacement (Python) | [Blog Post](https://towardsdatascience.com/understanding-sampling-with-and-without-replacement-python-7aff8f47ebe4)/[Jupyter Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Statistics/Sample_With_Replacement/SampleWithReplacement.ipynb) | None
+Understanding Sampling With and Without Replacement (Python) | [Blog Post](https://medium.com/data-science/understanding-sampling-with-and-without-replacement-python-7aff8f47ebe4)/[Jupyter Notebook](https://github.com/mGalarnyk/Python_Tutorials/blob/master/Statistics/Sample_With_Replacement/SampleWithReplacement.ipynb) | None
 
 ## Synthetic Data
 What is it? | Blog Post/Jupyter Notebook | Youtube Video
@@ -121,7 +121,6 @@ Data Visualization with Matplotlib and Seaborn | [Data Visualization with Matplo
 ## Other Python Resources
 What is it? | Repo/Website | Youtube Video
 --- | --- | ---
-Course | [Python for Data Visualization LinkedIn Learning](https://www.linkedin.com/learning/python-for-data-visualization/effectively-present-data-with-python) | [Free Preview Video](https://youtu.be/BE8CVGJuftI)
 Installations (Anaconda, Spark Etc) | [General Installations](https://github.com/mGalarnyk/Installations_Mac_Ubuntu_Windows "Python Installations") | See the link for more installations. 
 
 ## Contributors
