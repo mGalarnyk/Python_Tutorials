@@ -59,6 +59,14 @@ The running example is a financial markets task from [Trillion Dollar Words](htt
       <p>Why it is here: after training, the model has to answer requests. vLLM serves it behind the same API as OpenAI, so existing code can call it. The adapter trained on the laptop also runs on NVIDIA's smaller FP8 version of Nemotron: F1 0.725, 5.2 GB of GPU memory, about 100 sentences per second.</p>
     </td>
   </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <a href="./slides/presentation_model_customization.pdf"><img src="./images/slides/slide14_results_prompt_finetune.png" width="420" alt="Talk slide: results on the FOMC task with Nemotron 3 Nano 4B. Off-the-shelf 0.516, plus the paper's labeling guide 0.588, plus 6 examples chosen by prompt optimization 0.637, plus LoRA 0.748 test weighted F1"></a><br>
+      <b>6. <a href="./slides/presentation_model_customization.pdf">GEPA and prompt optimization</a></b><br><sub><a href="./slides/presentation_model_customization.pdf">PDF</a> · <a href="./slides/presentation_model_customization.pptx">PowerPoint</a></sub>
+      <p>The follow-up talk, from the AWS &amp; NVIDIA model customization workshop (November 10, 2026). Same task and model, before any training: the paper's own labeling guide in the prompt, few-shot examples, and GEPA, a prompt optimizer where the model reads its mistakes and rewrites its prompt. Then LoRA and RL (GRPO) on top. Paper's prompt 0.516 → better prompt 0.637 → plus LoRA 0.748.</p>
+    </td>
+    <td width="50%" valign="top"></td>
+  </tr>
 </table>
 
 ## Results
